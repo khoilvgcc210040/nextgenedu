@@ -1,0 +1,114 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+    body, html {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        font-family: "Montserrat", sans-serif;
+        overflow: hidden;
+    }
+
+    .navbar-expand-lg .navbar-nav .nav-link {
+        border-radius: var(--border-radius-large);
+        margin: 10px;
+        padding: 10px;
+        color: #000;
+        font-weight: 700;
+    }
+    
+    .navbar {
+        background: #ffffff;
+        border-bottom: 1px solid rgba(128, 208, 199, 0.35);
+        z-index: 9;
+    }
+
+    .navbar {
+        background-color: blue;
+    }
+</style>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="{% url "home" %}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-backpack3" viewBox="0 0 16 20">
+                    <path d="M4.04 7.43a4 4 0 0 1 7.92 0 .5.5 0 1 1-.99.14 3 3 0 0 0-5.94 0 .5.5 0 1 1-.99-.14M4 9.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.5.5h-7a.5.5 0 0 1-.5-.5zm1 .5v3h6v-3h-1v.5a.5.5 0 0 1-1 0V10z"/>
+                    <path d="M6 2.341V2a2 2 0 1 1 4 0v.341c.465.165.904.385 1.308.653l.416-1.247a1 1 0 0 1 1.748-.284l.77 1.027a1 1 0 0 1 .15.917l-.803 2.407C13.854 6.49 14 7.229 14 8v5.5a2.5 2.5 0 0 1-2.5 2.5h-7A2.5 2.5 0 0 1 2 13.5V8c0-.771.146-1.509.41-2.186l-.802-2.407a1 1 0 0 1 .15-.917l.77-1.027a1 1 0 0 1 1.748.284l.416 1.247A6 6 0 0 1 6 2.34ZM7 2v.083a6 6 0 0 1 2 0V2a1 1 0 1 0-2 0m5.941 2.595.502-1.505-.77-1.027-.532 1.595q.447.427.8.937M3.86 3.658l-.532-1.595-.77 1.027.502 1.505q.352-.51.8-.937M8 3a5 5 0 0 0-5 5v5.5A1.5 1.5 0 0 0 4.5 15h7a1.5 1.5 0 0 0 1.5-1.5V8a5 5 0 0 0-5-5"/>
+                </svg>
+                <span>Edulogy</span>
+            </a>
+
+            <div class="d-lg-none ms-auto me-4">
+                <a href="#top" class="navbar-icon bi-person smoothscroll"></a>
+            </div>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-lg-5 me-lg-auto">
+                    <li class="nav-item">
+                        <a class="nav-link click-scroll" href="{% url "home" %}">Home</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link click-scroll" href="{% url "subjects" %}">Subjects</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link click-scroll" href="index.html#section_3">How it works</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link click-scroll" href="index.html#section_4">FAQs</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link click-scroll" href="index.html#section_5">Contact</a>
+                    </li>
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#section_5" id="navbarLightDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">Pages</a>
+
+                        <ul class="dropdown-menu dropdown-menu-light" aria-labelledby="navbarLightDropdownMenuLink">
+                            <li><a class="dropdown-item" href="topics-listing.html">Topics Listing</a></li>
+
+                            <li><a class="dropdown-item active" href="contact.html">Contact Form</a></li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <div class="d-none d-lg-block">
+                    <a href="#top" class="navbar-icon bi-person smoothscroll"></a>
+                </div>
+            </div>
+        </div>
+    </nav>
+        <div id="auth-section">
+            <!-- Nếu chưa đăng nhập -->
+            {% if not user.is_authenticated %}
+                <div id="not-logged-in">
+                    <h2>Welcome to Our Website</h2>
+                    <a href="{% url "auth" %}?form=signup" class="btn btn-primary">Sign Up</a>
+                    <a href="{% url "auth" %}?form=login" class="btn btn-success">Login</a>
+                </div>
+            <!-- Nếu đã đăng nhập -->
+            {% else %}
+                <div id="logged-in">
+                    <h2>Welcome Back, {{ user.username }}!</h2>
+                    <a href="{% url 'logout' %}" class="btn btn-danger">Logout</a>
+                </div>
+            {% endif %}
+        </div>
+</body>
+</html>

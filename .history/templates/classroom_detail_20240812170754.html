@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classroom Detail</title>
+    <style>
+
+        .sidebar {
+            background-color: {{ classroom.subject.bg_color }};
+            padding: 30px 20px 100px 20px;
+            min-height: 100%;
+            position: fixed;
+            left: 0;
+            width: 250px;
+            transition: transform 0.3s ease-in-out;
+            transform: translateX(0);
+            z-index: 1000;
+            max-height: 200px;
+            overflow-y: scroll;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .sidebar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .sidebar.collapsed {
+            transform: translateX(-250px);
+        }
+
+        .content-area {
+            height: 100%;
+            margin-left: 250px;
+            padding: 20px 40px;
+            transition: margin-left 0.3s ease-in-out;
+        }
+
+        .content-area.expanded {
+            margin-left: 30px;
+        }
+
+        .btn-toggle-sidebar {
+            position: fixed;
+            left: 270px;
+            transform: translateX(-100%);
+            transition: left 0.3s ease-in-out;
+            background-color: #fff;
+            border: 2px solid #000;
+            border-radius: 50%;
+            height: 40px;
+            width: 40px;
+            font-size: 25px;
+            z-index: 1100;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .sidebar.collapsed + .btn-toggle-sidebar {
+            left: 50px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-settings, .btn-favorite {
+            background: none;
+            border: none;
+            color: #000;
+            font-size: 20px;
+        }
+
+        .comment-box {
+            margin-top: 30px;
+        }
+
+        .rating-stars {
+            font-size: 20px;
+        }
+
+        .comment {
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+        }
+
+        .content-section {
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        .nav-item .nav-link{
+            border-bottom: 2px solid #000;
+            color: #000;
+            font-weight: 500;
+            padding: 0.7rem 0.3rem;
+        }
+
+        .submenu .nav-item .nav-link{
+            border-bottom: 2px solid #000;
+            color: #000;
+            font-weight: 500;
+            margin-left: 2rem;
+            padding: 0.7rem 0;
+        }
+
+        .header{
+            border-bottom: 2px solid #000;
+        }
+    </style>
+</head>
+<body style="padding: 80px 0;">
+    {% include "header.html" %}
+    
+    <div class="sidebar">
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a id="welcome-link" class="nav-link active" href="#">Welcome</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link toggle-link" href="#">Title <i class="fas fa-caret-down"></i></a>
+                <ul class="nav flex-column submenu" style="display: none;">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-content="title-content">Sub-item 1</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-content="title-content">Sub-item 2</a>
+                    </li>
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link toggle-link" href="#">Sub-title <i class="fas fa-caret-down"></i></a>
+                <ul class="nav flex-column submenu" style="display: none;">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-content="subtitle-content">Sub-item 1</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-content="subtitle-content">Sub-item 2</a>
+                    </li>
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link toggle-link" href="#">Sub-title <i class="fas fa-caret-down"></i></a>
+                <ul class="nav flex-column submenu" style="display: none;">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-content="subtitle-content">Sub-item 1</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-content="subtitle-content">Sub-item 2</a>
+                    </li>
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link toggle-link" href="#">Sub-title <i class="fas fa-caret-down"></i></a>
+                <ul class="nav flex-column submenu" style="display: none;">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-content="subtitle-content">Sub-item 1</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-content="subtitle-content">Sub-item 2</a>
+                    </li>
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link toggle-link" href="#">Sub-title <i class="fas fa-caret-down"></i></a>
+                <ul class="nav flex-column submenu" style="display: none;">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-content="subtitle-content">Sub-item 1</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-content="subtitle-content">Sub-item 2</a>
+                    </li>
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link toggle-link" href="#">Sub-title <i class="fas fa-caret-down"></i></a>
+                <ul class="nav flex-column submenu" style="display: none;">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-content="subtitle-content">Sub-item 1</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-content="subtitle-content">Sub-item 2</a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+    <button class="btn-toggle-sidebar">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <div class="content-area">
+        <div id="welcome-content" class="content-section active">
+            <div class="header">
+                <h1 style="font-weight: 700;">Welcome</h1>
+                <div>
+                    <button onclick="window.location.href='{% url 'classrooms' subject_id=classroom.subject.id grade=classroom.grade %}'" class="btn btn-outline-primary">
+                        Back
+                    </button>
+                </div>
+                <div>
+                    <div class="btn-group">
+                        <button class="btn-settings" id="settingsDropdown" aria-expanded="false">
+                            <i class="fas fa-cog"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-light" aria-labelledby="settingsDropdown">
+                            <li><a class="dropdown-item" href="#">Setting 1</a></li>
+                            <li><a class="dropdown-item" href="#">Setting 2</a></li>
+                            <li><a class="dropdown-item" href="#">Setting 3</a></li>
+                        </ul>
+                    </div>
+                    
+                    <button class="btn-favorite"><i class="fas fa-heart"></i></button>
+                </div>
+            </div>
+            <p><strong>Subject:</strong> {{ classroom.subject.name }}</p>
+            <p><strong>Grade:</strong> {{ classroom.grade }}</p>
+            <p><strong>Description:</strong> {{ classroom.description }}</p>
+            <p><strong>School:</strong> {{ classroom.school }}</p>
+            <p><strong>Status:</strong> {{ classroom.status|yesno:"Active,Inactive" }}</p>
+            <p><strong>Participants:</strong> {{ classroom.participants }}</p>
+            <p><strong>Likes:</strong> {{ classroom.likes }}</p>
+            <p><strong>Created at:</strong> {{ classroom.created_at|date:"F d, Y" }}</p>
+            <button class="btn btn-outline-secondary">Participants and Scores</button>
+        </div>
+
+        <div id="title-content" class="content-section">
+            <div class="header">
+                <h1>Title</h1>
+                <div>
+                    <button class="btn-settings"><i class="fas fa-cog"></i></button>
+                    <button class="btn-favorite"><i class="fas fa-heart"></i></button>
+                </div>
+            </div>
+            <p>
+                This is the title content area. You can place title-related content here...
+            </p>
+        </div>
+
+        <div id="subtitle-content" class="content-section">
+            <div class="header">
+                <h1>Sub-title</h1>
+                <div>
+                    <button class="btn-settings"><i class="fas fa-cog"></i></button>
+                    <button class="btn-favorite"><i class="fas fa-heart"></i></button>
+                </div>
+            </div>
+            <p>
+                This is the sub-title content area. You can place sub-title-related content here...
+            </p>
+        </div>
+    </div>
+
+    <!-- FontAwesome Icons -->
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const sidebar = document.querySelector('.sidebar');
+            const contentArea = document.querySelector('.content-area');
+            const toggleButton = document.querySelector('.btn-toggle-sidebar');
+
+            toggleButton.addEventListener('click', function () {
+                sidebar.classList.toggle('collapsed');
+                contentArea.classList.toggle('expanded');
+            });
+
+            const toggleLinks = document.querySelectorAll('.toggle-link');
+            toggleLinks.forEach(link => {
+                link.addEventListener('click', function (event) {
+                    event.preventDefault(); 
+                    let submenu = this.nextElementSibling;
+                    let icon = this.querySelector('i');  
+                    if (submenu.style.display === 'none' || submenu.style.display === '') {
+                        submenu.style.display = 'block'; 
+                        icon.classList.remove('fa-caret-down');
+                        icon.classList.add('fa-caret-up'); 
+                    } else {
+                        submenu.style.display = 'none';
+                        icon.classList.remove('fa-caret-up');
+                        icon.classList.add('fa-caret-down');
+                    }
+                });
+            });
+
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(event) {
+                    event.preventDefault();
+
+                    document.querySelectorAll('.content-section').forEach(section => section.classList.remove('active'));
+                    document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+
+                    this.classList.add('active');
+                    const contentId = this.dataset.content || this.id.replace('-link', '-content');
+                    document.getElementById(contentId).classList.add('active');
+                });
+            });
+        });
+    </script>
+</body>
+</html>

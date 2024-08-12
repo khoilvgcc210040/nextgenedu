@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classroom Details</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* CSS styles tương tự như đã mô tả trước đó */
+    </style>
+</head>
+<body>
+
+<div class="sidebar">
+    <h2>Classroom Navigation</h2>
+    <!-- Django loop to render titles and subtitles -->
+    {% for title in classroom_titles %}
+    <div class="menu-item" onclick="toggleSubmenu(this)">
+        {{ title.name }}
+        <div class="submenu">
+            {% for subtitle in title.subtitles %}
+            <div class="submenu-item" onclick="loadContent('{{ subtitle.url }}')">{{ subtitle.name }}</div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="content">
+    <!-- Hiển thị nội dung tùy theo trạng thái của phòng học -->
+    {% if classroom.status %}
+        <h1>This is a private classroom</h1>
+        <p>Content is not available for public view.</p>
+    {% else %}
+        <h1>{{ classroom.name }}</h1>
+        <p>{{ classroom.description }}</p>
+
+        <!-- Comments Section -->
+        <div class="comments">
+            <h2>Comments</h2>
+            <!-- Django loop to render comments -->
+            {% for comment in comments %}
+            <div class="comment-box">
+                <div class="comment-header">{{ comment.user.username }} - {{ comment.date }}</div>
+                <div class="comment-body">{{ comment.body }}</div>
+            </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+
+<script>
+    function toggleSubmenu(element) {
+        var submenu = element.querySelector('.submenu');
+        if (submenu.style.display === 'none' || submenu.style.display === '') {
+            submenu.style.display = 'block';
+        } else {
+            submenu.style.display = 'none';
+        }
+    }
+
+    function loadContent(url) {
+        // Logic to load content into the right pane dynamically
+        fetch(url)
+            .then(response => response.text())
+            .then(html => {
+                document.querySelector('.content').innerHTML = html;
+            });
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,193 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<style>
+  .explore-section {
+      padding: 100px 0;
+  }
+
+  .nav-tabs .subject-nav-link {
+      font-weight: bold;
+      font-size: 18px;
+      color: #6c757d;
+      border: none;
+      outline: none;
+      padding: 10px;
+  }
+
+  .nav-tabs .subject-nav-link.active {
+      color: #007bff;
+      border-bottom: 3px solid #007bff;
+      outline: none;
+  }
+
+  .nav-tabs .subject-nav-link:focus {
+    box-shadow: none; 
+    outline: none; 
+  }
+
+  .custom-block {
+      border-radius: 15px;
+      padding: 20px;
+      color: #fff;
+      transition: transform 0.5s ease;
+      height: 100%;
+  }
+
+  .custom-block:hover {
+      transform: translateY(-5px);
+  }
+
+  .custom-block h5 {
+      font-size: 20px;
+      font-weight: bold;
+      color: #000;
+  }
+
+  .badge.bg-design {
+      background-color: #00bfff;
+      font-size: 14px;
+      padding: 10px 15px;
+      margin: 0 auto;
+  }
+
+  .container-grade {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  hr {
+    border: 2px solid #007bff;
+    margin-bottom: 40px;
+  }
+
+  a {
+    text-decoration: none;
+  }
+
+  a:hover {
+      text-decoration: none;
+  }
+</style>
+<body>
+    {% include "header.html" %}
+
+    <section class="explore-section section-padding" id="section_2">
+      <img src="{% static 'subject-img1.jpg' %}" alt="Subjects Image" class="img-fluid" style="width: 90%; height: 500px; display: block; margin: 0 auto; border-radius: 15px;">
+      <p style="width: 90%; display: block; margin: 1rem auto 3rem auto; font-weight: 600; font-size: 16px; font-style: italic; text-align: justify;">
+        At NextGenEdu, we offer an extensive selection of subjects tailored to your interests and aspirations. Our dedicated educators and innovative curriculum ensure you receive a comprehensive education. Join our dynamic community, where personalized learning and collaboration pave the way for academic excellence and a successful future in your chosen field.
+      </p>
+      <div class="container">
+          <div class="row">
+              <div class="col-12 text-center">
+                  <h2 class="mb-4" style="font-weight: 600; text-transform: uppercase;">Subjects</h2>
+              </div>
+          </div>
+      </div>
+
+      <div class="container-fluid container-grade">
+          <div class="row">
+              <ul class="nav nav-tabs justify-content-center" id="myTab" role="tablist">
+                  <li class="nav-item" role="presentation">
+                      <button class="subject-nav-link active" id="design-tab" data-bs-toggle="tab" data-bs-target="#design-tab-pane" type="button" role="tab" aria-controls="design-tab-pane" aria-selected="true">Grade 10</button>
+                  </li>
+
+                  <li class="nav-item" role="presentation">
+                      <button class="subject-nav-link" id="marketing-tab" data-bs-toggle="tab" data-bs-target="#marketing-tab-pane" type="button" role="tab" aria-controls="marketing-tab-pane" aria-selected="false">Grade 11</button>
+                  </li>
+
+                  <li class="nav-item" role="presentation">
+                      <button class="subject-nav-link" id="finance-tab" data-bs-toggle="tab" data-bs-target="#finance-tab-pane" type="button" role="tab" aria-controls="finance-tab-pane" aria-selected="false">Grade 12</button>
+                  </li>
+              </ul>
+          </div>
+      </div>
+      <hr>
+      <div class="container">
+          <div class="tab-content" id="myTabContent">
+              <div class="tab-pane fade show active" id="design-tab-pane" role="tabpanel" aria-labelledby="design-tab" tabindex="0">
+                  <div class="row">
+                      {% for sub in subjects %}
+                          {% if sub.grade == 10 %}
+                              <div class="col-lg-3 col-md-6 col-12 mb-4" style="cursor: pointer; outline: none;" onclick="window.location.href='{% url 'classrooms' sub.id sub.grade %}'">
+                                  <div class="custom-block shadow-lg" style="background-color: {{sub.bg_color}};">
+                                      <a href="{% url 'classrooms' sub.id sub.grade %}">
+                                          <div class="d-flex align-items-start">
+                                              <div>
+                                                  <h5 class="mb-2">{{sub.name}}</h5>
+                                                  <p class="mb-0" style="font-size: 14px; color: #334155;">{{sub.description}}</p>
+                                              </div>
+                                              <span class="badge bg-design ms-auto">15</span>
+                                          </div>
+                                      </a>
+                                  </div>
+                              </div>
+                          {% endif %}
+                      {% endfor %}
+                  </div>
+              </div>
+
+              <div class="tab-pane fade" id="marketing-tab-pane" role="tabpanel" aria-labelledby="marketing-tab" tabindex="0">
+                  <div class="row">
+                      {% for sub in subjects %}
+                          {% if sub.grade == 11 %}
+                              <div class="col-lg-3 col-md-6 col-12 mb-4" style="cursor: pointer;" onclick="window.location.href='{% url 'classrooms' sub.id sub.grade %}'">
+                                  <div class="custom-block shadow-lg" style="background-color: {{sub.bg_color}};">
+                                      <a href="{% url 'classrooms' sub.id sub.grade %}">
+                                          <div class="d-flex align-items-start">
+                                              <div>
+                                                  <h5 class="mb-2">{{sub.name}}</h5>
+                                                  <p class="mb-0" style="font-size: 14px; color: #334155;">{{sub.description}}</p>
+                                              </div>
+                                              <span class="badge bg-design ms-auto">14</span>
+                                          </div>
+                                      </a>
+                                  </div>
+                              </div>
+                          {% endif %}
+                      {% endfor %}
+                  </div>
+              </div>
+
+              <div class="tab-pane fade" id="finance-tab-pane" role="tabpanel" aria-labelledby="finance-tab" tabindex="0">
+                  <div class="row">
+                      {% for sub in subjects %}
+                          {% if sub.grade == 12 %}
+                              <div class="col-lg-3 col-md-6 col-12 mb-4" style="cursor: pointer;" onclick="window.location.href='{% url 'classrooms' sub.id sub.grade %}'">
+                                  <div class="custom-block shadow-lg" style="background-color: {{sub.bg_color}};">
+                                      <a href="{% url 'classrooms' sub.id sub.grade %}">
+                                          <div class="d-flex align-items-start">
+                                              <div>
+                                                  <h5 class="mb-2">{{sub.name}}</h5>
+                                                  <p class="mb-0" style="font-size: 14px; color: #334155;">{{sub.description}}</p>
+                                              </div>
+                                              <span class="badge bg-design rounded-pill ms-auto">14</span>
+                                          </div>
+                                      </a>
+                                  </div>
+                              </div>
+                          {% endif %}
+                      {% endfor %}
+                  </div>
+              </div>
+          </div>
+      </div>
+  </section>
+  
+    
+
+    <!-- JAVASCRIPT FILES -->
+    <script src="{% static "js/jquery.min.js" %}"></script>
+    <script src="{% static "js/bootstrap.bundle.min.js" %}"></script>
+    {% comment %} <script src="{% static "js/jquery.sticky.js" %}"></script> {% endcomment %}
+    <script src="{% static "js/custom.js" %}"></script>
+</body>
+</html>

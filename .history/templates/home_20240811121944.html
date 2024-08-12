@@ -1,0 +1,156 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+    body, html {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        font-family: "Montserrat", sans-serif;
+        overflow: hidden;
+    }
+
+    .navbar-expand-lg .navbar-nav .nav-link {
+        border-radius: 10px;;
+        margin: 10px;
+        padding: 10px;
+        color: #000;
+        font-weight: 700;
+    }
+    
+    .navbar {
+        background: #ffffff;
+        border-bottom: 1px solid rgba(128, 208, 199, 0.35);
+        z-index: 9;
+    }
+
+    .navbar {
+        background-color: #fff;
+    }
+
+    .navbar .dropdown-menu {
+        background: #ffffff;
+        box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.175);
+        border: 0;
+        display: block;
+        opacity: 0;
+        min-width: 9rem;
+        margin-top: 20px;
+        padding: 13px 0 10px 0;
+        transition: all 0.3s;
+        pointer-events: none;
+      }
+      
+      .navbar .dropdown-menu::before {
+        content: "";
+        width: 0;
+        height: 0;
+        border-left: 20px solid transparent;
+        border-right: 20px solid transparent;
+        border-bottom: 15px solid #ffffff;
+        position: absolute;
+        top: -10px;
+        left: 10px;
+      }
+      
+      .navbar .dropdown-item {
+        display: inline-block;
+        color: #000;
+        font-family: "Montserrat", sans-serif;
+        font-size: 14px;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        position: relative;
+      }
+      
+      .navbar .dropdown-item.active,
+      .navbar .dropdown-item:active,
+      .navbar .dropdown-item:focus,
+      .navbar .dropdown-item:hover {
+        background: transparent;
+        color: #13547a;
+      }
+
+      .nav-item{
+        display: flex;
+        align-items: center;
+      }
+      
+      @media screen and (min-width: 992px) {
+        .navbar .dropdown:hover .dropdown-menu {
+          opacity: 1;
+          margin-top: 0;
+          pointer-events: auto;
+        }
+      }
+
+.group {
+ display: flex;
+ line-height: 28px;
+ align-items: center;
+ position: relative;
+ max-width: 190px;
+}
+
+.input {
+ width: 100%;
+ height: 40px;
+ line-height: 28px;
+ padding: 0 1rem;
+ padding-left: 2.5rem;
+ border: 2px solid transparent;
+ border-radius: 8px;
+ outline: none;
+ background-color: #f3f3f4;
+ color: #0d0c22;
+ transition: .3s ease;
+}
+
+.input::placeholder {
+ color: #9e9ea7;
+}
+
+.input:focus, input:hover {
+ outline: none;
+ border-color: rgba(234,76,137,0.4);
+ background-color: #fff;
+ box-shadow: 0 0 0 4px rgb(234 76 137 / 10%);
+}
+
+.icon {
+ position: absolute;
+ left: 1rem;
+ fill: #9e9ea7;
+ width: 1rem;
+ height: 1rem;
+}
+</style>
+<body>
+    
+        <div id="auth-section">
+            <!-- Nếu chưa đăng nhập -->
+            {% if not user.is_authenticated %}
+                <div id="not-logged-in">
+                    <h2>Welcome to Our Website</h2>
+                    <a href="{% url "auth" %}?form=signup" class="btn btn-primary">Sign Up</a>
+                    <a href="{% url "auth" %}?form=login" class="btn btn-success">Login</a>
+                </div>
+            <!-- Nếu đã đăng nhập -->
+            {% else %}
+                <div id="logged-in">
+                    <h2>Welcome Back, {{ user.username }}!</h2>
+                    <a href="{% url 'logout' %}" class="btn btn-danger">Logout</a>
+                </div>
+            {% endif %}
+        </div>
+</body>
+</html>
