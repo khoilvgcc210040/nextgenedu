@@ -1,0 +1,568 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classroom Detail</title>
+    <style>
+
+        .sidebar {
+            background-color: {{ classroom.subject.bg_color }};
+            padding: 30px 20px 100px 20px;
+            min-height: 100%;
+            position: fixed;
+            left: 0;
+            width: 250px;
+            transition: transform 0.3s ease-in-out;
+            transform: translateX(0);
+            z-index: 1000;
+            max-height: 200px;
+            overflow-y: scroll;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .sidebar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .sidebar.collapsed {
+            transform: translateX(-250px);
+        }
+
+        .content-area {
+            height: 100%;
+            margin-left: 250px;
+            padding: 20px 40px;
+            transition: margin-left 0.3s ease-in-out;
+        }
+
+        .content-area.expanded {
+            margin-left: 30px;
+        }
+
+        .btn-toggle-sidebar {
+            position: fixed;
+            left: 270px;
+            transform: translateX(-100%);
+            transition: left 0.3s ease-in-out;
+            background-color: #fff;
+            border: 2px solid #000;
+            border-radius: 50%;
+            height: 40px;
+            width: 40px;
+            font-size: 25px;
+            z-index: 1100;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .sidebar.collapsed + .btn-toggle-sidebar {
+            left: 50px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-settings, .btn-favorite {
+            background: none;
+            border: none;
+            color: #000;
+            font-size: 20px;
+        }
+
+        .content-section {
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        .nav-item .nav-link{
+            border-bottom: 2px solid #000;
+            color: #000;
+            font-weight: 500;
+            padding: 0.7rem 0.3rem;
+        }
+
+        .submenu .nav-item .nav-link{
+            border-bottom: 2px solid #000;
+            color: #000;
+            font-weight: 500;
+            margin-left: 2rem;
+            padding: 0.7rem 0;
+        }
+
+        .header{
+            border-bottom: 2px solid #000;
+        }
+
+        .cd-popup {
+            --cd-burger-line-width: 1.125em;
+            --cd-burger-line-height: 0.125em;
+            --cd-burger-offset: 0.625em;
+            --cd-burger-bg: rgba(0, 0, 0, .15);
+            --cd-burger-color: #333;
+            --cd-burger-line-border-radius: 0.1875em;
+            --cd-burger-diameter: 2.125em;
+            --cd-burger-btn-border-radius: calc(var(--cd-burger-diameter) / 2);
+            --cd-burger-line-transition: .3s;
+            --cd-burger-transition: all .1s ease-in-out;
+            --cd-burger-hover-scale: 1.1;
+            --cd-burger-active-scale: .95;
+            --cd-burger-enable-outline-color: var(--cd-burger-bg);
+            --cd-burger-enable-outline-width: 0.125em;
+            --cd-burger-enable-outline-offset: var(--cd-burger-enable-outline-width);
+            /* nav */
+            --cd-nav-padding-x: 0.25em;
+            --cd-nav-padding-y: 0.625em;
+            --cd-nav-border-radius: 0.375em;
+            --cd-nav-border-color: #ccc;
+            --cd-nav-border-width: 0.0625em;
+            --cd-nav-shadow-color: rgba(0, 0, 0, .2);
+            --cd-nav-shadow-width: 0 1px 5px;
+            --cd-nav-bg: #eee;
+            --cd-nav-font-family: "Montserrat", sans-serif;
+            --cd-nav-default-scale: .8;
+            --cd-nav-active-scale: 1;
+            --cd-nav-position-left: 0;
+            --cd-nav-position-right: unset;
+            /* if you want to change sides just switch one property */
+            /* from properties to "unset" and the other to 0 */
+            /* title */
+            --cd-nav-title-size: 0.625em;
+            --cd-nav-title-color: #777;
+            --cd-nav-title-padding-x: 1rem;
+            --cd-nav-title-padding-y: 0.25em;
+            /* nav button */
+            --cd-nav-button-padding-x: 1rem;
+            --cd-nav-button-padding-y: 0.375em;
+            --cd-nav-button-border-radius: 0.375em;
+            --cd-nav-button-font-size: 12px;
+            --cd-nav-button-hover-bg: #6495ed;
+            --cd-nav-button-hover-text-color: #fff;
+            --cd-nav-button-distance: 0.875em;
+            /* underline */
+            --cd-underline-border-width: 0.0625em;
+            --cd-underline-border-color: #ccc;
+            --cd-underline-margin-y: 0.3125em;
+          }
+          
+          /* cd-popup settings 👆 */
+          
+          .cd-popup {
+            display: inline-block;
+            text-rendering: optimizeLegibility;
+            position: relative;
+          }
+          
+          .cd-popup input {
+            display: none;
+          }
+          
+          .cd-burger {
+            display: flex;
+            position: relative;
+            align-items: center;
+            justify-content: center;
+            background: var(--cd-burger-bg);
+            width: var(--cd-burger-diameter);
+            height: var(--cd-burger-diameter);
+            border-radius: var(--cd-burger-btn-border-radius);
+            border: none;
+            cursor: pointer;
+            overflow: hidden;
+            transition: var(--cd-burger-transition);
+            outline: var(--cd-burger-enable-outline-width) solid transparent;
+            outline-offset: 0;
+          }
+          
+          .cd-burger span {
+            height: var(--cd-burger-line-height);
+            width: var(--cd-burger-line-width);
+            background: var(--cd-burger-color);
+            border-radius: var(--cd-burger-line-border-radius);
+            position: absolute;
+            transition: var(--cd-burger-line-transition);
+          }
+          
+          .cd-burger span:nth-child(1) {
+            top: var(--cd-burger-offset);
+          }
+          
+          .cd-burger span:nth-child(2) {
+            bottom: var(--cd-burger-offset);
+          }
+          
+          .cd-burger span:nth-child(3) {
+            top: 50%;
+            transform: translateY(-50%);
+          }
+          
+          .cd-popup-window {
+            transform: scale(var(--cd-nav-default-scale));
+            visibility: hidden;
+            opacity: 0;
+            position: absolute;
+            padding: var(--cd-nav-padding-y) var(--cd-nav-padding-x);
+            background: var(--cd-nav-bg);
+            font-family: var(--cd-nav-font-family);
+            color: var(--cd-nav-text-color);
+            border-radius: var(--cd-nav-border-radius);
+            box-shadow: var(--cd-nav-shadow-width) var(--cd-nav-shadow-color);
+            border: var(--cd-nav-border-width) solid var(--cd-nav-border-color);
+            top: calc(var(--cd-burger-diameter) + var(--cd-burger-enable-outline-width) + var(--cd-burger-enable-outline-offset));
+            left: var(--cd-nav-position-left);
+            right: var(--cd-nav-position-right);
+            transition: var(--cd-burger-transition);
+          }
+
+          .cd-popup-window legend {
+            padding: var(--cd-nav-title-padding-y) var(--cd-nav-title-padding-x);
+            margin: 0;
+            color: var(--cd-nav-title-color);
+            font-size: var(--cd-nav-title-size);
+            text-transform: uppercase;
+          }
+          
+          .cd-popup-window ul {
+            margin: 0;
+            padding: 0;
+            list-style-type: none;
+          }
+          
+          .cd-popup-window ul button {
+            outline: none;
+            width: 100%;
+            border: none;
+            background: none;
+            display: flex;
+            align-items: center;
+            color: var(--cd-burger-color);
+            font-size: var(--cd-nav-button-font-size);
+            padding: var(--cd-nav-button-padding-y) var(--cd-nav-button-padding-x);
+            white-space: nowrap;
+            border-radius: var(--cd-nav-button-border-radius);
+            cursor: pointer;
+            column-gap: var(--cd-nav-button-distance);
+          }
+          
+          .cd-popup-window ul li:nth-child(1) svg,
+          .cd-popup-window ul li:nth-child(2) svg {
+            color: cornflowerblue;
+          }
+          
+          .cd-popup-window ul li:nth-child(4) svg,
+          .cd-popup-window ul li:nth-child(5) svg {
+            color: rgb(153, 153, 153);
+          }
+          
+          .cd-popup-window ul li:nth-child(7) svg {
+            color: red;
+          }
+          
+          .cd-popup-window hr {
+            margin: var(--cd-underline-margin-y) 0;
+            border: none;
+            border-bottom: var(--cd-underline-border-width) solid var(--cd-underline-border-color);
+          }
+          
+          /* actions */
+          
+          .cd-popup-window ul button:hover,
+          .cd-popup-window ul button:focus-visible,
+          .cd-popup-window ul button:hover svg,
+          .cd-popup-window ul button:focus-visible svg {
+            color: var(--cd-nav-button-hover-text-color);
+            background: var(--cd-nav-button-hover-bg);
+          }
+          
+          .cd-burger:hover {
+            transform: scale(var(--cd-burger-hover-scale));
+          }
+          
+          .cd-burger:active {
+            transform: scale(var(--cd-burger-active-scale));
+          }
+          
+          .cd-burger:focus:not(:hover) {
+            outline-color: var(--cd-burger-enable-outline-color);
+            outline-offset: var(--cd-burger-enable-outline-offset);
+          }
+          
+          .cd-popup input:checked+.cd-burger span:nth-child(1) {
+            top: 50%;
+            transform: translateY(-50%) rotate(45deg);
+          }
+          
+          .cd-popup input:checked+.cd-burger span:nth-child(2) {
+            bottom: 50%;
+            transform: translateY(50%) rotate(-45deg);
+          }
+          
+          .cd-popup input:checked+.cd-burger span:nth-child(3) {
+            transform: translateX(calc(var(--cd-burger-diameter) * -1 - var(--cd-burger-line-width)));
+          }
+          
+          .cd-popup input:checked~nav {
+            transform: scale(var(--cd-nav-active-scale));
+            visibility: visible;
+            opacity: 1;
+          }
+
+          .navbar .navbar-brand span{
+            color: {{ classroom.subject.bg_color }} !important;
+          }
+    
+        .navbar .navbar-nav .header-nav-link {
+            color: {{ classroom.subject.bg_color }} !important;
+        }
+        
+        .comment-box {
+            border: 2px solid #ccc;
+            border-radius: 15px;
+            padding: 10px;
+            width: 100%;
+            position: relative;
+        }
+        
+        .user-icon img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+        
+        .comment-content {
+            margin-left: 10px;
+        }
+        
+        .comment-content textarea {
+            width: 100%;
+            border: none;
+            outline: none;
+            resize: none;
+            padding: 5px;
+            font-size: 14px;
+        }
+        
+        .rating:not(:checked) > input {
+            position: absolute;
+            appearance: none;
+        }
+
+        .rating:not(:checked) > label {
+            float: right;
+            cursor: pointer;
+            font-size: 30px;
+            color: #666;
+        }
+
+        .rating:not(:checked) > label:before {
+            content: '★';
+        }
+
+        .rating > input:checked + label:hover,
+        .rating > input:checked + label:hover ~ label,
+        .rating > input:checked ~ label:hover,
+        .rating > input:checked ~ label:hover ~ label,
+        .rating > label:hover ~ input:checked ~ label {
+        color: #e58e09;
+        }
+
+        .rating:not(:checked) > label:hover,
+        .rating:not(:checked) > label:hover ~ label {
+        color: #ff9e0b;
+        }
+
+        .rating > input:checked ~ label {
+        color: #ffa723;
+        }
+        
+        .send-button img {
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .send-button img:hover {
+            transform: translatey(-5%);
+        }
+        
+    </style>
+</head>
+<body style="padding: 80px 0;">
+    {% include "header.html" %}
+    
+    <div class="sidebar">
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a id="welcome-link" class="nav-link active" href="#">Welcome</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link toggle-link" href="#">Title <i class="fas fa-caret-down"></i></a>
+                <ul class="nav flex-column submenu" style="display: none;">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-content="title-content">Sub-item 1</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-content="title-content">Sub-item 2</a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+    <button class="btn-toggle-sidebar">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <div class="content-area">
+        <div id="welcome-content" class="content-section active">
+            <div class="header">
+                <h1 style="font-weight: 700;" class="text-truncate">Welcome to {{classroom.name}}</h1>
+                <div class="d-flex justify-content-between align-items-center">
+                    <label class="cd-popup m-0 mr-3">
+                        <input type="checkbox">
+                        <div class="cd-burger" tabindex="0">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        </div>
+                        <nav class="cd-popup-window mt-1">
+                        <ul>
+                            <li>
+                            <button onclick="window.location.href='{% url 'subjects' %}'">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-gear" viewBox="0 0 16 16">
+                                    <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492M5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0"/>
+                                    <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115z"/>
+                                </svg>
+                                <span style="font-weight: 500;">Settings</span>
+                            </button>
+                            </li>
+                            <li>
+                            <button onclick="window.location.href='{% url 'classrooms' classroom.subject.id classroom.grade %}'">
+                                <svg stroke-linejoin="round" stroke-linecap="round" stroke-width="2" stroke="currentColor" fill="none" viewBox="0 0 24 24" height="14" width="14" xmlns="http://www.w3.org/2000/svg">
+                                <line y2="18" x2="6" y1="6" x1="18"></line>
+                                <line y2="18" x2="18" y1="6" x1="6"></line>
+                                </svg>
+                                <span style="font-weight: 500;">Classrooms</span>
+                            </button>
+                            </li>
+                        </ul>
+                        </nav>
+                    </label>                      
+                    <button class="btn-favorite mr-4" style="outline: none;"><i class="fa-regular fa-star fa-xl"></i></button>
+                </div>
+            </div>
+            <p class="mt-3 mb-3" style="text-align: justify;"><strong>Description:</strong> {{ classroom.description }}</p>
+        </div>
+        <hr style="border: 1px solid #000;">
+        <h1 style="font-weight: 700;" class="text-truncate">Comments</h1>
+        <p>There are 11 comments on {{ classroom.name }}</p>
+        <div class="d-flex">
+            <div class="user-icon mr-3">
+                <img src="{% static "account.png" %}" alt="User Icon">
+            </div>
+            <div class="comment-box">
+                <div class="comment-content">
+                    <textarea placeholder="Write a comment..."></textarea>
+                </div>
+                <div class="send-button d-flex justify-content-between align-items-center"> 
+                    <div class="rating">
+                    <input value="5" name="rate" id="star5" type="radio" >
+                    <label title="text" for="star5"></label>
+                    <input value="4" name="rate" id="star4" type="radio">
+                    <label title="text" for="star4"></label>
+                    <input value="3" name="rate" id="star3" type="radio" checked="">
+                    <label title="text" for="star3"></label>
+                    <input value="2" name="rate" id="star2" type="radio">
+                    <label title="text" for="star2"></label>
+                    <input value="1" name="rate" id="star1" type="radio">
+                    <label title="text" for="star1"></label>
+                    </div>
+                    <img src="{% static "rocket.png" %}" alt="Send Icon">
+                </div>
+            </div>  
+        </div>  
+
+        <div id="title-content" class="content-section">
+            <div class="header">
+                <h1>Title</h1>
+                <div>
+                    <button class="btn-settings"><i class="fas fa-cog"></i></button>
+                    <button class="btn-favorite"><i class="fas fa-heart"></i></button>
+                </div>
+            </div>
+            <p>
+                This is the title content area. You can place title-related content here...
+            </p>
+        </div>
+
+        <div id="subtitle-content" class="content-section">
+            <div class="header">
+                <h1>Sub-title</h1>
+                <div>
+                    <button class="btn-settings"><i class="fas fa-cog"></i></button>
+                    <button class="btn-favorite"><i class="fas fa-heart"></i></button>
+                </div>
+            </div>
+            <p>
+                This is the sub-title content area. You can place sub-title-related content here...
+            </p>
+        </div>
+    </div>
+
+    <!-- FontAwesome Icons -->
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const sidebar = document.querySelector('.sidebar');
+            const contentArea = document.querySelector('.content-area');
+            const toggleButton = document.querySelector('.btn-toggle-sidebar');
+
+            toggleButton.addEventListener('click', function () {
+                sidebar.classList.toggle('collapsed');
+                contentArea.classList.toggle('expanded');
+            });
+
+            const toggleLinks = document.querySelectorAll('.toggle-link');
+            toggleLinks.forEach(link => {
+                link.addEventListener('click', function (event) {
+                    event.preventDefault(); 
+                    let submenu = this.nextElementSibling;
+                    let icon = this.querySelector('i');  
+                    if (submenu.style.display === 'none' || submenu.style.display === '') {
+                        submenu.style.display = 'block'; 
+                        icon.classList.remove('fa-caret-down');
+                        icon.classList.add('fa-caret-up'); 
+                    } else {
+                        submenu.style.display = 'none';
+                        icon.classList.remove('fa-caret-up');
+                        icon.classList.add('fa-caret-down');
+                    }
+                });
+            });
+
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(event) {
+                    event.preventDefault();
+
+                    document.querySelectorAll('.content-section').forEach(section => section.classList.remove('active'));
+                    document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+
+                    this.classList.add('active');
+                    const contentId = this.dataset.content || this.id.replace('-link', '-content');
+                    document.getElementById(contentId).classList.add('active');
+                });
+            });
+        });
+    </script>
+</body>
+</html>

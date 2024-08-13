@@ -86,14 +86,14 @@
         .nav-item .nav-link{
             border-bottom: 2px solid #000;
             color: #000;
-            font-weight: 700;
+            font-weight: 500;
             padding: 0.7rem 0.3rem;
         }
 
         .submenu .nav-item .nav-link{
             border-bottom: 2px solid #000;
             color: #000;
-            font-weight: 700;
+            font-weight: 500;
             margin-left: 2rem;
             padding: 0.7rem 0;
         }
@@ -315,9 +315,9 @@
             opacity: 1;
           }
 
-        .navbar .navbar-brand span{
+          .navbar .navbar-brand span{
             color: {{ classroom.subject.bg_color }} !important;
-        }
+          }
     
         .navbar .navbar-nav .header-nav-link {
             color: {{ classroom.subject.bg_color }} !important;
@@ -1094,17 +1094,6 @@
                     <strong>Description:</strong> {{ classroom.description }}
                 </p>
             </div>
-            <div class="d-flex pb-3 align-items-center pt-3 pb-3">
-                <div class="doc-icon mr-3">
-                    <img src="{% static "google-docs.png" %}" alt="Document Icon">
-                </div>
-                <div class="doc-icon mr-3">
-                    <img src="{% static "google-docs.png" %}" alt="Document Icon">
-                </div>
-                <div class="doc-icon mr-3">
-                    <img src="{% static "google-docs.png" %}" alt="Document Icon">
-                </div>
-            </div>
             <div class="edit-description d-flex justify-content-end">
                 <a href="#" class="edit-icon">
                     <i class="fas fa-edit fa-lg"></i>
@@ -1112,8 +1101,8 @@
             </div>
             <hr style="border: 1px solid #000;">
             
-            <h1 style="font-weight: 700;" class="text-truncate">Submit assignment</h1>
-            <p>Deadline time: hour day/month/year - hour day/month/year</p>
+            <h1 style="font-weight: 700;" class="text-truncate">Documents</h1>
+            <p>There are 11 documents on {{ classroom.name }}</p>
             <div class="d-flex pb-3 justify-content-between align-items-center pt-3 pb-3" style="padding-right: 400px;">
                 <div class="doc-icon mr-3">
                     <img src="{% static "google-docs.png" %}" alt="Document Icon">

@@ -13,14 +13,13 @@
             position: fixed;
             left: 0;
             width: 250px;
-            transition: transform 0.4s ease-in-out;
+            transition: transform 0.3s ease-in-out;
             transform: translateX(0);
             z-index: 1000;
             max-height: 200px;
             overflow-y: scroll;
             scrollbar-width: none;
             -ms-overflow-style: none;
-            border-radius: 0 15px 5px 0;
         }
 
         .sidebar::-webkit-scrollbar {
@@ -46,7 +45,7 @@
             position: fixed;
             left: 270px;
             transform: translateX(-100%);
-            transition: left 0.4s ease-in-out;
+            transition: left 0.3s ease-in-out;
             background-color: #fff;
             border: 2px solid #000;
             border-radius: 50%;
@@ -86,14 +85,14 @@
         .nav-item .nav-link{
             border-bottom: 2px solid #000;
             color: #000;
-            font-weight: 700;
+            font-weight: 500;
             padding: 0.7rem 0.3rem;
         }
 
         .submenu .nav-item .nav-link{
             border-bottom: 2px solid #000;
             color: #000;
-            font-weight: 700;
+            font-weight: 500;
             margin-left: 2rem;
             padding: 0.7rem 0;
         }
@@ -315,9 +314,9 @@
             opacity: 1;
           }
 
-        .navbar .navbar-brand span{
+          .navbar .navbar-brand span{
             color: {{ classroom.subject.bg_color }} !important;
-        }
+          }
     
         .navbar .navbar-nav .header-nav-link {
             color: {{ classroom.subject.bg_color }} !important;
@@ -361,13 +360,6 @@
             transform: translatey(-5%);
         }
 
-        .doc-icon img , .messenger-icon img {
-            width: 40px;
-            height: 40px;
-            cursor: pointer;
-            transition: transform 0.3s ease-in-out;
-        }
-
         .rating {
             display: flex;
             flex-direction: row-reverse;
@@ -393,7 +385,7 @@
         stroke-linejoin: bevel;
         stroke-dasharray: 12;
         animation: idle 4s linear infinite;
-        transition: stroke 0.2s, fill 0.4s;
+        transition: stroke 0.2s, fill 0.5s;
         }
 
         @keyframes idle {
@@ -521,236 +513,8 @@
         }
         
        .edit-icon:hover {
-            opacity: 0.4;
+            opacity: 0.5;
         } 
-
-        .right-sidebar {
-            background-color: {{ classroom.subject.bg_color }};
-            padding: 30px 20px 100px 20px;
-            min-height: 100%;
-            position: fixed;
-            right: 0;
-            width: 800px;
-            transition: transform 0.7s ease-in-out;
-            transform: translateX(100%);
-            z-index: 1100;
-            max-height: 200px;
-            overflow-y: scroll;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-            border-radius: 15px 0 0 5px;
-        }
-        
-        .right-sidebar::-webkit-scrollbar {
-            display: none;
-        }
-        
-        .right-sidebar.expanded {
-            transform: translateX(0);
-        }
-        
-        .btn-toggle-right-sidebar {
-            position: fixed;
-            right: 0;
-            transform: translateX(0);
-            transform: translateY(280px);
-            transition: right 0.7s ease-in-out;
-            background-color: #fff;
-            border: 2px solid #000;
-            border-right: none;
-            border-radius: 30px 0 0 30px;
-            height: 40px;
-            width: 40px;
-            outline: none;
-            font-size: 25px;
-            z-index: 1100;
-            cursor: pointer;
-        }
-        
-        .right-sidebar.expanded + .btn-toggle-right-sidebar {
-            right: 800px;
-            border-right: none;
-            outline: none;
-        }       
-        
-        .btn-toggle-right-sidebar .tooltip {
-            position: absolute;
-            left: 0px;
-            top: 5px;
-            transform: translateX(-120%);
-            visibility: hidden;
-            opacity: 0;
-            transition: opacity 0.3s ease-in-out;
-            background-color: #6c757d;
-            color: white;
-            padding: 5px;
-            border-radius: 3px;
-            font-size: 12px;
-        }
-        
-        .btn-toggle-right-sidebar .tooltip-text {
-            white-space: nowrap;
-        }
-        
-        .btn-toggle-right-sidebar:hover .tooltip {
-            visibility: visible;
-            opacity: 1;
-        }
-
-        .btn-doc {
-            padding: 5px 10px;
-            border-radius: 5px;
-            background-color: {{ classroom.subject.bg_color }};
-            font-weight: 500;
-            border: none;
-            transition: transform 0.3s ease-in-out;
-        }
-
-        .btn-doc:hover {
-            transform: translateY(-5%);
-        }
-
-        .tabs {
-            display: flex;
-            margin-bottom: 20px;
-        }
-
-        .tabs button {
-            background-color: #fff;
-            border-radius: 5px;
-            outline: none !important;
-        }
-        
-        .tab {
-            flex: 1;
-            padding: 10px;
-            cursor: pointer;
-            text-align: center;
-            background-color: #f1f1f1;
-            border: 1px solid #ccc;
-            font-weight: bold;
-            transition: background-color 0.3s ease-in-out;
-        }
-        
-        .tab.active {
-            background-color: #1e293b;
-            border-bottom: none;
-            color: #fff;
-        }
-        
-        .tab-content {
-            display: none;
-        }
-        
-        .tab-content.active {
-            display: block;
-        }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-        
-        table th, table td {
-            padding: 10px;
-            text-align: left;
-            border-bottom: 1px solid #000;
-        }
-        
-        .delete-btn {
-            background: none;
-            border: none;
-            outline: none !important;
-            cursor: pointer;
-            font-size: 1.2em;
-            transitiotransition: transform 0.9s ease-in-out;n
-        }
-
-        .delete-btn:hover {
-            transform: translateY(-5%);
-        }
-        
-        .pagination {
-            text-align: center;
-        }
-        
-        .pagination button {
-            padding: 5px 10px;
-            margin: 0 2px;
-            border: 1px solid #ccc;
-            background-color: #f1f1f1;
-            cursor: pointer;
-        }
-        
-        .pagination button:hover {
-            background-color: #ddd;
-        }
-        
-        .hidden {
-            display: none;
-        }
-
-        .search-filter {
-            display: flex;
-            justify-content: flex-start;
-            align-items: center;
-            margin-bottom: 10px;
-            border-radius: 5px;
-        }
-        
-        .search-box {
-            padding: 5px;
-            margin-right: 5px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-
-        .role-filter {
-            padding: 6px;
-            margin-right: 5px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-
-        .role-filter option{
-            padding: 6px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        
-        .search-btn {
-            padding: 5px;
-            border: none;
-            background: none;
-            cursor: pointer;
-            font-size: 1.2em;
-            outline: none !important;
-        }    
-        
-        .btn-toggle-right-messenger {
-            position: fixed;
-            right: 30px;
-            transform: translateY(600px);
-            transition: transform 0.7s ease-in-out;
-            background-color: #fff;
-            border-radius: 50%;
-            border: none;
-            height: 40px;
-            width: 40px;
-            outline: none;
-            font-size: 25px;
-            z-index: 1200;
-            padding: 0;
-            outline: none !important;
-        }
-
-        .btn-toggle-right-messenger img:hover {
-            transform: translateY(-5%);
-        }
-        .btn-toggle-right-messenger:hover {
-            background-color: {{ classroom.subject.bg_color }};
-        }
         
     </style>
 </head>
@@ -763,13 +527,13 @@
                 <a id="welcome-link" class="nav-link active" href="#">Welcome</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link toggle-link" data-content="title-content" href="#">Title <i class="fas fa-caret-down"></i></a>
+                <a class="nav-link toggle-link" href="#">Title <i class="fas fa-caret-down"></i></a>
                 <ul class="nav flex-column submenu" style="display: none;">
                     <li class="nav-item">
-                        <a class="nav-link" href="#" data-content="subtitle-content">Sub-item 1</a>
+                        <a class="nav-link" href="#" data-content="title-content">Sub-item 1</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#" data-content="subtitle-content">Sub-item 2</a>
+                        <a class="nav-link" href="#" data-content="title-content">Sub-item 2</a>
                     </li>
                 </ul>
             </li>
@@ -779,103 +543,6 @@
     <button class="btn-toggle-sidebar">
         <i class="fas fa-bars"></i>
     </button>
-
-    <div class="right-sidebar">
-        <div class="tabs">
-            <button id="participants-btn" class="tab active p-3">Participants</button>
-            <button id="scores-btn" class="tab p-3">Scores</button>
-        </div>
-
-        <div id="participants" class="tab-content active">
-            <div class="search-filter d-flex justify-content-end align-items-center">
-                <select class="role-filter">
-                    <option value="">Roles</option>
-                    <option value="Student">Student</option>
-                    <option value="Instructor">Instructor</option>
-                    <!-- Add more roles as needed -->
-                </select>
-                <input type="text" class="search-box" placeholder="Search by name...">
-                <button class="search-btn">🔍</button>
-            </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>First name / Last name</th>
-                        <th>Roles</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Repeat rows as needed -->
-                    <tr>
-                        <td>Khoi Lieu</td>
-                        <td>Student</td>
-                        <td><button class="delete-btn">🗑️</button></td>
-                    </tr>
-                    <tr>
-                        <td>Khoi Lieu</td>
-                        <td>Course Instructor</td>
-                        <td><button class="delete-btn">🗑️</button></td>
-                    </tr>
-                </tbody>
-            </table>
-            <!-- Pagination -->
-            <div class="pagination">
-                <button>1</button>
-                <button>2</button>
-                <button>3</button>
-                <button>4</button>
-                <button>5</button>
-                <button>&gt;</button>
-            </div>
-        </div>
-
-        <div id="scores" class="tab-content hidden">
-            <h3>"Subject name" ranking</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Username</th>
-                        <th>Test</th>
-                        <th>Time</th>
-                        <th>Score</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Repeat rows as needed -->
-                    <tr>
-                        <td>Khoi Lieu</td>
-                        <td>1</td>
-                        <td>1h 20s</td>
-                        <td>120</td>
-                    </tr>
-                </tbody>
-            </table>
-            <!-- Pagination -->
-            <div class="pagination">
-                <button>1</button>
-                <button>2</button>
-                <button>3</button>
-                <button>4</button>
-                <button>5</button>
-                <button>&gt;</button>
-            </div>
-        </div>
-    </div>
-    
-    <button class="btn-toggle-right-sidebar">
-        <i class="fas fa-chevron-left"></i>
-        <div class="tooltip" style="font-family: Montserrat, sans-serif !important;">
-            <span class="tooltip-text">Participants and Scores</span>
-        </div>
-    </button>
-
-    <button class="btn-toggle-right-messenger">
-        <div class="messenger-icon mr-3">
-            <img src="{% static "messenger.png" %}" alt="messenger Icon">
-        </div>
-    </button>
-    
 
     <div class="content-area">
         <div id="welcome-content" class="content-section active">
@@ -920,11 +587,9 @@
                     <strong>Description:</strong> {{ classroom.description }}
                 </p>
             </div>
-            <div class="edit-description d-flex justify-content-end">
-                <a href="#" class="edit-icon">
-                    <i class="fas fa-edit fa-lg"></i>
-                </a>
-            </div>
+            <a href="#" class="edit-icon">
+                <i class="fas fa-edit fa-lg"></i>
+            </a>
             <hr style="border: 1px solid #000;">
             <h1 style="font-weight: 700;" class="text-truncate">Comments</h1>
             <p>There are 11 comments on {{ classroom.name }}</p>
@@ -1028,105 +693,25 @@
                 <p style="text-align: justify;">
                     <strong>Description:</strong> {{ classroom.description }}
                 </p>
+                
             </div>
-            <div class="edit-description d-flex justify-content-end">
-                <a href="#" class="edit-icon">
-                    <i class="fas fa-edit fa-lg"></i>
-                </a>
-            </div>
+            <a href="#" class="edit-icon">
+                <i class="fas fa-edit fa-lg"></i>
+            </a>
             <hr style="border: 1px solid #000;">
-            <h1 style="font-weight: 700;" class="text-truncate">Documents</h1>
-            <p>There are 11 documents on {{ classroom.name }}</p>
-            <div class="d-flex pb-3 justify-content-between align-items-center pt-3 pb-3" style="padding-right: 400px;">
-                <div class="doc-icon mr-3">
-                    <img src="{% static "google-docs.png" %}" alt="Document Icon">
-                </div>
-                <p class="m-0">Name of the document</p>
-                <button class="btn-doc" style="outline: none;">Open</button> | 
-                <button class="btn-doc" style="outline: none;">Download</button> 
-            </div>
-            <div class="edit-description d-flex justify-content-end">
-                <a href="#" class="edit-icon">
-                    <i class="fas fa-edit fa-lg"></i>
-                </a>
-            </div>
         </div>
 
         <div id="subtitle-content" class="content-section">
             <div class="header">
-                <h1 style="font-weight: 700;" class="text-truncate">Welcome to {{classroom.name}}</h1>
-                <div class="d-flex justify-content-between align-items-center">
-                    <label class="cd-popup m-0 mr-3">
-                        <input type="checkbox">
-                        <div class="cd-burger" tabindex="0">
-                            <span></span>
-                            <span></span>
-                            <span></span>
-                        </div>
-                        <nav class="cd-popup-window mt-1">
-                        <ul>
-                            <li>
-                            <button onclick="window.location.href='{% url 'subjects' %}'">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-gear" viewBox="0 0 16 16">
-                                    <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492M5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0"/>
-                                    <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115z"/>
-                                </svg>
-                                <span style="font-weight: 500;">Settings</span>
-                            </button>
-                            </li>
-                            <li>
-                            <button onclick="window.location.href='{% url 'classrooms' classroom.subject.id classroom.grade %}'">
-                                <svg stroke-linejoin="round" stroke-linecap="round" stroke-width="2" stroke="currentColor" fill="none" viewBox="0 0 24 24" height="14" width="14" xmlns="http://www.w3.org/2000/svg">
-                                <line y2="18" x2="6" y1="6" x1="18"></line>
-                                <line y2="18" x2="18" y1="6" x1="6"></line>
-                                </svg>
-                                <span style="font-weight: 500;">Classrooms</span>
-                            </button>
-                            </li>
-                        </ul>
-                        </nav>
-                    </label>                      
-                    <button class="btn-favorite mr-4" style="outline: none;"><i class="fa-regular fa-star fa-xl"></i></button>
+                <h1>Sub-title</h1>
+                <div>
+                    <button class="btn-settings"><i class="fas fa-cog"></i></button>
+                    <button class="btn-favorite"><i class="fas fa-heart"></i></button>
                 </div>
             </div>
-            <div class="description mt-3 mb-3">
-                <p style="text-align: justify;">
-                    <strong>Description:</strong> {{ classroom.description }}
-                </p>
-            </div>
-            <div class="d-flex pb-3 align-items-center pt-3 pb-3">
-                <div class="doc-icon mr-3">
-                    <img src="{% static "google-docs.png" %}" alt="Document Icon">
-                </div>
-                <div class="doc-icon mr-3">
-                    <img src="{% static "google-docs.png" %}" alt="Document Icon">
-                </div>
-                <div class="doc-icon mr-3">
-                    <img src="{% static "google-docs.png" %}" alt="Document Icon">
-                </div>
-            </div>
-            <div class="edit-description d-flex justify-content-end">
-                <a href="#" class="edit-icon">
-                    <i class="fas fa-edit fa-lg"></i>
-                </a>
-            </div>
-            <hr style="border: 1px solid #000;">
-            
-            <h1 style="font-weight: 700;" class="text-truncate">Submit assignment</h1>
-            <p>Deadline time: hour day/month/year - hour day/month/year</p>
-            <div class="d-flex pb-3 justify-content-between align-items-center pt-3 pb-3" style="padding-right: 400px;">
-                <div class="doc-icon mr-3">
-                    <img src="{% static "google-docs.png" %}" alt="Document Icon">
-                </div>
-                <p class="m-0">Name of the document</p>
-                <button class="btn-doc" style="outline: none;">Open</button> | 
-                <button class="btn-doc" style="outline: none;">Download</button> 
-            </div>
-            <div class="edit-description d-flex justify-content-end">
-                <a href="#" class="edit-icon">
-                    <i class="fas fa-edit fa-lg"></i>
-                </a>
-            </div>
+            <p>
+                This is the sub-title content area. You can place sub-title-related content here...
+            </p>
         </div>
     </div>
 
@@ -1135,27 +720,12 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const sidebar = document.querySelector('.sidebar');
-            const rightSidebar = document.querySelector('.right-sidebar');
             const contentArea = document.querySelector('.content-area');
             const toggleButton = document.querySelector('.btn-toggle-sidebar');
-            const toggleRightButton = document.querySelector('.btn-toggle-right-sidebar');
-            const toggleIcon = toggleRightButton.querySelector('i');
 
             toggleButton.addEventListener('click', function () {
                 sidebar.classList.toggle('collapsed');
                 contentArea.classList.toggle('expanded');
-            });
-
-            toggleRightButton.addEventListener('click', function () {
-                rightSidebar.classList.toggle('expanded');
-
-                if (rightSidebar.classList.contains('expanded')) {
-                    toggleIcon.classList.remove('fa-chevron-left');
-                    toggleIcon.classList.add('fa-chevron-right');
-                } else {
-                    toggleIcon.classList.remove('fa-chevron-right');
-                    toggleIcon.classList.add('fa-chevron-left');
-                }
             });
 
             const toggleLinks = document.querySelectorAll('.toggle-link');
@@ -1189,26 +759,6 @@
                     document.getElementById(contentId).classList.add('active');
                 });
             });
-
-            const participantsBtn = document.getElementById("participants-btn");
-            const scoresBtn = document.getElementById("scores-btn");
-            const participantsContent = document.getElementById("participants");
-            const scoresContent = document.getElementById("scores");
-
-            participantsBtn.addEventListener("click", function() {
-                participantsBtn.classList.add("active");
-                scoresBtn.classList.remove("active");
-                participantsContent.classList.add("active");
-                scoresContent.classList.remove("active");
-            });
-
-            scoresBtn.addEventListener("click", function() {
-                scoresBtn.classList.add("active");
-                participantsBtn.classList.remove("active");
-                scoresContent.classList.add("active");
-                participantsContent.classList.remove("active");
-            });
-            
         });
     </script>
 </body>

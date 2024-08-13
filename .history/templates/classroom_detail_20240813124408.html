@@ -86,14 +86,14 @@
         .nav-item .nav-link{
             border-bottom: 2px solid #000;
             color: #000;
-            font-weight: 700;
+            font-weight: 500;
             padding: 0.7rem 0.3rem;
         }
 
         .submenu .nav-item .nav-link{
             border-bottom: 2px solid #000;
             color: #000;
-            font-weight: 700;
+            font-weight: 500;
             margin-left: 2rem;
             padding: 0.7rem 0;
         }
@@ -315,9 +315,9 @@
             opacity: 1;
           }
 
-        .navbar .navbar-brand span{
+          .navbar .navbar-brand span{
             color: {{ classroom.subject.bg_color }} !important;
-        }
+          }
     
         .navbar .navbar-nav .header-nav-link {
             color: {{ classroom.subject.bg_color }} !important;
@@ -730,26 +730,16 @@
         
         .btn-toggle-right-messenger {
             position: fixed;
-            right: 30px;
-            transform: translateY(600px);
-            transition: transform 0.7s ease-in-out;
-            background-color: #fff;
-            border-radius: 50%;
+            right: 10px;
+            transform: translateY(500px);
+            transition: right 0.7s ease-in-out;
+            background-color: transparent;
             border: none;
             height: 40px;
             width: 40px;
             outline: none;
             font-size: 25px;
             z-index: 1200;
-            padding: 0;
-            outline: none !important;
-        }
-
-        .btn-toggle-right-messenger img:hover {
-            transform: translateY(-5%);
-        }
-        .btn-toggle-right-messenger:hover {
-            background-color: {{ classroom.subject.bg_color }};
         }
         
     </style>
@@ -763,13 +753,13 @@
                 <a id="welcome-link" class="nav-link active" href="#">Welcome</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link toggle-link" data-content="title-content" href="#">Title <i class="fas fa-caret-down"></i></a>
+                <a class="nav-link toggle-link" href="#">Title <i class="fas fa-caret-down"></i></a>
                 <ul class="nav flex-column submenu" style="display: none;">
                     <li class="nav-item">
-                        <a class="nav-link" href="#" data-content="subtitle-content">Sub-item 1</a>
+                        <a class="nav-link" href="#" data-content="title-content">Sub-item 1</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#" data-content="subtitle-content">Sub-item 2</a>
+                        <a class="nav-link" href="#" data-content="title-content">Sub-item 2</a>
                     </li>
                 </ul>
             </li>
@@ -1054,79 +1044,15 @@
 
         <div id="subtitle-content" class="content-section">
             <div class="header">
-                <h1 style="font-weight: 700;" class="text-truncate">Welcome to {{classroom.name}}</h1>
-                <div class="d-flex justify-content-between align-items-center">
-                    <label class="cd-popup m-0 mr-3">
-                        <input type="checkbox">
-                        <div class="cd-burger" tabindex="0">
-                            <span></span>
-                            <span></span>
-                            <span></span>
-                        </div>
-                        <nav class="cd-popup-window mt-1">
-                        <ul>
-                            <li>
-                            <button onclick="window.location.href='{% url 'subjects' %}'">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-gear" viewBox="0 0 16 16">
-                                    <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492M5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0"/>
-                                    <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115z"/>
-                                </svg>
-                                <span style="font-weight: 500;">Settings</span>
-                            </button>
-                            </li>
-                            <li>
-                            <button onclick="window.location.href='{% url 'classrooms' classroom.subject.id classroom.grade %}'">
-                                <svg stroke-linejoin="round" stroke-linecap="round" stroke-width="2" stroke="currentColor" fill="none" viewBox="0 0 24 24" height="14" width="14" xmlns="http://www.w3.org/2000/svg">
-                                <line y2="18" x2="6" y1="6" x1="18"></line>
-                                <line y2="18" x2="18" y1="6" x1="6"></line>
-                                </svg>
-                                <span style="font-weight: 500;">Classrooms</span>
-                            </button>
-                            </li>
-                        </ul>
-                        </nav>
-                    </label>                      
-                    <button class="btn-favorite mr-4" style="outline: none;"><i class="fa-regular fa-star fa-xl"></i></button>
+                <h1>Sub-title</h1>
+                <div>
+                    <button class="btn-settings"><i class="fas fa-cog"></i></button>
+                    <button class="btn-favorite"><i class="fas fa-heart"></i></button>
                 </div>
             </div>
-            <div class="description mt-3 mb-3">
-                <p style="text-align: justify;">
-                    <strong>Description:</strong> {{ classroom.description }}
-                </p>
-            </div>
-            <div class="d-flex pb-3 align-items-center pt-3 pb-3">
-                <div class="doc-icon mr-3">
-                    <img src="{% static "google-docs.png" %}" alt="Document Icon">
-                </div>
-                <div class="doc-icon mr-3">
-                    <img src="{% static "google-docs.png" %}" alt="Document Icon">
-                </div>
-                <div class="doc-icon mr-3">
-                    <img src="{% static "google-docs.png" %}" alt="Document Icon">
-                </div>
-            </div>
-            <div class="edit-description d-flex justify-content-end">
-                <a href="#" class="edit-icon">
-                    <i class="fas fa-edit fa-lg"></i>
-                </a>
-            </div>
-            <hr style="border: 1px solid #000;">
-            
-            <h1 style="font-weight: 700;" class="text-truncate">Submit assignment</h1>
-            <p>Deadline time: hour day/month/year - hour day/month/year</p>
-            <div class="d-flex pb-3 justify-content-between align-items-center pt-3 pb-3" style="padding-right: 400px;">
-                <div class="doc-icon mr-3">
-                    <img src="{% static "google-docs.png" %}" alt="Document Icon">
-                </div>
-                <p class="m-0">Name of the document</p>
-                <button class="btn-doc" style="outline: none;">Open</button> | 
-                <button class="btn-doc" style="outline: none;">Download</button> 
-            </div>
-            <div class="edit-description d-flex justify-content-end">
-                <a href="#" class="edit-icon">
-                    <i class="fas fa-edit fa-lg"></i>
-                </a>
-            </div>
+            <p>
+                This is the sub-title content area. You can place sub-title-related content here...
+            </p>
         </div>
     </div>
 
