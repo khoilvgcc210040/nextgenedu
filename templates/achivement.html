@@ -1,0 +1,187 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classrooms - {{ subject.name }} - Grade {{ grade }}</title>
+    {% comment %} <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> {% endcomment %}
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<style>
+    .btn-back {
+        display: flex;
+        height: 3em;
+        width: 100px;
+        align-items: center;
+        justify-content: center;
+        background-color: #eeeeee4b;
+        border-radius: 3px;
+        letter-spacing: 1px;
+        transition: all 0.2s linear;
+        cursor: pointer;
+        border: none;
+        color: {{ subject.bg_color }};
+        background: #fff;
+    }
+
+    .btn-back > svg {
+        margin-right: 5px;
+        margin-left: 5px;
+        font-size: 20px;
+        transition: all 0.4s ease-in;
+    }
+
+    .btn-back:hover > svg {
+        font-size: 1.2em;
+        transform: translateX(-5px);
+    }
+
+    .btn-back:hover {
+        transform: translateY(-2px);
+    }
+
+    header {
+        border: 2px solid #000;
+        border-radius: 20px;
+        padding: 70px;
+    }
+
+    .profile-container {
+        text-align: center;
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        width: 100%;
+    }
+
+    .profile-container img {
+        border-radius: 50%;
+        width: 100px;
+        height: 100px;
+    }
+
+    .profile-container h2 {
+        margin: 10px 0;
+    }
+
+    .profile-container p {
+        color: #888;
+        margin-bottom: 20px;
+    }
+
+    .achievements {
+        display: flex;
+        justify-content: space-around;
+        margin-top: 20px;
+    }
+
+    .achievement-item {
+        text-align: center;
+    }
+
+    .achievement-item i {
+        font-size: 50px;
+        color: #000;
+    }
+
+    .achievement-item span {
+        display: block;
+        background-color: #000;
+        color: #fff;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        line-height: 30px;
+        margin: 10px auto 5px;
+    }
+
+    .achievement-item p {
+        margin-top: 5px;
+        font-size: 14px;
+    }
+</style>
+<body>
+    {% include "header.html" %}
+    <div class="container" style="padding: 100px 0;">
+        <div class="mb-4">
+            <button class="btn-back" onclick="window.location.href='{% url 'subjects' %}'" style="outline: none;">
+                <svg height="16" width="16" fill="currentColor" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 1024 1024">
+                    <path d="M874.690416 495.52477c0 11.2973-9.168824 20.466124-20.466124 20.466124l-604.773963 0 188.083679 188.083679c7.992021 7.992021 7.992021 20.947078 0 28.939099-4.001127 3.990894-9.240455 5.996574-14.46955 5.996574-5.239328 0-10.478655-1.995447-14.479783-5.996574l-223.00912-223.00912c-3.837398-3.837398-5.996574-9.046027-5.996574-14.46955 0-5.433756 2.159176-10.632151 5.996574-14.46955l223.019353-223.029586c7.992021-7.992021 20.957311-7.992021 28.949332 0 7.992021 8.002254 7.992021 20.957311 0 28.949332l-188.073446 188.073446 604.753497 0C865.521592 475.058646 874.690416 484.217237 874.690416 495.52477z"></path>
+                </svg>
+                <span>Back</span>
+            </button>
+        </div>        
+        <header class="mb-5" style="background-color: {{ subject.bg_color }};">
+            <h1 class="display-4" style="font-weight: 600;">My Achievements</h1>
+            <p class="lead" style="text-align: justify;">"My Achievements records personal milestones and successes. Whether it's academic excellence, professional accomplishments, or personal growth, this section highlights the key moments that have shaped one's journey. It celebrates the hard work and determination that have led to these significant achievements."</p>
+        </header>
+
+        <section>
+            <div class="profile-container">
+                <img src="{% static "account.png" %}" alt="Profile Picture">
+                <h2>Username</h2>
+                <p>Date Joined: day / month / year</p>
+            
+                <div class="achievements">
+                    <div class="achievement-item">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                        <span>1</span>
+                        <p>Classroom</p>
+                    </div>
+                    <div class="achievement-item">
+                        <i class="fas fa-heart"></i>
+                        <span>1</span>
+                        <p>Likes</p>
+                    </div>
+                    <div class="achievement-item">
+                        <i class="fas fa-star"></i>
+                        <span>1</span>
+                        <p>Max Score</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Password Modal -->
+    <div class="modal fade" id="passwordModal" tabindex="-1" aria-labelledby="passwordModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content d-flex justify-content-center align-items-center bg-transparent border-0">
+                <button type="button" class="btn-close position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="card p-4" style="max-width: 400px; width: 100%; border: 5px solid {{ subject.bg_color }}">
+                    <div class="card-body">
+                    <h5 class="card-title text-center mb-4 font-weight-bold" style="color: {{ subject.bg_color }}">Classroom Password</h5>
+                    <form method="POST" action="{% url 'enter_password' classroom_id=0 %}" id="passwordForm">
+                        {% csrf_token %}
+                        <input type="hidden" id="classroomId" name="classroom_id">
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" required>
+                        </div>
+                        <button type="submit" class="submit-modal btn btn-dark w-100 border-0" style="background-color: {{ subject.bg_color }}; overflow: hidden; transition: all 0.3s ease;">
+                            <span class="btn-text">Join now ➜</span>
+                        </button>
+                    </form>                    
+                    </div>
+                </div>                
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    var passwordModal = document.getElementById('passwordModal');
+    passwordModal.addEventListener('show.bs.modal', function (event) {
+        var button = event.relatedTarget; 
+        var classroomId = button.getAttribute('data-classroom-id'); 
+
+        var form = document.getElementById('passwordForm');
+        form.action = form.action.replace('/0/', '/' + classroomId + '/'); 
+
+        var classroomIdInput = document.getElementById('classroomId');
+        classroomIdInput.value = classroomId; 
+    });
+</script>

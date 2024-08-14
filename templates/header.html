@@ -187,8 +187,93 @@
     .btn-login:hover {
         background-color: #e2e8f0;
     }
+
+    .add-icon img{
+        margin-right: 10px;
+        width: 60px;
+        height: 60px;
+    }
+
+    .card-body input[type="text"],
+    .card-body input[type="password"] {
+        padding: 5px;
+        width: 100%;
+        border-radius: 5px;
+    }
+
+
+    .card-body textarea {
+        padding: 5px;
+        width: 100%;
+        border-radius: 5px;
+        border: 2px solid #000;
+        resize: none;
+        height: 70px !important;
+    }
+
+    .btn-status button{
+        padding: 10px 70px;
+        border: 2px solid #000;
+        border-radius: 5px;
+    }
+
+    .submit-modal {
+        padding: 12px 0;
+    }
+
+    .status-btn {
+        background-color: #ffffff;
+        border: none;
+        padding: 10px 20px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .status-btn.active {
+        background-color: #343a40;
+        color: white;
+    }
+    
+    #passwordInputContainer .modal-input {
+        padding-right: 40px;
+    }
+    
+    #togglePassword {
+        font-size: 1.2em;
+        top: 35% !important;
+    }
 </style>
 <body>
+    <div class="modal fade" id="createClassroomModal" tabindex="-1" aria-labelledby="createClassroomModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content d-flex justify-content-center align-items-center bg-transparent border-0">
+                <button type="button" class="btn-close position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="card p-4" style="width: 100%; border: 5px solid {{ subject.bg_color }}">
+                    <div class="card-body">
+                        <div class="add-icon d-flex justify-content-center">
+                            <img src="{% static 'add.png' %}" alt="Add Icon">
+                        </div>
+                        <h5 class="card-title text-center mb-4 mt-4 font-weight-bold" style="font-size: 27px;">Create your free classroom</h5>
+                        <h6 class="card-title text-center mb-4 mt-4 ">Give your students uninterrupted access to Learn and Test modes for all content in your class. It’s free!</h6>
+                        <form method="POST" action="#" id="createClassroomForm">
+                            {% csrf_token %}
+                            <input type="hidden" id="classroomId" name="classroom_id">
+                            <input type="text" class="modal-input mb-3" placeholder="Enter a classroom name...">
+                            <textarea type="text" class="modal-input mb-3" placeholder="Enter a classroom description..." name="" id=""></textarea>
+                            <div class="btn-status d-flex justify-content-between align-items-center mb-3">
+                                <button type="button" id="publicBtn" class="status-btn">Public</button>
+                                <button type="button" id="privateBtn" class="status-btn">Private</button>
+                            </div>
+                            <div id="passwordInputContainer"></div>
+                            <button type="submit" class="submit-modal btn btn-dark w-100 border-0" style="background-color: #1e40af; overflow: hidden; transition: all 0.3s ease;">
+                                <span class="btn-text">Submit</span>
+                            </button>
+                        </form>                    
+                    </div>
+                </div>                
+            </div>
+        </div>
+    </div>
     <nav class="navbar navbar-expand-lg">
         <div class="container">
             <a class="navbar-brand" href="{% url "home" %}">
@@ -206,15 +291,15 @@
                     </li>
 
                     <li class="nav-item">
-                        <a class="header-nav-link click-scroll" href="index.html#section_3">Manage</a>
+                        <a class="header-nav-link click-scroll" href="{% url "manage_classroom" %}">Manage</a>
                     </li>
 
                     <li class="nav-item">
-                        <a class="header-nav-link click-scroll" href="index.html#section_4">Achievement</a>
+                        <a class="header-nav-link click-scroll" href="{% url "achivement" %}">Achievement</a>
                     </li>
 
                     <li class="nav-item">
-                        <a class="header-nav-link click-scroll" href="index.html#section_5">Favorite</a>
+                        <a class="header-nav-link click-scroll" href="{% url "favorite" %}">Favorite</a>
                     </li>
 
                     <li>
@@ -228,7 +313,7 @@
                         <a class="header-nav-link" href="#section_5" id="navbarLightDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">✙ Create</a>
 
                         <ul class="dropdown-menu dropdown-menu-light" aria-labelledby="navbarLightDropdownMenuLink">
-                            <li><a class="dropdown-item" href="topics-listing.html">✙ Create a classroom</a></li>
+                            <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#createClassroomModal" href="#">✙ Create a classroom</a></li>
                         </ul>
                     </li>
 
@@ -255,3 +340,62 @@
     </nav>
 </body>
 </html>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.getElementById('privateBtn').addEventListener('click', function() {
+        toggleActiveStatus(this);
+        const passwordContainer = document.getElementById('passwordInputContainer');
+        if (!document.getElementById('passwordInput')) {
+            const passwordWrapper = document.createElement('div');
+            passwordWrapper.style.position = 'relative';
+            passwordWrapper.id = 'passwordWrapper';
+    
+            const passwordInput = document.createElement('input');
+            passwordInput.type = 'password';
+            passwordInput.id = 'passwordInput';
+            passwordInput.name = 'classroom_password';
+            passwordInput.className = 'modal-input mb-3'; // Sử dụng cùng lớp CSS
+            passwordInput.placeholder = 'Enter a classroom password...';
+            
+            const eyeIcon = document.createElement('span');
+            eyeIcon.id = 'togglePassword';
+            eyeIcon.innerHTML = '👁️'; // Sử dụng biểu tượng con mắt
+            eyeIcon.style.position = 'absolute';
+            eyeIcon.style.right = '10px';
+            eyeIcon.style.top = '50%';
+            eyeIcon.style.transform = 'translateY(-50%)';
+            eyeIcon.style.cursor = 'pointer';
+    
+            passwordWrapper.appendChild(passwordInput);
+            passwordWrapper.appendChild(eyeIcon);
+            passwordContainer.appendChild(passwordWrapper);
+    
+            eyeIcon.addEventListener('click', function() {
+                const passwordField = document.getElementById('passwordInput');
+                if (passwordField.type === 'password') {
+                    passwordField.type = 'text';
+                    eyeIcon.innerHTML = '🙈'; // Thay đổi biểu tượng khi hiển thị mật khẩu
+                } else {
+                    passwordField.type = 'password';
+                    eyeIcon.innerHTML = '👁️'; // Trở lại biểu tượng con mắt khi ẩn mật khẩu
+                }
+            });
+        }
+    });
+    
+    document.getElementById('publicBtn').addEventListener('click', function() {
+        toggleActiveStatus(this);
+        const passwordWrapper = document.getElementById('passwordWrapper');
+        if (passwordWrapper) {
+            passwordWrapper.remove(); // Xóa input password và biểu tượng con mắt
+        }
+    });
+    
+    function toggleActiveStatus(activeButton) {
+        const buttons = document.querySelectorAll('.status-btn');
+        buttons.forEach(button => {
+            button.classList.remove('active');
+        });
+        activeButton.classList.add('active');
+    }    
+</script>

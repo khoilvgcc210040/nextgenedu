@@ -225,4 +225,69 @@ def classroom_detail(request, id):
     }
     return render(request, 'classroom_detail.html', context)
 
+def setting_classroom(request, id):
+    classroom = get_object_or_404(Classroom, id=id)
+    context = {
+        'classroom': classroom
+    }
+    return render(request, 'setting_classroom.html', context)
+
+def manage_classroom(request):
+    # classroom = get_object_or_404(Classroom, id=id)
+    # context = {
+    #     'classroom': classroom
+    # }
+    return render(request, 'manage_classroom.html')
+
+def question_list(request):
+    # classroom = get_object_or_404(Classroom, id=id)
+    # context = {
+    #     'classroom': classroom
+    # }
+    return render(request, 'question_list.html')
+
+def create_question(request):
+    # classroom = get_object_or_404(Classroom, id=id)
+    # context = {
+    #     'classroom': classroom
+    # }
+    return render(request, 'create_question.html')
+
+def marking(request):
+    # classroom = get_object_or_404(Classroom, id=id)
+    # context = {
+    #     'classroom': classroom
+    # }
+    return render(request, 'marking.html')
+
+def setting(request):
+    # classroom = get_object_or_404(Classroom, id=id)
+    # context = {
+    #     'classroom': classroom
+    # }
+    return render(request, 'setting.html')
+
+def adminPage(request):
+    # classroom = get_object_or_404(Classroom, id=id)
+    # context = {
+    #     'classroom': classroom
+    # }
+    return render(request, 'adminPage.html')
+
+def achivement(request):
+    # classroom = get_object_or_404(Classroom, id=id)
+    # context = {
+    #     'classroom': classroom
+    # }
+    return render(request, 'achivement.html')
+
+def favorite(request):
+    # classroom = get_object_or_404(Classroom, id=id)
+    # context = {
+    #     'classroom': classroom
+    # }
+    return render(request, 'favorite.html')
+
+
+
 

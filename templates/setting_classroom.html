@@ -1,0 +1,324 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classroom Detail</title>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.min.js"></script>
+    <style>
+        .sidebar {
+            background-color: {{ classroom.subject.bg_color }};
+            padding: 36px 20px 100px 20px;
+            min-height: 100%;
+            position: fixed;
+            left: 0;
+            width: 250px;
+            transition: transform 0.4s ease-in-out;
+            transform: translateX(0);
+            z-index: 1000;
+            max-height: 200px;
+            overflow-y: scroll;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            border-radius: 0 15px 5px 0;
+        }
+
+        .sidebar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .sidebar.collapsed {
+            transform: translateX(-250px);
+        }
+
+        .content-area {
+            height: 100%;
+            margin-left: 250px;
+            padding: 20px 40px;
+            transition: margin-left 0.3s ease-in-out;
+        }
+
+        .content-area.expanded {
+            margin-left: 30px;
+        }
+
+        .btn-toggle-sidebar {
+            position: fixed;
+            left: 270px;
+            transform: translateX(-100%);
+            transition: left 0.4s ease-in-out;
+            background-color: #fff;
+            border: 2px solid #000;
+            border-radius: 50%;
+            height: 40px;
+            width: 40px;
+            font-size: 25px;
+            z-index: 1000;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .sidebar.collapsed + .btn-toggle-sidebar {
+            left: 50px;
+        }
+
+        .header {
+            border-bottom: 2px solid #000;
+        }
+
+        .btn-settings, .btn-favorite {
+            background: none;
+            border: none;
+            color: #000;
+            font-size: 20px;
+        }
+
+        .content-section {
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        .nav-item .nav-link{
+            border-bottom: 2px solid #000;
+            color: #000;
+            font-weight: 700;
+            padding: 0.7rem 0.3rem;
+        }
+
+        .nav-item .nav-link-back{
+            text-decoration: none;
+            display: block;
+            color: #000;
+            font-weight: 700;
+            padding: 2rem 0;
+        }
+
+        .navbar .navbar-brand span{
+            color: {{ classroom.subject.bg_color }} !important;
+        }
+    
+        .navbar .navbar-nav .header-nav-link {
+            color: {{ classroom.subject.bg_color }} !important;
+        }
+        
+        .btn-edit:hover{
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        .btn-delete {
+            background-color: {{ classroom.subject.bg_color }};
+            padding: 7px 14px;
+            border-radius: 10px;
+            transition: background-color 0.1s ease-in-out;
+        }
+
+        .btn-delete:hover {
+            background-color: #fecaca;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            margin-top: 20px;
+            width: 80px;
+            height: 40px;
+            cursor: pointer;
+        }
+
+        .toggle-switch input[type="checkbox"] {
+            display: none;
+        }
+
+        .toggle-switch-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 50%;
+            height: 60%;
+            background-color: #ddd;
+            border-radius: 20px;
+            box-shadow: inset 0 0 0 2px #ccc;
+            transition: background-color 0.3s ease-in-out;
+        }
+
+        .toggle-switch-handle {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 25px;
+            height: 25px;
+            background-color: #fff;
+            border-radius: 50%;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .toggle-switch::before {
+            content: "";
+            position: absolute;
+            top: -25px;
+            right: -35px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #aaa;
+            text-shadow: 1px 1px #fff;
+            transition: color 0.3s ease-in-out;
+        }
+
+        .toggle-switch input[type="checkbox"]:checked + .toggle-switch-handle {
+            transform: translateX(45px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2), 0 0 0 3px #05c46b;
+        }
+
+        .toggle-switch input[type="checkbox"]:checked + .toggle-switch-background {
+            background-color: #05c46b;
+            box-shadow: inset 0 0 0 2px #04b360;
+        }
+
+        .toggle-switch input[type="checkbox"]:checked + .toggle-switch:before {
+            content: "On";
+            color: #05c46b;
+            right: -15px;
+        }
+
+        .toggle-switch input[type="checkbox"]:checked + .toggle-switch-background .toggle-switch-handle {
+            transform: translateX(20px);
+        }
+
+        .btn-back {
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .btn-back:hover {
+            transform: translateX(-5%);
+        }
+    </style>
+</head>
+<body style="padding: 80px 0;">
+    {% include "header.html" %}
+    
+    <div class="sidebar">
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a id="welcome-link" class="nav-link active" href="#">Classroom Information</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link toggle-link" data-content="title-content" href="#">Chat</a>
+            </li>
+            <li class="nav-item">
+                <a class="btn-back nav-link-back toggle-link" href="#" onclick="history.back()"><i class="fa-solid fa-backward"></i>&nbsp;Back</a>
+            </li>
+        </ul>
+    </div>
+    
+
+    <div class="content-area">
+        <div id="welcome-content" class="content-section active pb-lg-5">
+            <div class="text-center">
+                <h1 style="font-weight: 700;" class="text-truncate ">CLASSROOM INFORMATION</h1>
+            </div>
+            <hr style="border: 1px solid #000;">
+            <div class="description d-flex justify-content-between align-items-center">
+                <div>
+                    <p class="m-0" style="font-weight: 700;">Classroom Name</p>
+                    <p class="m-0 pl-3 pt-3">Khoi's Math Class</p>
+                </div>
+                <div>
+                    <p class="btn-edit m-0 pr-5" style="font-weight: 700;">Edit</p>
+                </div>
+            </div>
+            <hr style="border: 1px solid #000;">
+            <div class="description d-flex justify-content-between align-items-center">
+                <div>
+                    <p class="m-0" style="font-weight: 700;">Classroom Description</p>
+                    <p class="m-0 pl-3 pt-3">Description of the classroom content</p>
+                </div>
+                <div>
+                    <p class="btn-edit m-0 pr-5" style="font-weight: 700;">Edit</p>
+                </div>
+            </div>
+            <hr style="border: 1px solid #000;">
+            <div class="description d-flex justify-content-between align-items-center">
+                <div>
+                    <p class="m-0" style="font-weight: 700;">Classroom Status</p>
+                    <p class="m-0 pl-3 pt-3">Private</p>
+                </div>
+                <div>
+                    <p class="btn-edit m-0 pr-5" style="font-weight: 700;">Edit</p>
+                </div>
+            </div>
+            <hr style="border: 1px solid #000;">
+            <div class="description d-flex justify-content-between align-items-center">
+                <div>
+                    <p class="m-0" style="font-weight: 700;">Participants</p>
+                    <p class="m-0 pl-3 pt-3">45</p>
+                </div>
+            </div>
+            <hr style="border: 1px solid #000;">
+            <div class="description d-flex justify-content-between align-items-center">
+                <div>
+                    <p class="m-0" style="font-weight: 700;">Likes</p>
+                    <p class="m-0 pl-3 pt-3">35</p>
+                </div>
+            </div>
+            <hr style="border: 1px solid #000;">
+            <div class="description d-flex justify-content-between align-items-center">
+                <div>
+                    <p class="m-0" style="font-weight: 700;">Delete Your Classroom</p>
+                    <p class="m-0 pl-3 pt-3">This will delete all your data and cannot be undone.</p>
+                </div>
+                <div>
+                    <button class="btn-delete m-0" style="font-weight: 700;">Delete classroom</button>
+                </div>
+            </div>
+        </div> 
+
+        <div id="title-content" class="content-section pb-lg-5">
+            <div class="text-center">
+                <h1 style="font-weight: 700;" class="text-truncate ">CHAT</h1>
+            </div>
+            <hr style="border: 1px solid #000;">
+            <div class="description d-flex justify-content-between align-items-center">
+                <div>
+                    <p class="m-0" style="font-weight: 700;">Allow participants to chat</p>
+                </div>
+                <div class="d-flex align-items-center">
+                    <label class="toggle-switch">
+                        <input type="checkbox">
+                        <div class="toggle-switch-background">
+                            <div class="toggle-switch-handle"></div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FontAwesome Icons -->
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(event) {
+                    event.preventDefault();
+
+                    document.querySelectorAll('.content-section').forEach(section => section.classList.remove('active'));
+                    document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+
+                    this.classList.add('active');
+                    const contentId = this.dataset.content || this.id.replace('-link', '-content');
+                    document.getElementById(contentId).classList.add('active');
+                });
+            });
+        });
+    </script>
+</body>
+</html>

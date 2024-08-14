@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings</title>
+    <style>
+
+        .settings {
+            width: 100%;
+            background-color: white;
+            padding: 100px 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .settings h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 30px;
+            font-weight: 700;
+        }
+
+        .settings h3 {
+            font-size: 20px;
+            font-weight: 700;
+            position: relative;
+            margin-left: 10%;
+        }
+
+        .section {
+            margin-bottom: 20px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            padding: 25px;
+            margin: 30px 10%;
+        }
+
+        .section label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .section input[type="text"],
+        .section input[type="email"],
+        .section input[type="password"],
+        .section input[type="number"] {
+            width: 50%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+        }
+
+        .section input[type="number"] {
+            width: 10%;
+            display: inline-block;
+        }
+
+        .section button {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            background-color: #6c757d;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .section button:hover {
+            background-color: #5a6268;
+        }
+
+        .section .switch-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+        }
+
+        .switch-container label {
+            font-weight: normal;
+        }
+
+        .section .switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 20px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 20px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 14px;
+            width: 14px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+
+        .delete-section {
+            display: flex;
+            justify-content: center;
+        }
+
+        .delete-section button {
+            width: 80%;
+            background-color: #dc3545;
+            border: none;
+            border-radius: 4px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 10px;
+        }
+
+        .delete-section button:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+{% include "header.html" %}
+<div class="settings">
+    <h2>Settings</h2>
+
+    <h3>Personal information</h3>
+    <div class="section">
+        <label for="email">Email</label>
+        <input type="email" id="email" value="khoileuiat03@gmail.com">
+
+        <label for="username">Username</label>
+        <input type="text" id="username" value="khoileuiat03">
+
+        <label for="dob">Date of birth</label>
+        <input type="number" id="dob-day" placeholder="13">
+        <input type="number" id="dob-month" placeholder="10">
+        <input type="number" id="dob-year" placeholder="2003">
+
+        <button>Save change</button>
+    </div>
+
+    <h3>Password</h3>
+    <div class="section">
+        <label for="current-password">Current password</label>
+        <input type="password" id="current-password" value="**********">
+
+        <label for="new-password">New password</label>
+        <input type="password" id="new-password" value="**********">
+
+        <label for="confirm-password">Confirm new password</label>
+        <input type="password" id="confirm-password" value="**********">
+
+        <button>Update password</button>
+    </div>
+
+    <h3>Notifications</h3>
+    <div class="section">
+        <div class="switch-container">
+            <label for="notify-sections">Notify me when sections are added to classrooms</label>
+            <label class="switch">
+                <input type="checkbox" id="notify-sections">
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <div class="switch-container">
+            <label for="receive-emails">Receive email notifications</label>
+            <label class="switch">
+                <input type="checkbox" id="receive-emails">
+                <span class="slider"></span>
+            </label>
+        </div>
+    </div>
+
+    <h3>Delete account</h3>
+    <div class="section delete-section">
+        <button>Permanently delete your account</button>
+    </div>
+</div>
+
+</body>
+</html>

@@ -5,6 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Classroom Detail</title>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.min.js"></script>
     <style>
         .sidebar {
             background-color: {{ classroom.subject.bg_color }};
@@ -53,7 +56,7 @@
             height: 40px;
             width: 40px;
             font-size: 25px;
-            z-index: 1100;
+            z-index: 1000;
             cursor: pointer;
             margin-top: 10px;
         }
@@ -368,6 +371,10 @@
             transition: transform 0.3s ease-in-out;
         }
 
+        .doc-icon img:hover{
+            transform: translatey(-5%); 
+        }
+
         .rating {
             display: flex;
             flex-direction: row-reverse;
@@ -530,7 +537,7 @@
             min-height: 100%;
             position: fixed;
             right: 0;
-            width: 800px;
+            width: 60%;
             transition: transform 0.7s ease-in-out;
             transform: translateX(100%);
             z-index: 1100;
@@ -563,12 +570,13 @@
             width: 40px;
             outline: none;
             font-size: 25px;
-            z-index: 1100;
+            z-index: 1000;
             cursor: pointer;
         }
         
         .right-sidebar.expanded + .btn-toggle-right-sidebar {
-            right: 800px;
+            right: 60%;
+            z-index: 1200;
             border-right: none;
             outline: none;
         }       
@@ -730,8 +738,8 @@
         
         .btn-toggle-right-messenger {
             position: fixed;
-            right: 30px;
-            transform: translateY(600px);
+            right: 25px;
+            transform: translateY(580px);
             transition: transform 0.7s ease-in-out;
             background-color: #fff;
             border-radius: 50%;
@@ -740,7 +748,7 @@
             width: 40px;
             outline: none;
             font-size: 25px;
-            z-index: 1200;
+            z-index: 1000;
             padding: 0;
             outline: none !important;
         }
@@ -750,6 +758,124 @@
         }
         .btn-toggle-right-messenger:hover {
             background-color: {{ classroom.subject.bg_color }};
+        }
+
+        .modal-content {
+            border-radius: 15px;
+        }
+
+        .chat-header {
+            border-bottom: 1px solid #ddd;
+            padding: 15px;
+            text-align: center;
+            position: relative;
+        }
+
+        .chat-header h5 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .chat-header .options {
+            position: absolute;
+            right: 20px;
+            top: 15px;
+        }
+
+        .chat-body {
+            padding: 20px;
+            max-height: 500px;
+            overflow-y: auto;
+            background-color: #fff;
+        }
+
+        .chat-message {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .chat-message .user-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .chat-message .message-content {
+            margin-left: 10px;
+            background-color: #f1f1f1;
+            border-radius: 10px;
+            padding: 10px;
+            flex: 1;
+        }
+
+        .chat-message .message-meta {
+            font-size: 12px;
+            color: #888;
+        }
+
+        .chat-message .message-text {
+            margin-top: 5px;
+            font-size: 14px;
+        }
+
+        .chat-footer {
+            padding: 15px;
+            border-top: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+        }
+
+        .chat-footer input[type="text"] {
+            flex: 1;
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            margin-right: 10px;
+        }
+
+        .chat-footer button {
+            border: none;
+            background: none;
+            font-size: 20px;
+            color: #888;
+            cursor: pointer;
+            outline: none !important;
+        }
+
+        .folder-card img{
+            margin-right: 10px;
+            width: 40px;
+            height: 40px;
+        }
+
+        .file-card, .recording-card {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 10px;
+            background-color: #fff;
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .file-card img, .recording-card img {
+            margin-right: 10px;
+            width: 40px;
+            height: 40px;
+        }
+
+        .crown-icon {
+            position: absolute;
+            top: 0;
+            left: 24px;
+            transform: translate(-50%, -70%);
+            background-color: transparent;
         }
         
     </style>
@@ -766,10 +892,10 @@
                 <a class="nav-link toggle-link" data-content="title-content" href="#">Title <i class="fas fa-caret-down"></i></a>
                 <ul class="nav flex-column submenu" style="display: none;">
                     <li class="nav-item">
-                        <a class="nav-link" href="#" data-content="subtitle-content">Sub-item 1</a>
+                        <a class="nav-link" href="#" data-content="subtitle-content1">Sub-item 1</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#" data-content="subtitle-content">Sub-item 2</a>
+                        <a class="nav-link" href="#" data-content="subtitle-content2">Sub-item 2</a>
                     </li>
                 </ul>
             </li>
@@ -870,15 +996,124 @@
         </div>
     </button>
 
-    <button class="btn-toggle-right-messenger">
+    <div class="modal fade" id="folderModal" tabindex="-1" aria-labelledby="folderModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content" style="border: 5px solid {{ classroom.subject.bg_color }}; border-radius: 15px;">
+                <div class="chat-header d-flex justify-content-between align-items-center">
+                    <h5 class="modal-title" id="folderModalLabel">Name of the classroom</h5>
+                    <div class="folder-card">
+                        <img src="{% static 'back.png' %}" onclick="openChatModal()" style="cursor: pointer;" alt="Folder Icon">
+                    </div>
+                </div>
+                <div class="folder-body">
+                    <div class="d-flex justify-content-between align-items-center p-3">
+                        <p class="m-0">Name of the file</p>
+                        <span>🗑️</span>
+                    </div>
+                    <hr class="m-0">
+                    <div class="d-flex justify-content-between align-items-center p-3">
+                        <p class="m-0">Name of the file</p>
+                        <span>🗑️</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="chatModal" tabindex="-1" aria-labelledby="chatModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content" style="border: 5px solid {{ classroom.subject.bg_color }}; border-radius: 15px;">
+                <div class="chat-header d-flex justify-content-between align-items-center">
+                    <h5 class="modal-title" id="chatModalLabel">Name of the classroom</h5>
+                    <div class="folder-card">
+                        <img src="{% static 'folder.png' %}" onclick="openFolderModal()" style="cursor: pointer;" alt="Folder Icon">
+                    </div>
+                </div>
+                <div class="chat-body">
+                    <div class="chat-message">
+                        <div class="user-icon">
+                            <img src="{% static 'account.png' %}" alt="User Icon" class="img-fluid">
+                        </div>
+                        <div class="message-content">
+                            <div class="message-meta">Username <span class="text-muted">day / month / year</span></div>
+                            <div class="file-card">
+                                <img src="{% static 'google-docs.png' %}" alt="File Icon">
+                                <div>
+                                    <p class="m-0">File name</p>
+                                    <p class="m-0 text-muted">File size</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="chat-message">
+                        <div class="user-icon position-relative">
+                            <img src="{% static 'account.png' %}" alt="User Icon" class="img-fluid">
+                            <div class="crown-icon">
+                                <img src="{% static 'crown.png' %}" alt="Crown Icon" width="20">
+                            </div>
+                        </div>
+                        <div class="message-content">
+                            <div class="message-meta">Username <span class="text-muted">day / month / year</span></div>
+                            <div class="recording-card">
+                                <img src="{% static 'play-button.png' %}" alt="Play Icon">
+                                <div>
+                                    <p class="m-0">Recording time</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="chat-message">
+                        <div class="user-icon">
+                            <img src="{% static 'account.png' %}" alt="User Icon" class="img-fluid">
+                        </div>
+                        <div class="message-content">
+                            <div class="message-meta">Username <span class="text-muted">day / month / year</span></div>
+                            <div class="message-text">User message...</div>
+                        </div>
+                    </div>
+
+                    <div class="chat-message">
+                        <div class="user-icon">
+                            <img src="{% static 'account.png' %}" alt="User Icon" class="img-fluid">
+                        </div>
+                        <div class="message-content">
+                            <div class="message-meta">Username <span class="text-muted">day / month / year</span></div>
+                            <div class="message-text">User message...</div>
+                        </div>
+                    </div>
+
+                    <div class="chat-message text-end d-flex justify-content-end">
+                        <div class="d-inline-block">
+                            <div class="message-meta">day / month / year <span class="text-muted">Username</span></div>
+                            <div class="message-text">User message...</div>
+                        </div>
+                        <div class="user-icon ms-2">
+                            <img src="{% static 'account.png' %}" alt="User Icon" class="img-fluid">
+                        </div>
+                    </div>
+                </div>
+                <div class="chat-footer">
+                    <input type="text" placeholder="Please input your message in here...">
+                    <button><i class="fa-solid fa-image"></i></button>
+                    <button><i class="fa-solid fa-file"></i></button>
+                    <button><i class="fa-solid fa-microphone"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
+    <button class="btn-toggle-right-messenger" data-bs-toggle="modal" data-bs-target="#chatModal">
         <div class="messenger-icon mr-3">
-            <img src="{% static "messenger.png" %}" alt="messenger Icon">
+            <img src="{% static 'messenger.png' %}" alt="messenger Icon">
         </div>
     </button>
     
 
     <div class="content-area">
-        <div id="welcome-content" class="content-section active">
+        <div id="welcome-content" class="content-section active pb-lg-5">
             <div class="header">
                 <h1 style="font-weight: 700;" class="text-truncate">Welcome to {{classroom.name}}</h1>
                 <div class="d-flex justify-content-between align-items-center">
@@ -892,8 +1127,8 @@
                         <nav class="cd-popup-window mt-1">
                         <ul>
                             <li>
-                            <button onclick="window.location.href='{% url 'subjects' %}'">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-gear" viewBox="0 0 16 16">
+                            <button onclick="window.location.href='{% url 'setting_classroom' classroom.id %}'">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="{{ classroom.subject.bg_color }}" class="bi bi-gear" viewBox="0 0 16 16">
                                     <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492M5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0"/>
                                     <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115z"/>
                                 </svg>
@@ -902,7 +1137,7 @@
                             </li>
                             <li>
                             <button onclick="window.location.href='{% url 'classrooms' classroom.subject.id classroom.grade %}'">
-                                <svg stroke-linejoin="round" stroke-linecap="round" stroke-width="2" stroke="currentColor" fill="none" viewBox="0 0 24 24" height="14" width="14" xmlns="http://www.w3.org/2000/svg">
+                                <svg stroke-linejoin="round" stroke-linecap="round" stroke-width="2" stroke="{{ classroom.subject.bg_color }}" fill="{{ classroom.subject.bg_color }}" viewBox="0 0 24 24" height="14" width="14" xmlns="http://www.w3.org/2000/svg">
                                 <line y2="18" x2="6" y1="6" x1="18"></line>
                                 <line y2="18" x2="18" y1="6" x1="6"></line>
                                 </svg>
@@ -987,7 +1222,7 @@
             </div>
         </div> 
 
-        <div id="title-content" class="content-section">
+        <div id="title-content" class="content-section pb-lg-5">
             <div class="header">
                 <h1 style="font-weight: 700;" class="text-truncate">Welcome to {{classroom.name}}</h1>
                 <div class="d-flex justify-content-between align-items-center">
@@ -1002,7 +1237,7 @@
                         <ul>
                             <li>
                             <button onclick="window.location.href='{% url 'subjects' %}'">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-gear" viewBox="0 0 16 16">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="{{ classroom.subject.bg_color }}" class="bi bi-gear" viewBox="0 0 16 16">
                                     <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492M5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0"/>
                                     <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115z"/>
                                 </svg>
@@ -1011,7 +1246,7 @@
                             </li>
                             <li>
                             <button onclick="window.location.href='{% url 'classrooms' classroom.subject.id classroom.grade %}'">
-                                <svg stroke-linejoin="round" stroke-linecap="round" stroke-width="2" stroke="currentColor" fill="none" viewBox="0 0 24 24" height="14" width="14" xmlns="http://www.w3.org/2000/svg">
+                                <svg stroke-linejoin="round" stroke-linecap="round" stroke-width="2" stroke="{{ classroom.subject.bg_color }}" fill="{{ classroom.subject.bg_color }}" viewBox="0 0 24 24" height="14" width="14" xmlns="http://www.w3.org/2000/svg">
                                 <line y2="18" x2="6" y1="6" x1="18"></line>
                                 <line y2="18" x2="18" y1="6" x1="6"></line>
                                 </svg>
@@ -1037,7 +1272,7 @@
             <hr style="border: 1px solid #000;">
             <h1 style="font-weight: 700;" class="text-truncate">Documents</h1>
             <p>There are 11 documents on {{ classroom.name }}</p>
-            <div class="d-flex pb-3 justify-content-between align-items-center pt-3 pb-3" style="padding-right: 400px;">
+            <div class="d-flex justify-content-between align-items-center pt-3 pb-3" style="padding-right: 400px;">
                 <div class="doc-icon mr-3">
                     <img src="{% static "google-docs.png" %}" alt="Document Icon">
                 </div>
@@ -1052,7 +1287,7 @@
             </div>
         </div>
 
-        <div id="subtitle-content" class="content-section">
+        <div id="subtitle-content1" class="content-section pb-lg-5">
             <div class="header">
                 <h1 style="font-weight: 700;" class="text-truncate">Welcome to {{classroom.name}}</h1>
                 <div class="d-flex justify-content-between align-items-center">
@@ -1067,7 +1302,7 @@
                         <ul>
                             <li>
                             <button onclick="window.location.href='{% url 'subjects' %}'">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-gear" viewBox="0 0 16 16">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="{{ classroom.subject.bg_color }}" class="bi bi-gear" viewBox="0 0 16 16">
                                     <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492M5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0"/>
                                     <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115z"/>
                                 </svg>
@@ -1076,7 +1311,7 @@
                             </li>
                             <li>
                             <button onclick="window.location.href='{% url 'classrooms' classroom.subject.id classroom.grade %}'">
-                                <svg stroke-linejoin="round" stroke-linecap="round" stroke-width="2" stroke="currentColor" fill="none" viewBox="0 0 24 24" height="14" width="14" xmlns="http://www.w3.org/2000/svg">
+                                <svg stroke-linejoin="round" stroke-linecap="round" stroke-width="2" stroke="currentColor" fill="{{ classroom.subject.bg_color }}" viewBox="0 0 24 24" height="14" width="14" xmlns="http://www.w3.org/2000/svg">
                                 <line y2="18" x2="6" y1="6" x1="18"></line>
                                 <line y2="18" x2="18" y1="6" x1="6"></line>
                                 </svg>
@@ -1094,7 +1329,7 @@
                     <strong>Description:</strong> {{ classroom.description }}
                 </p>
             </div>
-            <div class="d-flex pb-3 align-items-center pt-3 pb-3">
+            <div class="d-flex align-items-center pt-3 pb-3">
                 <div class="doc-icon mr-3">
                     <img src="{% static "google-docs.png" %}" alt="Document Icon">
                 </div>
@@ -1114,18 +1349,122 @@
             
             <h1 style="font-weight: 700;" class="text-truncate">Submit assignment</h1>
             <p>Deadline time: hour day/month/year - hour day/month/year</p>
-            <div class="d-flex pb-3 justify-content-between align-items-center pt-3 pb-3" style="padding-right: 400px;">
+            <div class="d-flex align-items-end pt-3 pb-3">
                 <div class="doc-icon mr-3">
                     <img src="{% static "google-docs.png" %}" alt="Document Icon">
                 </div>
-                <p class="m-0">Name of the document</p>
-                <button class="btn-doc" style="outline: none;">Open</button> | 
-                <button class="btn-doc" style="outline: none;">Download</button> 
+                <button class="btn-doc bg-secondary text-white" style="outline: none; padding: 3px 6px;">Choose file to submit</button> 
+            </div>
+            <div class="d-flex justify-content-start">
+                <button class="btn-doc" style="outline: none; padding: 5px 10px;">Submit</button> 
+            </div>
+            <hr>
+            <h1 style="font-weight: 700;" class="text-truncate">Submit assignment</h1>
+            <p>Deadline time: hour day/month/year - hour day/month/year</p>
+            <div class="d-flex align-items-end pt-3 pb-3">
+                <div class="doc-icon mr-3">
+                    <img src="{% static "google-docs.png" %}" alt="Document Icon">
+                </div>
+                <p class="m-0">Name of the document</p> 
+            </div>
+            <div class="d-flex justify-content-start align-items-center">
+                <button class="btn-doc mr-3" style="outline: none; padding: 5px 10px;">Update</button> 
+                <button class="btn-doc" style="outline: none; padding: 5px 10px;">Delete</button> 
+            </div>
+            <hr>
+            <h1 style="font-weight: 700;" class="text-truncate">Submit assignment</h1>
+            <p>Deadline time: hour day/month/year - hour day/month/year</p>
+            <div class="d-flex align-items-end pt-3 pb-3">
+                <div class="doc-icon mr-3">
+                    <img src="{% static "google-docs.png" %}" alt="Document Icon">
+                </div>
+                <p class="m-0">Name of the document</p> 
+            </div>
+            <div class="d-flex justify-content-start align-items-center">
+                <p class="m-0 ml-1" style="font-weight: 700;">Your score: 7/10</p>
+            </div>
+        </div>
+
+        <div id="subtitle-content2" class="content-section pb-lg-5">
+            <div class="header">
+                <h1 style="font-weight: 700;" class="text-truncate">Welcome to {{classroom.name}}</h1>
+                <div class="d-flex justify-content-between align-items-center">
+                    <label class="cd-popup m-0 mr-3">
+                        <input type="checkbox">
+                        <div class="cd-burger" tabindex="0">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                        <nav class="cd-popup-window mt-1">
+                        <ul>
+                            <li>
+                            <button onclick="window.location.href='{% url 'subjects' %}'">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="{{ classroom.subject.bg_color }}" class="bi bi-gear" viewBox="0 0 16 16">
+                                    <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492M5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0"/>
+                                    <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115z"/>
+                                </svg>
+                                <span style="font-weight: 500;">Settings</span>
+                            </button>
+                            </li>
+                            <li>
+                            <button onclick="window.location.href='{% url 'classrooms' classroom.subject.id classroom.grade %}'">
+                                <svg stroke-linejoin="round" stroke-linecap="round" stroke-width="2" stroke="{{ classroom.subject.bg_color }}" fill="none" viewBox="0 0 24 24" height="14" width="14" xmlns="http://www.w3.org/2000/svg">
+                                <line y2="18" x2="6" y1="6" x1="18"></line>
+                                <line y2="18" x2="18" y1="6" x1="6"></line>
+                                </svg>
+                                <span style="font-weight: 500;">Classrooms</span>
+                            </button>
+                            </li>
+                        </ul>
+                        </nav>
+                    </label>                      
+                    <button class="btn-favorite mr-4" style="outline: none;"><i class="fa-regular fa-star fa-xl"></i></button>
+                </div>
+            </div>
+            <div class="description mt-3 mb-3">
+                <p style="text-align: justify;">
+                    <strong>Description:</strong> {{ classroom.description }}
+                </p>
+            </div>
+            <div class="d-flex align-items-center pt-3 pb-3">
+                <div class="doc-icon mr-3">
+                    <img src="{% static "google-docs.png" %}" alt="Document Icon">
+                </div>
+                <div class="doc-icon mr-3">
+                    <img src="{% static "google-docs.png" %}" alt="Document Icon">
+                </div>
+                <div class="doc-icon mr-3">
+                    <img src="{% static "google-docs.png" %}" alt="Document Icon">
+                </div>
             </div>
             <div class="edit-description d-flex justify-content-end">
                 <a href="#" class="edit-icon">
                     <i class="fas fa-edit fa-lg"></i>
                 </a>
+            </div>
+            <hr style="border: 1px solid #000;">
+            
+            <h1 style="font-weight: 700;" class="text-truncate">Answer the question</h1>
+            <p class="m-0 mt-2 mb-2">There are a total of 10 questions</p>
+            <div class="d-flex align-items-end pb-3">
+                <div class="doc-icon mr-3">
+                    <img src="{% static "option.png" %}" alt="Document Icon">
+                </div> 
+            </div>
+            <div class="d-flex justify-content-start">
+                <button class="btn-doc" style="outline: none; padding: 5px 10px;">Get started</button> 
+            </div>
+            <hr>
+            <h1 style="font-weight: 700;" class="text-truncate">Answer the question</h1>
+            <p>There are a total of 10 questions</p>
+            <div class="d-flex align-items-end pb-3">
+                <div class="doc-icon mr-3">
+                    <img src="{% static "option.png" %}" alt="Document Icon">
+                </div> 
+            </div>
+            <div class="d-flex justify-content-start align-items-center">
+                <p class="m-0 ml-1" style="font-weight: 700;">Your score: 7/10</p>
             </div>
         </div>
     </div>
@@ -1208,8 +1547,33 @@
                 scoresContent.classList.add("active");
                 participantsContent.classList.remove("active");
             });
-            
         });
+
+        function openFolderModal() {
+            // Đóng modal hiện tại
+            var currentModal = document.querySelector('.modal.show');
+            if (currentModal) {
+                var modalInstance = bootstrap.Modal.getInstance(currentModal);
+                modalInstance.hide();
+            }
+    
+            // Mở folderModal
+            var folderModal = new bootstrap.Modal(document.getElementById('folderModal'));
+            folderModal.show();
+        }
+
+        function openChatModal() {
+            // Đóng modal hiện tại
+            var currentModal = document.querySelector('.modal.show');
+            if (currentModal) {
+                var modalInstance = bootstrap.Modal.getInstance(currentModal);
+                modalInstance.hide();
+            }
+    
+            // Mở folderModal
+            var folderModal = new bootstrap.Modal(document.getElementById('chatModal'));
+            folderModal.show();
+        }
     </script>
 </body>
 </html>
