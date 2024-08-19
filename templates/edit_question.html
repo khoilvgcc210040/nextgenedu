@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create the Question</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: "Montserrat", sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            position: relative;
+        }
+
+        .question-container {
+            background-color: #ffffff;
+            border-radius: 15px;
+            border: 5px solid #000;
+            padding: 20px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .question-container h1 {
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+
+        .question-container .form-group {
+            margin-bottom: 20px;
+        }
+
+        .question-container input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        .question-container .option-container {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        .question-container .option-container .option {
+            flex: 0 0 48%;
+            margin-bottom: 20px;
+        }
+
+        .question-container .option-container .option input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        .question-container .submit-btn {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .question-container .submit-btn button {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .question-container .submit-btn button:hover {
+            background-color: #5a6268;
+        }
+
+        .back-icon {
+            position: absolute;
+            top: 15%;
+            left: 15%;
+            font-size: 24px;
+            cursor: pointer;
+            color: #000;
+            z-index: 1000;
+            transition: transform 0.2s ease-in-out; 
+        }
+        
+        .submission-title-content {
+            display: flex;
+            align-items: center;
+            transition: all 0.2s ease-in-out; 
+        }
+        
+        .submission-title-content:hover {
+            transform: translateX(-10%);
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    {% include "header.html" %}
+
+    <a href="#" class="back-icon" style="text-decoration: none;">
+        <div class="submission-title-content d-flex align-items-center" onclick="window.location.href='{% url "question_list" submission.id %}'">
+            <i class="fas fa-backward fa-lg mr-2"></i>
+            <p class="m-0" style="font-weight: 500;">Back</p>
+        </div>
+    </a>
+
+    <div class="question-container">
+        <h1>Edit the question</h1>
+        <form method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <input type="text" name="question_text" value="{{ question.text }}" required>
+            </div>
+            <div class="option-container">
+                {% for answer in answers %}
+                    <div class="option">
+                        <input type="text" name="option{{ forloop.counter }}" value="{{ answer.text }}" required>
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="form-group">
+                <label for="correct_option">Correct Option:</label>
+                <select name="correct_option" style="padding: 3px 6px; border: 1px solid #000; border-radius: 5px;"  required>
+                    {% for answer in answers %}
+                        <option value="{{ forloop.counter }}" {% if answer.is_correct %}selected{% endif %}>Option {{ forloop.counter }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="submit-btn">
+                <button type="submit">Save changes</button>
+            </div>
+        </form>
+    </div>
+
+</body>
+</html>

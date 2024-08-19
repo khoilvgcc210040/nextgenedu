@@ -85,63 +85,76 @@
 
     <div class="content-wrapper">
         <div class="submission-title">
-            <div class="submission-title-content d-flex align-items-center" onclick="window.location.href='{% url "manage_classroom" %}'">
+            <div class="submission-title-content d-flex align-items-center" onclick="window.location.href='{% url "manage_classroom_detail" submission.section.classroom.id %}'">
                 <i class="fas fa-backward fa-lg mr-2"></i>
-                <p class="m-0" style="font-weight: 500;">Name of the submission</p>
+                <p class="m-0" style="font-weight: 500;">{{ submission.title }}</p>
             </div>
         </div>
 
         <div class="add-question-btn">
-            <button><i class="fas fa-plus"></i> Add a question</button>
-        </div>
+            <button onclick="window.location.href='{% url 'create_question' submission.id %}'">
+                <i class="fas fa-plus"></i> Add a question
+            </button>
+        </div>      
 
         <div class="table-question">
             <table class="question-table">
                 <thead>
                     <tr>
-                        <th>4 question</th>
+                        <th>{{ questions.count }} question(s)</th>
                     </tr>
                 </thead>
                 <tbody>
+                    {% for question in questions %}
                     <tr>
                         <td>
-                            <div>Question Text 1</div>
+                            <div>{{ question.text }}</div>
                             <div class="d-flex justify-content-between align-items-center mt-2">
                                 <div>
-                                    <i class="fas fa-key fa-lg"></i> Answer 1 &nbsp;
-                                    <i class="fas fa-key fa-lg"></i> Answer 2 &nbsp;
-                                    <i class="fas fa-key fa-lg"></i> Answer 3 &nbsp;
-                                    <i class="fas fa-key fa-lg"></i> Answer 4
+                                    {% for answer in question.answers.all %}
+                                        {% if answer.is_correct %}<i class="fas fa-key fa-lg text-warning"></i>{% else %}<i class="fas fa-key fa-lg"></i>{% endif %} {{ answer.text }} 
+                                    {% endfor %}
                                 </div>
                                 <div class="question-actions">
-                                    <i class="fas fa-edit fa-lg"></i>
-                                    <i class="fas fa-trash-alt fa-lg"></i>
-                                </div>
+                                    <a href="{% url 'edit_question' submission.id question.id %}">
+                                        <i class="fas fa-edit fa-lg" style="vertical-align: 0;"></i>
+                                    </a>
+                                    <i class="fas fa-trash-alt fa-lg text-danger" style="line-height: 1;" data-toggle="modal" data-target="#deleteModal{{ question.id }}"></i>
+                                </div>                               
                             </div>
                         </td>
                     </tr>
-                    <tr>
-                        <td>
-                            <div>Question Text 1</div>
-                            <div class="d-flex justify-content-between align-items-center mt-2">
-                                <div>
-                                    <i class="fas fa-key fa-lg"></i> Answer 1 &nbsp;
-                                    <i class="fas fa-key fa-lg"></i> Answer 2 &nbsp;
-                                    <i class="fas fa-key fa-lg"></i> Answer 3 &nbsp;
-                                    <i class="fas fa-key fa-lg"></i> Answer 4
+
+                    <!-- Modal xác nhận xóa -->
+                    <div class="modal fade" id="deleteModal{{ question.id }}" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel{{ question.id }}" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="deleteModalLabel{{ question.id }}">Confirm Delete</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
                                 </div>
-                                <div class="question-actions">
-                                    <i class="fas fa-edit fa-lg"></i>
-                                    <i class="fas fa-trash-alt fa-lg"></i>
+                                <div class="modal-body">
+                                    Are you sure you want to delete this question?
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                    <form action="{% url 'delete_question' submission.id question.id %}" method="POST">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-danger">Delete</button>
+                                    </form>
                                 </div>
                             </div>
-                        </td>
-                    </tr>
-                    <!-- Thêm các câu hỏi khác ở đây -->
+                        </div>
+                    </div>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>
     </div>
-
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

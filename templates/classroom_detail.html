@@ -1,4 +1,5 @@
 {% load static %}
+{% load filters %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -882,25 +883,178 @@
 </head>
 <body style="padding: 80px 0;">
     {% include "header.html" %}
+
+    <!-- Modal for editing submission -->
+    <div class="modal fade" id="editSubmissionModal" tabindex="-1" aria-labelledby="editSubmissionModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editSubmissionModalLabel">Edit Submission</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editSubmissionForm" method="post" enctype="multipart/form-data" action="{% url 'update_submission' classroom.id 0 %}">
+                        {% csrf_token %}
+                        <!-- Edit Description -->
+                        <div class="mb-3">
+                            <label for="submissionDescription" class="form-label">Description</label>
+                            <textarea id="submissionDescription" name="description" class="form-control" rows="3"></textarea>
+                        </div>
+
+                        <!-- Manage Files -->
+                        <div class="mb-3">
+                            <label for="uploadFile" class="form-label">Upload New File</label>
+                            <input type="file" id="uploadFile" name="uploadFile" class="form-control">
+                        </div>
+                        <div class="mb-3">
+                            <label for="deleteFileSubmission" class="form-label">Delete Existing File</label>
+                            <select id="deleteFileSubmission" name="deleteFileSubmission" class="form-select">
+                                <option value="">Select a file to delete</option>
+                                <!-- File options will be populated dynamically -->
+                            </select>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Save changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Classroom Description Modal -->
+    <div class="modal fade" id="editClassroomDescriptionModal" tabindex="-1" aria-labelledby="editClassroomDescriptionModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editClassroomDescriptionModalLabel">Edit Classroom Description</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="editClassroomDescriptionForm" method="POST" action="{% url 'update_classroom_description' classroom.id %}">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="classroomDescription" class="form-label">Description</label>
+                            <textarea id="classroomDescription" name="description" rows="4" class="form-control">{{ classroom.description }}</textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Modal for editing description -->
+    <div class="modal fade" id="editDescriptionModal" tabindex="-1" aria-labelledby="editDescriptionModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editDescriptionModalLabel">Edit Description</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editDescriptionForm" method="post" action="{% url 'update_section' classroom.id 0 %}">
+                        {% csrf_token %}
+                        <input type="hidden" id="editSectionId" name="section_id" value="">
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea id="description" name="description" class="form-control" rows="3"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save changes</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal for editing description -->
+    <div class="modal fade" id="editDescriptionModal" tabindex="-1" aria-labelledby="editDescriptionModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editDescriptionModalLabel">Edit Description</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editDescriptionForm" method="post" action="{% url 'update_section' classroom.id 0 %}">
+                        {% csrf_token %}
+                        <input type="hidden" id="editSectionId" name="section_id" value="">
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea id="description" name="description" class="form-control" rows="3"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save changes</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
+    <!-- Modal for uploading and deleting files -->
+    <div class="modal fade" id="editFilesModal" tabindex="-1" aria-labelledby="editFilesModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editFilesModalLabel">Manage Files</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editFilesForm" method="post" enctype="multipart/form-data" action="{% url 'update_section' classroom.id 0 %}">
+                        {% csrf_token %}
+                        <input type="hidden" id="editFilesSectionId" name="section_id" value="">
+                        <!-- Upload file -->
+                        <div class="mb-3">
+                            <label for="uploadFile" class="form-label">Upload File</label>
+                            <input type="file" id="uploadFile" name="uploadFile" class="form-control">
+                        </div>
+                        <!-- Delete file -->
+                        <div class="mb-3">
+                            <label for="deleteFile" class="form-label">Delete File</label>
+                            <select id="deleteFile" name="deleteFile" class="form-select">
+                                <option value="">Select a file to delete</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save changes</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     
     <div class="sidebar">
         <ul class="nav flex-column">
-            <li class="nav-item">
-                <a id="welcome-link" class="nav-link active" href="#">Welcome</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link toggle-link" data-content="title-content" href="#">Title <i class="fas fa-caret-down"></i></a>
-                <ul class="nav flex-column submenu" style="display: none;">
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" data-content="subtitle-content1">Sub-item 1</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" data-content="subtitle-content2">Sub-item 2</a>
-                    </li>
-                </ul>
-            </li>
+            {% for section in sections %}
+                {% if not section.parent_section %}
+                <li class="nav-item">
+                    <a class="nav-link toggle-link" data-content="section-content-{{ section.id }}" href="#">{{ section.title }} <i class="fas fa-caret-down"></i></a>
+                    <ul class="nav flex-column submenu" style="display: none;">
+                        {% for subsection in sections %}
+                            {% if subsection.parent_section == section %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="#" data-content="subsection-content-{{ subsection.id }}">{{ subsection.title }}</a>
+                            </li>
+                            {% endif %}
+                        {% endfor %}
+                        {% for submission in section.submissions.all %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-content="submission-content-{{ submission.id }}">{{ submission.title }} ({{ submission.get_submission_type_display }})</a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </li>
+                {% endif %}
+            {% endfor %}
         </ul>
-    </div>
+    </div>    
+    
 
     <button class="btn-toggle-sidebar">
         <i class="fas fa-bars"></i>
@@ -911,18 +1065,8 @@
             <button id="participants-btn" class="tab active p-3">Participants</button>
             <button id="scores-btn" class="tab p-3">Scores</button>
         </div>
-
+    
         <div id="participants" class="tab-content active">
-            <div class="search-filter d-flex justify-content-end align-items-center">
-                <select class="role-filter">
-                    <option value="">Roles</option>
-                    <option value="Student">Student</option>
-                    <option value="Instructor">Instructor</option>
-                    <!-- Add more roles as needed -->
-                </select>
-                <input type="text" class="search-box" placeholder="Search by name...">
-                <button class="search-btn">🔍</button>
-            </div>
             <table>
                 <thead>
                     <tr>
@@ -932,32 +1076,19 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- Repeat rows as needed -->
+                    {% for participant in participants %}
                     <tr>
-                        <td>Khoi Lieu</td>
-                        <td>Student</td>
+                        <td>{{ participant.user.username }}</td>
+                        <td>{{ participant.user.role }}</td>
                         <td><button class="delete-btn">🗑️</button></td>
                     </tr>
-                    <tr>
-                        <td>Khoi Lieu</td>
-                        <td>Course Instructor</td>
-                        <td><button class="delete-btn">🗑️</button></td>
-                    </tr>
+                    {% endfor %}
                 </tbody>
             </table>
-            <!-- Pagination -->
-            <div class="pagination">
-                <button>1</button>
-                <button>2</button>
-                <button>3</button>
-                <button>4</button>
-                <button>5</button>
-                <button>&gt;</button>
-            </div>
         </div>
-
+    
         <div id="scores" class="tab-content hidden">
-            <h3>"Subject name" ranking</h3>
+            <h3>"{{ classroom.subject.name }}" ranking</h3>
             <table>
                 <thead>
                     <tr>
@@ -968,26 +1099,18 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- Repeat rows as needed -->
+                    {% for score in scores_data %}
                     <tr>
-                        <td>Khoi Lieu</td>
-                        <td>1</td>
-                        <td>1h 20s</td>
-                        <td>120</td>
+                        <td>{{ score.user.username }}</td>
+                        <td>{{ score.num_tests }}</td>
+                        <td>{{ score.total_time|floatformat:2 }}s</td>
+                        <td>{{ score.total_score }}</td>
                     </tr>
+                    {% endfor %}
                 </tbody>
             </table>
-            <!-- Pagination -->
-            <div class="pagination">
-                <button>1</button>
-                <button>2</button>
-                <button>3</button>
-                <button>4</button>
-                <button>5</button>
-                <button>&gt;</button>
-            </div>
         </div>
-    </div>
+    </div>    
     
     <button class="btn-toggle-right-sidebar">
         <i class="fas fa-chevron-left"></i>
@@ -1110,10 +1233,11 @@
             <img src="{% static 'messenger.png' %}" alt="messenger Icon">
         </div>
     </button>
-    
 
     <div class="content-area">
-        <div id="welcome-content" class="content-section active pb-lg-5">
+        {% for section in sections %}
+        {% if forloop.first %}
+        <div id="section-content-{{ section.id }}" class="content-section active">
             <div class="header">
                 <h1 style="font-weight: 700;" class="text-truncate">Welcome to {{classroom.name}}</h1>
                 <div class="d-flex justify-content-between align-items-center">
@@ -1152,10 +1276,10 @@
             </div>
             <div class="description mt-3 mb-3">
                 <p style="text-align: justify;">
-                    <strong>Description:</strong> {{ classroom.description }}
+                    <strong>Description:</strong> <span class="actual-description">{{ classroom.description }}</span>
                 </p>
-            </div>
-            <div class="edit-description d-flex justify-content-end">
+            </div>            
+            <div class="edit-description-classroom d-flex justify-content-end">
                 <a href="#" class="edit-icon">
                     <i class="fas fa-edit fa-lg"></i>
                 </a>
@@ -1220,11 +1344,11 @@
                     </div>
                 </div>     
             </div>
-        </div> 
-
-        <div id="title-content" class="content-section pb-lg-5">
+        </div>
+        {% else %}
+        <div id="section-content-{{ section.id }}" class="content-section hidden">
             <div class="header">
-                <h1 style="font-weight: 700;" class="text-truncate">Welcome to {{classroom.name}}</h1>
+                <h1 style="font-weight: 700;" class="text-truncate">{{section.title}}</h1>
                 <div class="d-flex justify-content-between align-items-center">
                     <label class="cd-popup m-0 mr-3">
                         <input type="checkbox">
@@ -1261,7 +1385,7 @@
             </div>
             <div class="description mt-3 mb-3">
                 <p style="text-align: justify;">
-                    <strong>Description:</strong> {{ classroom.description }}
+                    <strong>Description:</strong> <span class="actual-description">{{ section.description }}</span> 
                 </p>
             </div>
             <div class="edit-description d-flex justify-content-end">
@@ -1271,25 +1395,33 @@
             </div>
             <hr style="border: 1px solid #000;">
             <h1 style="font-weight: 700;" class="text-truncate">Documents</h1>
-            <p>There are 11 documents on {{ classroom.name }}</p>
+            <p>There are {{ section.files.count }} documents on {{ section.title }}</p>
+            {% for file in section.files.all %}
             <div class="d-flex justify-content-between align-items-center pt-3 pb-3" style="padding-right: 400px;">
                 <div class="doc-icon mr-3">
-                    <img src="{% static "google-docs.png" %}" alt="Document Icon">
+                    <img src="{% static 'google-docs.png' %}" alt="Document Icon">
                 </div>
-                <p class="m-0">Name of the document</p>
-                <button class="btn-doc" style="outline: none;">Open</button> | 
-                <button class="btn-doc" style="outline: none;">Download</button> 
-            </div>
-            <div class="edit-description d-flex justify-content-end">
+                <div class="file-name-container" style="flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                    <p class="m-0">{{ file.file.name|filename }}</p>
+                </div>
+                <button class="btn-doc" style="outline: none; margin-left: 15px;" onclick="openPDFModal('{{ file.file.url }}')">Open</button>
+                <span style="margin-left: 10px;">|</span>
+                <button class="btn-doc" style="outline: none; margin-left: 10px;">
+                    <a href="{{ file.file.url }}" download style="text-decoration: none; color: #000;">Download</a>
+                </button>
+            </div>            
+            {% endfor %}
+            <div class="edit-files d-flex justify-content-end">
                 <a href="#" class="edit-icon">
                     <i class="fas fa-edit fa-lg"></i>
                 </a>
             </div>
         </div>
-
-        <div id="subtitle-content1" class="content-section pb-lg-5">
+        {% endif %}
+        {% for subsection in section.subsections.all %}
+        <div id="subsection-content-{{ subsection.id }}" class="content-section hidden">
             <div class="header">
-                <h1 style="font-weight: 700;" class="text-truncate">Welcome to {{classroom.name}}</h1>
+                <h1 style="font-weight: 700;" class="text-truncate">{{subsection.title}}</h1>
                 <div class="d-flex justify-content-between align-items-center">
                     <label class="cd-popup m-0 mr-3">
                         <input type="checkbox">
@@ -1311,7 +1443,7 @@
                             </li>
                             <li>
                             <button onclick="window.location.href='{% url 'classrooms' classroom.subject.id classroom.grade %}'">
-                                <svg stroke-linejoin="round" stroke-linecap="round" stroke-width="2" stroke="currentColor" fill="{{ classroom.subject.bg_color }}" viewBox="0 0 24 24" height="14" width="14" xmlns="http://www.w3.org/2000/svg">
+                                <svg stroke-linejoin="round" stroke-linecap="round" stroke-width="2" stroke="{{ classroom.subject.bg_color }}" fill="{{ classroom.subject.bg_color }}" viewBox="0 0 24 24" height="14" width="14" xmlns="http://www.w3.org/2000/svg">
                                 <line y2="18" x2="6" y1="6" x1="18"></line>
                                 <line y2="18" x2="18" y1="6" x1="6"></line>
                                 </svg>
@@ -1326,19 +1458,8 @@
             </div>
             <div class="description mt-3 mb-3">
                 <p style="text-align: justify;">
-                    <strong>Description:</strong> {{ classroom.description }}
+                    <strong>Description:</strong> <span class="actual-description">{{ subsection.description }}</span>  
                 </p>
-            </div>
-            <div class="d-flex align-items-center pt-3 pb-3">
-                <div class="doc-icon mr-3">
-                    <img src="{% static "google-docs.png" %}" alt="Document Icon">
-                </div>
-                <div class="doc-icon mr-3">
-                    <img src="{% static "google-docs.png" %}" alt="Document Icon">
-                </div>
-                <div class="doc-icon mr-3">
-                    <img src="{% static "google-docs.png" %}" alt="Document Icon">
-                </div>
             </div>
             <div class="edit-description d-flex justify-content-end">
                 <a href="#" class="edit-icon">
@@ -1346,131 +1467,234 @@
                 </a>
             </div>
             <hr style="border: 1px solid #000;">
-            
-            <h1 style="font-weight: 700;" class="text-truncate">Submit assignment</h1>
-            <p>Deadline time: hour day/month/year - hour day/month/year</p>
-            <div class="d-flex align-items-end pt-3 pb-3">
+            <h1 style="font-weight: 700;" class="text-truncate">Documents</h1>                     
+            <p>There are {{ subsection.files.count }} documents on {{ subsection.title }}</p>
+            {% for file in subsection.files.all %}
+            <div class="d-flex justify-content-between align-items-center pt-3 pb-3" style="padding-right: 400px;">
                 <div class="doc-icon mr-3">
-                    <img src="{% static "google-docs.png" %}" alt="Document Icon">
+                    <img src="{% static 'google-docs.png' %}" alt="Document Icon">
                 </div>
-                <button class="btn-doc bg-secondary text-white" style="outline: none; padding: 3px 6px;">Choose file to submit</button> 
-            </div>
-            <div class="d-flex justify-content-start">
-                <button class="btn-doc" style="outline: none; padding: 5px 10px;">Submit</button> 
-            </div>
-            <hr>
-            <h1 style="font-weight: 700;" class="text-truncate">Submit assignment</h1>
-            <p>Deadline time: hour day/month/year - hour day/month/year</p>
-            <div class="d-flex align-items-end pt-3 pb-3">
-                <div class="doc-icon mr-3">
-                    <img src="{% static "google-docs.png" %}" alt="Document Icon">
+                <div class="file-name-container" style="flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                    <p class="m-0">{{ file.file.name|filename }}</p>
                 </div>
-                <p class="m-0">Name of the document</p> 
-            </div>
-            <div class="d-flex justify-content-start align-items-center">
-                <button class="btn-doc mr-3" style="outline: none; padding: 5px 10px;">Update</button> 
-                <button class="btn-doc" style="outline: none; padding: 5px 10px;">Delete</button> 
-            </div>
-            <hr>
-            <h1 style="font-weight: 700;" class="text-truncate">Submit assignment</h1>
-            <p>Deadline time: hour day/month/year - hour day/month/year</p>
-            <div class="d-flex align-items-end pt-3 pb-3">
-                <div class="doc-icon mr-3">
-                    <img src="{% static "google-docs.png" %}" alt="Document Icon">
-                </div>
-                <p class="m-0">Name of the document</p> 
-            </div>
-            <div class="d-flex justify-content-start align-items-center">
-                <p class="m-0 ml-1" style="font-weight: 700;">Your score: 7/10</p>
+                <button class="btn-doc" style="outline: none; margin-left: 15px;" onclick="openPDFModal('{{ file.file.url }}')">Open</button>
+                <span style="margin-left: 10px;">|</span>
+                <button class="btn-doc" style="outline: none; margin-left: 10px;">
+                    <a href="{{ file.file.url }}" download style="text-decoration: none; color: #000;">Download</a>
+                </button>
+            </div>  
+            {% endfor %}
+            <div class="edit-files d-flex justify-content-end">
+                <a href="#" class="edit-icon">
+                    <i class="fas fa-edit fa-lg"></i>
+                </a>
             </div>
         </div>
-
-        <div id="subtitle-content2" class="content-section pb-lg-5">
-            <div class="header">
-                <h1 style="font-weight: 700;" class="text-truncate">Welcome to {{classroom.name}}</h1>
-                <div class="d-flex justify-content-between align-items-center">
-                    <label class="cd-popup m-0 mr-3">
-                        <input type="checkbox">
-                        <div class="cd-burger" tabindex="0">
-                            <span></span>
-                            <span></span>
-                            <span></span>
+        {% endfor %}
+        {% for submission in section.submissions.all %}
+            {% if submission.submission_type == 'assignment' %}
+            <div id="submission-content-{{ submission.id }}" class="content-section hidden">
+                <div class="header">
+                    <h1 style="font-weight: 700;" class="text-truncate">{{submission.title}}</h1>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <label class="cd-popup m-0 mr-3">
+                            <input type="checkbox">
+                            <div class="cd-burger" tabindex="0">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </div>
+                            <nav class="cd-popup-window mt-1">
+                            <ul>
+                                <li>
+                                <button onclick="window.location.href='{% url 'subjects' %}'">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="{{ classroom.subject.bg_color }}" class="bi bi-gear" viewBox="0 0 16 16">
+                                        <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492M5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0"/>
+                                        <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115z"/>
+                                    </svg>
+                                    <span style="font-weight: 500;">Settings</span>
+                                </button>
+                                </li>
+                                <li>
+                                <button onclick="window.location.href='{% url 'classrooms' classroom.subject.id classroom.grade %}'">
+                                    <svg stroke-linejoin="round" stroke-linecap="round" stroke-width="2" stroke="currentColor" fill="{{ classroom.subject.bg_color }}" viewBox="0 0 24 24" height="14" width="14" xmlns="http://www.w3.org/2000/svg">
+                                    <line y2="18" x2="6" y1="6" x1="18"></line>
+                                    <line y2="18" x2="18" y1="6" x1="6"></line>
+                                    </svg>
+                                    <span style="font-weight: 500;">Classrooms</span>
+                                </button>
+                                </li>
+                            </ul>
+                            </nav>
+                        </label>                      
+                        <button class="btn-favorite mr-4" style="outline: none;"><i class="fa-regular fa-star fa-xl"></i></button>
+                    </div>
+                </div>
+                <div class="description mt-3 mb-3">
+                    <p style="text-align: justify;">
+                        <strong>Description:</strong> <span class="actual-description">{{ submission.description }}</span>
+                    </p>
+                </div>
+                
+                <div class="d-flex align-items-center pt-2 pb-2">
+                    {% for file in submission.files.all %}
+                        <div class="d-flex align-items-center pt-2 pb-2">
+                            <div class="doc-icon mr-3">
+                                <a href="{{ file.file.url }}" download data-file-id="{{ file.id }}">
+                                    <img src="{% static 'google-docs.png' %}" alt="{{ file.file.name|filename }}">
+                                </a>
+                            </div>
+                            <div class="file-name-container" style="flex: 1;">
+                                <p class="m-0" style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="{{ file.file.name|filename }}">
+                                    {{ file.file.name|filename }}
+                                </p>
+                            </div>
                         </div>
-                        <nav class="cd-popup-window mt-1">
-                        <ul>
-                            <li>
-                            <button onclick="window.location.href='{% url 'subjects' %}'">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="{{ classroom.subject.bg_color }}" class="bi bi-gear" viewBox="0 0 16 16">
-                                    <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492M5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0"/>
-                                    <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115z"/>
-                                </svg>
-                                <span style="font-weight: 500;">Settings</span>
-                            </button>
-                            </li>
-                            <li>
-                            <button onclick="window.location.href='{% url 'classrooms' classroom.subject.id classroom.grade %}'">
-                                <svg stroke-linejoin="round" stroke-linecap="round" stroke-width="2" stroke="{{ classroom.subject.bg_color }}" fill="none" viewBox="0 0 24 24" height="14" width="14" xmlns="http://www.w3.org/2000/svg">
-                                <line y2="18" x2="6" y1="6" x1="18"></line>
-                                <line y2="18" x2="18" y1="6" x1="6"></line>
-                                </svg>
-                                <span style="font-weight: 500;">Classrooms</span>
-                            </button>
-                            </li>
-                        </ul>
-                        </nav>
-                    </label>                      
-                    <button class="btn-favorite mr-4" style="outline: none;"><i class="fa-regular fa-star fa-xl"></i></button>
+                    {% endfor %}
+                </div>                
+                
+                <div class="edit-submission d-flex justify-content-end">
+                    <a href="#" class="edit-icon">
+                        <i class="fas fa-edit fa-lg"></i>
+                    </a>
+                </div>
+                
+                <hr style="border: 1px solid #000;">
+                
+                <h1 style="font-weight: 700;" class="text-truncate">Submit assignment</h1>
+                <p>Deadline time: {{submission.open_date}} - {{submission.close_date}}</p>
+                <div class="d-flex align-items-end pt-3 pb-3">
+                    <div class="doc-icon mr-3">
+                        <img src="{% static "google-docs.png" %}" alt="Document Icon">
+                    </div>
+                    <button class="btn-doc bg-secondary text-white" style="outline: none; padding: 3px 6px;">Choose file to submit</button> 
+                </div>
+                <div class="d-flex justify-content-start">
+                    <button class="btn-doc" style="outline: none; padding: 5px 10px;">Submit</button> 
+                </div>
+                <hr>
+                <h1 style="font-weight: 700;" class="text-truncate">Submit assignment</h1>
+                <p>Deadline time: hour day/month/year - hour day/month/year</p>
+                <div class="d-flex align-items-end pt-3 pb-3">
+                    <div class="doc-icon mr-3">
+                        <img src="{% static "google-docs.png" %}" alt="Document Icon">
+                    </div>
+                    <p class="m-0">Name of the document</p> 
+                </div>
+                <div class="d-flex justify-content-start align-items-center">
+                    <button class="btn-doc mr-3" style="outline: none; padding: 5px 10px;">Update</button> 
+                    <button class="btn-doc" style="outline: none; padding: 5px 10px;">Delete</button> 
+                </div>
+                <hr>
+                <h1 style="font-weight: 700;" class="text-truncate">Submit assignment</h1>
+                <p>Deadline time: hour day/month/year - hour day/month/year</p>
+                <div class="d-flex align-items-end pt-3 pb-3">
+                    <div class="doc-icon mr-3">
+                        <img src="{% static "google-docs.png" %}" alt="Document Icon">
+                    </div>
+                    <p class="m-0">Name of the document</p> 
+                </div>
+                <div class="d-flex justify-content-start align-items-center">
+                    <p class="m-0 ml-1" style="font-weight: 700;">Your score: 7/10</p>
                 </div>
             </div>
-            <div class="description mt-3 mb-3">
-                <p style="text-align: justify;">
-                    <strong>Description:</strong> {{ classroom.description }}
-                </p>
-            </div>
-            <div class="d-flex align-items-center pt-3 pb-3">
-                <div class="doc-icon mr-3">
-                    <img src="{% static "google-docs.png" %}" alt="Document Icon">
+            {% elif submission.submission_type == 'question_test' %}
+            <div id="submission-content-{{ submission.id }}" class="content-section hidden">
+                <div class="header">
+                    <h1 style="font-weight: 700;" class="text-truncate">Welcome to {{classroom.name}}</h1>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <label class="cd-popup m-0 mr-3">
+                            <input type="checkbox">
+                            <div class="cd-burger" tabindex="0">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </div>
+                            <nav class="cd-popup-window mt-1">
+                            <ul>
+                                <li>
+                                <button onclick="window.location.href='{% url 'subjects' %}'">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="{{ classroom.subject.bg_color }}" class="bi bi-gear" viewBox="0 0 16 16">
+                                        <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492M5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0"/>
+                                        <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115z"/>
+                                    </svg>
+                                    <span style="font-weight: 500;">Settings</span>
+                                </button>
+                                </li>
+                                <li>
+                                <button onclick="window.location.href='{% url 'classrooms' classroom.subject.id classroom.grade %}'">
+                                    <svg stroke-linejoin="round" stroke-linecap="round" stroke-width="2" stroke="{{ classroom.subject.bg_color }}" fill="none" viewBox="0 0 24 24" height="14" width="14" xmlns="http://www.w3.org/2000/svg">
+                                    <line y2="18" x2="6" y1="6" x1="18"></line>
+                                    <line y2="18" x2="18" y1="6" x1="6"></line>
+                                    </svg>
+                                    <span style="font-weight: 500;">Classrooms</span>
+                                </button>
+                                </li>
+                            </ul>
+                            </nav>
+                        </label>                      
+                        <button class="btn-favorite mr-4" style="outline: none;"><i class="fa-regular fa-star fa-xl"></i></button>
+                    </div>
                 </div>
-                <div class="doc-icon mr-3">
-                    <img src="{% static "google-docs.png" %}" alt="Document Icon">
+                <div class="description mt-3 mb-3">
+                    <p style="text-align: justify;">
+                        <strong>Description:</strong> <span class="actual-description">{{ submission.description }}</span>
+                    </p>
                 </div>
-                <div class="doc-icon mr-3">
-                    <img src="{% static "google-docs.png" %}" alt="Document Icon">
+                
+                <div class="d-flex align-items-center pt-2 pb-2">
+                    {% for file in submission.files.all %}
+                        <div class="d-flex align-items-center pt-2 pb-2">
+                            <div class="doc-icon mr-3">
+                                <a href="{{ file.file.url }}" download data-file-id="{{ file.id }}">
+                                    <img src="{% static 'google-docs.png' %}" alt="{{ file.file.name|filename }}">
+                                </a>
+                            </div>
+                            <div class="file-name-container" style="flex: 1;">
+                                <p class="m-0" style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="{{ file.file.name|filename }}">
+                                    {{ file.file.name|filename }}
+                                </p>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>                              
+                
+                <div class="edit-submission d-flex justify-content-end">
+                    <a href="#" class="edit-icon">
+                        <i class="fas fa-edit fa-lg"></i>
+                    </a>
+                </div>
+                <hr style="border: 1px solid #000;">
+                
+                <h1 style="font-weight: 700;" class="text-truncate">Answer the question</h1>
+                <p class="m-0 mt-2 mb-2">There are a total of 10 questions</p>
+                <div class="d-flex align-items-end pb-3">
+                    <div class="doc-icon mr-3">
+                        <img src="{% static "option.png" %}" alt="Document Icon">
+                    </div> 
+                </div>
+                <div class="d-flex justify-content-start">
+                    <button class="btn-doc" style="outline: none; padding: 5px 10px;">Get started</button> 
+                </div>
+                <hr>
+                <h1 style="font-weight: 700;" class="text-truncate">Answer the question</h1>
+                <p>There are a total of 10 questions</p>
+                <div class="d-flex align-items-end pb-3">
+                    <div class="doc-icon mr-3">
+                        <img src="{% static "option.png" %}" alt="Document Icon">
+                    </div> 
+                </div>
+                <div class="d-flex justify-content-start align-items-center">
+                    <p class="m-0 ml-1" style="font-weight: 700;">Your score: 7/10</p>
                 </div>
             </div>
-            <div class="edit-description d-flex justify-content-end">
-                <a href="#" class="edit-icon">
-                    <i class="fas fa-edit fa-lg"></i>
-                </a>
-            </div>
-            <hr style="border: 1px solid #000;">
-            
-            <h1 style="font-weight: 700;" class="text-truncate">Answer the question</h1>
-            <p class="m-0 mt-2 mb-2">There are a total of 10 questions</p>
-            <div class="d-flex align-items-end pb-3">
-                <div class="doc-icon mr-3">
-                    <img src="{% static "option.png" %}" alt="Document Icon">
-                </div> 
-            </div>
-            <div class="d-flex justify-content-start">
-                <button class="btn-doc" style="outline: none; padding: 5px 10px;">Get started</button> 
-            </div>
-            <hr>
-            <h1 style="font-weight: 700;" class="text-truncate">Answer the question</h1>
-            <p>There are a total of 10 questions</p>
-            <div class="d-flex align-items-end pb-3">
-                <div class="doc-icon mr-3">
-                    <img src="{% static "option.png" %}" alt="Document Icon">
-                </div> 
-            </div>
-            <div class="d-flex justify-content-start align-items-center">
-                <p class="m-0 ml-1" style="font-weight: 700;">Your score: 7/10</p>
-            </div>
-        </div>
+            {% endif %}
+        {% endfor %}
+        {% endfor %}
     </div>
 
-    <!-- FontAwesome Icons -->
     <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.9.359/pdf.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const sidebar = document.querySelector('.sidebar');
@@ -1549,6 +1773,119 @@
             });
         });
 
+        document.addEventListener('DOMContentLoaded', function () {
+            const editSubmissionIcons = document.querySelectorAll('.edit-submission .edit-icon');
+            editSubmissionIcons.forEach(icon => {
+                icon.addEventListener('click', function (event) {
+                    event.preventDefault();
+
+                    const submissionElement = this.closest('.content-section');
+                    const submissionId = submissionElement.id.split('-').pop();
+                    const description = submissionElement.querySelector('.actual-description').innerText;
+                    const fileOptions = submissionElement.querySelectorAll('.doc-icon a');
+
+                    // Update the form action with the correct submission_id
+                    const form = document.getElementById('editSubmissionForm');
+                    form.action = form.action.replace('/0/', `/${submissionId}/`);
+                    
+                    // Set the description
+                    document.getElementById('submissionDescription').value = description;
+
+                    // Clear the delete file select options
+                    const deleteFileSelect = document.getElementById('deleteFileSubmission');
+                    deleteFileSelect.innerHTML = '<option value="">Select a file to delete</option>';
+
+                    // Populate the select with file options
+                    fileOptions.forEach(fileOption => {
+                        const fileName = fileOption.querySelector('img').alt;  // Lấy tên file từ thuộc tính alt của img
+                        const fileId = fileOption.getAttribute('data-file-id'); // Lấy ID file từ thuộc tính data-file-id
+                        const option = document.createElement('option');
+                        option.value = fileId;  // Sử dụng ID file làm giá trị để gửi đến server
+                        option.textContent = fileName;
+                        deleteFileSelect.appendChild(option);
+                    });
+
+                    // Show the modal
+                    const editSubmissionModal = new bootstrap.Modal(document.getElementById('editSubmissionModal'));
+                    editSubmissionModal.show();
+                });
+            });
+
+            const editDescriptionClassroomIcons = document.querySelectorAll('.edit-description-classroom .edit-icon');
+            editDescriptionClassroomIcons.forEach(icon => {
+                icon.addEventListener('click', function (event) {
+                    event.preventDefault();
+
+                    const classroomId = '{{ classroom.id }}';  // Sử dụng classroom_id từ template context
+                    const description = this.closest('.content-section').querySelector('.actual-description').innerText;
+
+                    // Cập nhật URL cho form với classroom_id
+                    const form = document.getElementById('editClassroomDescriptionForm');
+                    form.action = `/classroom/${classroomId}/update/`;  // Đặt URL phù hợp để cập nhật classroom description
+                    document.getElementById('classroomDescription').value = description;
+
+                    const editClassroomDescriptionModal = new bootstrap.Modal(document.getElementById('editClassroomDescriptionModal'));
+                    editClassroomDescriptionModal.show();
+                });
+            });
+
+
+
+            const editDescriptionIcons = document.querySelectorAll('.edit-description .edit-icon');
+            editDescriptionIcons.forEach(icon => {
+                icon.addEventListener('click', function (event) {
+                    event.preventDefault();
+
+                    const sectionId = this.closest('.content-section').id.split('-').pop();
+                    const description = this.closest('.content-section').querySelector('.actual-description').innerText;
+
+                    // Cập nhật URL cho form với section_id thực tế
+                    const form = document.getElementById('editDescriptionForm');
+                    form.action = form.action.replace('/0/', `/${sectionId}/`);
+                    document.getElementById('description').value = description;
+
+                    const editDescriptionModal = new bootstrap.Modal(document.getElementById('editDescriptionModal'));
+                    editDescriptionModal.show();
+                });
+            });
+        
+            const editFilesIcons = document.querySelectorAll('.edit-files .edit-icon');
+            editFilesIcons.forEach(icon => {
+                icon.addEventListener('click', function (event) {
+                    event.preventDefault();
+
+                    const sectionElement = this.closest('.content-section');
+                    const sectionId = sectionElement.id.split('-').pop();
+
+                    // Thay đổi selector để chắc chắn lấy được phần tử
+                    const fileOptions = sectionElement.querySelectorAll('.file-name-container p'); // Thử thay đổi selector
+
+                    console.log('fileOptions:', fileOptions); // Kiểm tra xem có lấy được không
+
+                    document.getElementById('editFilesSectionId').value = sectionId;
+
+                    const form = document.getElementById('editFilesForm');
+                    form.action = form.action.replace('/0/', `/${sectionId}/`);
+
+                    const deleteFileSelect = document.getElementById('deleteFile');
+                    deleteFileSelect.innerHTML = '<option value="">Select a file to delete</option>';
+
+                    // Thêm tùy chọn cho mỗi file
+                    fileOptions.forEach(fileOption => {
+                        const option = document.createElement('option');
+                        option.value = fileOption.textContent.trim(); // Lấy tên file
+                        option.textContent = fileOption.textContent.trim();
+                        deleteFileSelect.appendChild(option);
+                    });
+
+                    const editFilesModal = new bootstrap.Modal(document.getElementById('editFilesModal'));
+                    editFilesModal.show();
+                });
+            });
+        });
+                                
+        
+
         function openFolderModal() {
             // Đóng modal hiện tại
             var currentModal = document.querySelector('.modal.show');
@@ -1573,7 +1910,7 @@
             // Mở folderModal
             var folderModal = new bootstrap.Modal(document.getElementById('chatModal'));
             folderModal.show();
-        }
+        }  
     </script>
 </body>
 </html>

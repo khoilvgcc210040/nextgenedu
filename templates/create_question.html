@@ -109,7 +109,7 @@
     {% include "header.html" %}
 
     <a href="#" class="back-icon" style="text-decoration: none;">
-        <div class="submission-title-content d-flex align-items-center" onclick="window.location.href='{% url "manage_classroom" %}'">
+        <div class="submission-title-content d-flex align-items-center" onclick="window.location.href='{% url "question_list" submission.id %}'">
             <i class="fas fa-backward fa-lg mr-2"></i>
             <p class="m-0" style="font-weight: 500;">Back</p>
         </div>
@@ -117,23 +117,33 @@
 
     <div class="question-container">
         <h1>Create the question</h1>
-        <form>
+        <form method="POST">
+            {% csrf_token %}
             <div class="form-group">
-                <input type="text" placeholder="Enter a question..." required>
+                <input type="text" name="question_text" placeholder="Enter a question..." required>
             </div>
             <div class="option-container">
                 <div class="option">
-                    <input type="text" placeholder="Option 1" required>
+                    <input type="text" name="option1" placeholder="Option 1" required>
                 </div>
                 <div class="option">
-                    <input type="text" placeholder="Option 2" required>
+                    <input type="text" name="option2" placeholder="Option 2" required>
                 </div>
                 <div class="option">
-                    <input type="text" placeholder="Option 3" required>
+                    <input type="text" name="option3" placeholder="Option 3" required>
                 </div>
                 <div class="option">
-                    <input type="text" placeholder="Option 4" required>
+                    <input type="text" name="option4" placeholder="Option 4" required>
                 </div>
+            </div>
+            <div class="form-group">
+                <label for="correct_option">Correct Option:</label>
+                <select name="correct_option" style="padding: 3px 6px; border: 1px solid #000; border-radius: 5px;" required>
+                    <option value="1">Option 1</option>
+                    <option value="2">Option 2</option>
+                    <option value="3">Option 3</option>
+                    <option value="4">Option 4</option>
+                </select>
             </div>
             <div class="submit-btn">
                 <button type="submit">Submit</button>

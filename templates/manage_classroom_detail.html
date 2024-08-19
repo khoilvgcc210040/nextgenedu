@@ -78,6 +78,12 @@
         border-radius: 5px;
         margin-bottom: 10px;
         background-color: #f9f9f9;
+        transition: transform 0.2s ease-in-out;
+    }
+
+    .member-card, .section-card:hover {
+        transform: translateY(-5%); 
+        cursor: pointer;
     }
 
     .username, .section-name {
@@ -376,6 +382,13 @@
         border-radius: 5px;
       }
 
+      .card-body input[type="datetime-local"] {
+        padding: 5px 10px;
+        width: 100%;
+        border: 2px solid #000;
+        border-radius: 5px;
+      }
+
       .back-icon {
         position: absolute;
         top: 13%;
@@ -415,22 +428,46 @@
                 <button type="button" class="btn-close position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close"></button>
                 <div class="card p-4" style="max-width: 400px; width: 100%; border: 5px solid {{ subject.bg_color }}">
                     <div class="card-body">
-                        <h5 class="card-title text-center mb-4 font-weight-bold">Add a section</h5>
-                        <form method="POST" action="#" id="createForm">
+                        <h5 id="modalTitle" class="card-title text-center mb-4 font-weight-bold"></h5>
+                        <form method="POST" action="{% url 'create_section_submission' %}" id="createForm">
                             {% csrf_token %}
-                            <input type="hidden" id="classroomId" name="classroom_id">
+                            <input type="hidden" id="actionType" name="action_type">
+                            <input type="hidden" name="classroom_id" value="{{ classroom.id }}">
                             <div class="mb-3">
-                                <select class="dropdown" id="sectionType">
+                                <label for="open_date">Section type:</label>
+                                <select class="dropdown" id="sectionType" name="section_type">
                                     <option value="new">Create a new section</option>
                                     <option value="sub">Create a subsection</option>
+                                    <option value="submission">Create a submission</option>
                                 </select>
                             </div>
                             <div class="mb-3" id="parentSectionContainer" style="display: none;">
+                                <label for="open_date">Parent section:</label>
                                 <select class="dropdown" id="parentSection" name="parent_section">
                                     <option value="">Choose a parent section</option>
+                                    {% for section in sections %}
+                                        {% if not section.parent_section %}
+                                            <option value="{{ section.id }}">{{ section.title }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>                            
+                            <div id="submissionFields" style="display: none;">
+                                <label for="open_date">Open date:</label>
+                                <input type="datetime-local" class="modal-input mb-3" name="open_date" placeholder="Open date">
+                                <label for="close_date">Close date:</label>
+                                <input type="datetime-local" class="modal-input mb-3" name="close_date" placeholder="Close date">
+                                <label for="open_date">Submissions type:</label>
+                                <select class="dropdown mb-3" name="submission_type">
+                                    <option value="">Choose a submission type</option>
+                                    <option value="assignment">Assignment</option>
+                                    <option value="question_test">Question Test</option>
                                 </select>
                             </div>
-                            <input type="text" class="modal-input mb-3" placeholder="Name of the section...">
+                            <label for="open_date">Section name:</label>
+                            <input type="text" name="title" class="modal-input mb-3" placeholder="Name of the section...">
+                            <label for="open_date">Section description:</label>
+                            <textarea name="description" class="mb-4" id="" placeholder="Description of the section (you should describe about 50-60 words)..."></textarea>
                             <button type="submit" class="submit-modal btn btn-dark w-100 border-0" style="background-color: {{ subject.bg_color }}; overflow: hidden; transition: all 0.3s ease;">
                                 <span class="btn-text">Create a section</span>
                             </button>
@@ -446,7 +483,7 @@
                 <div class="manage-classroom-icon">
                     <img src="{% static 'open.png' %}" alt="Folder Icon">
                 </div>
-                <h1 style="font-weight: 700;">Name of the classroom</h1>
+                <h1 style="font-weight: 700;">{{ classroom.name }}</h1>
             </div>
             <div class="d-flex align-items-center">
                 <label class="cd-popup m-0 mr-3">
@@ -459,19 +496,19 @@
                     <nav class="cd-popup-window mt-1">
                     <ul>
                         <li>
-                        <button onclick="window.location.href='#'" data-bs-toggle="modal" data-bs-target="#createModal">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-gear" viewBox="0 0 16 16">
-                                <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492M5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0"/>
-                                <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115z"/>
+                        <button id="createSectionBtn" onclick="updateModalTitle('Create a section')" data-bs-toggle="modal" data-bs-target="#createModal">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle" viewBox="0 0 16 16">
+                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                                <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
                             </svg>
                             <span style="font-weight: 500;">Create a section</span>
                         </button>
                         </li>
                         <li>
-                        <button onclick="window.location.href='#'">
-                            <svg stroke-linejoin="round" stroke-linecap="round" stroke-width="2" stroke="currentColor" fill="{{ classroom.subject.bg_color }}" viewBox="0 0 24 24" height="14" width="14" xmlns="http://www.w3.org/2000/svg">
-                            <line y2="18" x2="6" y1="6" x1="18"></line>
-                            <line y2="18" x2="18" y1="6" x1="6"></line>
+                        <button id="createSubmissionBtn" onclick="updateModalTitle('Create a submission')" data-bs-toggle="modal" data-bs-target="#createModal">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle" viewBox="0 0 16 16">
+                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                                <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
                             </svg>
                             <span style="font-weight: 500;">Create a submission</span>
                         </button>
@@ -495,19 +532,22 @@
 
         <div id="sections-content" class="classroom-content">
             <div class="sections-list">
-                <div class="section-card">
-                    <span class="section-name">NAME OF THE SECTION</span>
-                    <div class="section-options">•••</div>
-                </div>
-                <div class="section-card">
-                    <span class="section-name">NAME OF THE SUBSECTION</span>
-                    <span class="section-description">Name of the sections</span>
-                    <div class="section-options">•••</div>
-                </div>
-                <div class="section-card">
-                    <span class="section-name">NAME OF THE SECTION</span>
-                    <div class="section-options">•••</div>
-                </div>
+                {% for section in sections %}
+                    <div class="section-card">
+                        <span class="section-name text-uppercase">{{ section.title }}</span>
+                        {% if section.parent_section %}
+                            <div class="section-description">
+                                Parent Section: <strong>{{ section.parent_section.title }}</strong>
+                            </div>
+                        {% else %}
+                            <div class="section-description">
+                                <em>This is a parent section</em>
+                            </div>
+                        {% endif %}
+                        <span class="date-joined">Date Created: {{ section.date_created|date:"d/m/Y" }}</span>
+                        <div class="section-options">•••</div>
+                    </div>
+                {% endfor %}
             </div>
             <div class="invitation-details">
                 <div class="invitation-link">
@@ -519,33 +559,25 @@
                     <label style="font-weight: 700;">CLASSROOM DETAILS</label><br>
                     <div class="detail-item">
                         <span class="detail-icon">📚</span>
-                        <span>Number of sections</span>
+                        <span>Number of sections: {{ num_sections }}</span>
                     </div>
                     <div class="detail-item">
                         <span class="detail-icon">👥</span>
-                        <span>Number of participants</span>
+                        <span>Number of participants: {{ num_participants }}</span>
                     </div>
-                </div>
+                </div>                
             </div>
         </div>
 
         <div id="members-content" class="classroom-content hidden">
             <div class="members-list">
-                <div class="member-card">
-                    <span class="username">USERNAME</span>
-                    <span class="date-joined">Date Joined: day / month / year</span>
-                    <div class="member-options">•••</div>
-                </div>
-                <div class="member-card">
-                    <span class="username">USERNAME</span>
-                    <span class="date-joined">Date Joined: day / month / year</span>
-                    <div class="member-options">•••</div>
-                </div>
-                <div class="member-card">
-                    <span class="username">USERNAME</span>
-                    <span class="date-joined">Date Joined: day / month / year</span>
-                    <div class="member-options">•••</div>
-                </div>
+                {% for participant in participants %}
+                    <div class="section-card">
+                        <span class="username text-uppercase">{{ participant.user.username }}</span>
+                        <span class="date-joined">Date Joined: {{ participant.date_joined|date:"d/m/Y" }}</span>
+                        <div class="member-options">•••</div>
+                    </div>
+                {% endfor %}
             </div>
             <div class="invitation-details">
                 <div class="invitation-link">
@@ -557,31 +589,33 @@
                     <label style="font-weight: 700;">CLASSROOM DETAILS</label><br>
                     <div class="detail-item">
                         <span class="detail-icon">📚</span>
-                        <span>Number of sections</span>
+                        <span>Number of sections: {{ num_sections }}</span>
                     </div>
                     <div class="detail-item">
                         <span class="detail-icon">👥</span>
-                        <span>Number of participants</span>
+                        <span>Number of participants: {{ num_participants }}</span>
                     </div>
-                </div>
+                </div>                
             </div>
         </div>
 
         <div id="submissions-content" class="classroom-content hidden">
             <div class="sections-list">
-                <div class="section-card">
-                    <span class="section-name">NAME OF THE SUBMISSION</span>
-                    <div class="section-options"><i class="fas fa-edit fa-lg"></i></div>
-                </div>
-                <div class="section-card">
-                    <span class="section-name">NAME OF THE SUBMISSION</span>
-                    <span class="section-description">Name of the sections</span>
-                    <div class="section-options"><i class="fas fa-edit fa-lg"></i></div>
-                </div>
-                <div class="section-card">
-                    <span class="section-name">NAME OF THE SUBMISSION</span>
-                    <div class="section-options"><i class="fas fa-edit fa-lg"></i></div>
-                </div>
+                {% for section in sections %}
+                    {% for submission in section.submissions.all %}
+                        <div class="section-card"
+                             {% if submission.submission_type == 'question_test' %}
+                                 onclick="window.location.href='{% url 'question_list' submission.id %}'"
+                             {% endif %}>
+                            <span class="section-name text-uppercase">{{ submission.title }} ({{ submission.get_submission_type_display }})</span>
+                            <div class="section-description">
+                                Parent Section: <strong>{{ submission.section.title }}</strong>
+                            </div>
+                            <span class="date-joined">Date Created: {{ submission.date_created|date:"d/m/Y" }}</span>
+                            <div class="section-options"><i class="fas fa-edit fa-lg"></i></div>
+                        </div>
+                    {% endfor %}
+                {% endfor %}
             </div>
             <div class="invitation-details">
                 <div class="invitation-link">
@@ -593,31 +627,23 @@
                     <label style="font-weight: 700;">CLASSROOM DETAILS</label><br>
                     <div class="detail-item">
                         <span class="detail-icon">📚</span>
-                        <span>Number of sections</span>
+                        <span>Number of sections: {{ num_sections }}</span>
                     </div>
                     <div class="detail-item">
                         <span class="detail-icon">👥</span>
-                        <span>Number of participants</span>
+                        <span>Number of participants: {{ num_participants }}</span>
                     </div>
-                </div>
+                </div>                
             </div>
         </div>
 
         <div id="marking-content" class="classroom-content hidden">
             <div class="sections-list">
-                <div class="section-card">
-                    <span class="section-name">NAME OF THE SECTION</span>
-                    <div class="section-options">•••</div>
-                </div>
-                <div class="section-card">
-                    <span class="section-name">NAME OF THE SUBSECTION</span>
-                    <span class="section-description">Name of the sections</span>
-                    <div class="section-options">•••</div>
-                </div>
-                <div class="section-card">
-                    <span class="section-name">NAME OF THE SECTION</span>
-                    <div class="section-options">•••</div>
-                </div>
+                {% for assignment in assignments %}
+                    <div class="section-card" onclick="window.location.href='{% url 'marking' assignment.id %}'">
+                        <span class="section-name">{{ assignment.title }} (Assignment)</span>
+                    </div>
+                {% endfor %}
             </div>
             <div class="invitation-details">
                 <div class="invitation-link">
@@ -629,13 +655,13 @@
                     <label style="font-weight: 700;">CLASSROOM DETAILS</label><br>
                     <div class="detail-item">
                         <span class="detail-icon">📚</span>
-                        <span>Number of sections</span>
+                        <span>Number of sections: {{ num_sections }}</span>
                     </div>
                     <div class="detail-item">
                         <span class="detail-icon">👥</span>
-                        <span>Number of participants</span>
+                        <span>Number of participants: {{ num_participants }}</span>
                     </div>
-                </div>
+                </div>                
             </div>
         </div>
     </main>
@@ -701,10 +727,39 @@
 
     document.getElementById('sectionType').addEventListener('change', function() {
         var parentSectionContainer = document.getElementById('parentSectionContainer');
+        var submissionFields = document.getElementById('submissionFields');
+
         if (this.value === 'sub') {
             parentSectionContainer.style.display = 'block';
+            submissionFields.style.display = 'none';
+        } else if (this.value === 'submission') {
+            parentSectionContainer.style.display = 'block';
+            submissionFields.style.display = 'block';
         } else {
             parentSectionContainer.style.display = 'none';
+            submissionFields.style.display = 'none';
         }
+    });
+
+    function updateModalTitle(title) {
+        document.getElementById('modalTitle').textContent = title;
+    }
+
+    document.getElementById('createSectionBtn').addEventListener('click', function() {
+        document.getElementById('actionType').value = 'section';
+        var sectionTypeElement = document.getElementById('sectionType');
+        sectionTypeElement.value = 'new';
+        
+        var event = new Event('change');
+        sectionTypeElement.dispatchEvent(event);
+    });
+
+    document.getElementById('createSubmissionBtn').addEventListener('click', function() {
+        document.getElementById('actionType').value = 'submission';
+        var sectionTypeElement = document.getElementById('sectionType');
+        sectionTypeElement.value = 'submission';
+
+        var event = new Event('change');
+        sectionTypeElement.dispatchEvent(event);
     });
 </script>
