@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ submission.title }}</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .title {
+            font-weight: 700;
+            font-size: 2rem;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        /* Progress Bar */
+        .progress {
+            height: 20px;
+            background-color: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: #007bff;
+            transition: width 0.6s ease;
+        }
+
+        /* Timer Styles */
+        .timer {
+            text-align: center;
+            font-size: 1.5rem;
+            margin-top: 10px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        /* Card Styles */
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .question-card {
+            background-color: #ffffff;
+            padding: 20px;
+        }
+
+        /* Answer Button Styles */
+        .answer-group {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+
+        .answer-button {
+            background-color: #ffffff;
+            border: 2px solid #000;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            width: 48%;
+            text-align: center;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .answer-button:hover {
+            background-color: #007bff;
+            color: #fff;
+            transform: scale(1.05);
+            border-color: #007bff;
+        }
+
+        .answer-button input[type="radio"] {
+            display: none;
+        }
+
+        .answer-button.active {
+            background-color: #007bff;
+            color: #fff;
+            border-color: #007bff;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background-color: #007bff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            color: #ffffff;
+            cursor: pointer;
+            margin-top: 20px;
+            display: block;
+            width: 100%;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <h1 class="title">{{ submission.title }}</h1>
+
+        <div class="progress mt-4 mb-4">
+            <div class="progress-bar" role="progressbar" id="progress-bar"></div>
+        </div>
+        <div class="d-flex justify-content-between">
+            <span>{{ answered_questions }}</span>
+            <span>{{ total_questions }}</span>
+        </div>
+
+        <!-- Timer -->
+        <div class="timer">
+            <span id="timer">00:00:00</span>
+        </div>
+
+        <div class="card mt-4 question-card">
+            <div class="card-body">
+                <h4 class="card-title">Question:</h4>
+                <p class="card-text">{{ current_question.text }}</p>
+
+                <h5 class="card-subtitle mb-2 text-muted">Select the correct answer:</h5>
+                <form method="post" action="{% url 'submit_answer' submission.id current_question.id %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="elapsed_time" id="elapsed_time" value="0">
+                    <div class="answer-group">
+                        {% for answer in current_question.answers.all %}
+                        <label class="answer-button" for="answer{{ answer.id }}">
+                            <input type="radio" name="selected_answer" id="answer{{ answer.id }}" value="{{ answer.id }}" required>
+                            {{ forloop.counter }}. {{ answer.text }}
+                        </label>
+                        {% endfor %}
+                    </div>
+                    <button type="submit" class="btn btn-primary">Next Question</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let timerInterval;
+        let elapsedTime = {{ elapsed_time }}; // In seconds
+
+        // Function to format time
+        function formatTime(seconds) {
+            let hours = Math.floor(seconds / 3600);
+            let minutes = Math.floor((seconds % 3600) / 60);
+            let remainingSeconds = seconds % 60;
+            return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+        }
+
+        // Display the initial time immediately
+        document.getElementById('timer').textContent = formatTime(elapsedTime);
+
+        function startTimer() {
+            let timerElement = document.getElementById('timer');
+            let startTime = Date.now() - elapsedTime * 1000;  // Adjust start time based on previous elapsed time
+
+            timerInterval = setInterval(() => {
+                elapsedTime = Math.floor((Date.now() - startTime) / 1000); // elapsedTime in seconds
+                timerElement.textContent = formatTime(elapsedTime);
+            }, 1000);
+        }
+
+        function stopTimer() {
+            clearInterval(timerInterval);
+        }
+
+        // Initialize progress bar width
+        function updateProgressBar() {
+            const totalQuestions = {{ total_questions }};
+            const answeredQuestions = {{ answered_questions }};
+            const progressBar = document.getElementById('progress-bar');
+
+            const widthPercentage = (answeredQuestions / totalQuestions) * 100;
+            console.log(widthPercentage)
+            progressBar.style.width = widthPercentage + '%';
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            startTimer();
+            updateProgressBar(); // Update the progress bar on page load
+        });
+
+        // Maintain selected answer's active state
+        document.querySelectorAll('.answer-button input[type="radio"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                document.querySelectorAll('.answer-button').forEach(label => {
+                    label.classList.remove('active');
+                });
+                this.parentElement.classList.add('active');
+            });
+        });
+
+        // Prevent back navigation and preserve elapsed time
+        window.history.pushState(null, "", window.location.href);
+        window.onpopstate = function() {
+            window.history.pushState(null, "", window.location.href);
+            alert("You cannot go back to the previous question!");
+        };
+
+        // Stop the timer on form submit and store elapsed time
+        document.querySelector('form').addEventListener('submit', function() {
+            document.getElementById('elapsed_time').value = elapsedTime; // Store time in seconds
+            stopTimer();
+        });
+
+    </script>
+</body>
+</html>

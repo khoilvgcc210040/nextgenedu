@@ -486,7 +486,7 @@
         }
 
         .star-rating {
-            font-size: 30px;
+            font-size: 10px;
             color: gold;
         }
         
@@ -499,6 +499,16 @@
         .star:hover ~ .star {
             color: orange;
         }   
+
+        .rating-star {
+            font-size: 16px;
+            color: #ccc;
+        }
+        
+        .rating-filled {
+            color: #FFD700;
+        }
+        
         
         .divider {
             display: flex;
@@ -1103,7 +1113,7 @@
                     <tr>
                         <td>{{ score.user.username }}</td>
                         <td>{{ score.num_tests }}</td>
-                        <td>{{ score.total_time|floatformat:2 }}s</td>
+                        <td>{{ score.total_time }}</td>
                         <td>{{ score.total_score }}</td>
                     </tr>
                     {% endfor %}
@@ -1118,6 +1128,7 @@
             <span class="tooltip-text">Participants and Scores</span>
         </div>
     </button>
+    
 
     <div class="modal fade" id="folderModal" tabindex="-1" aria-labelledby="folderModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
@@ -1285,65 +1296,67 @@
                 </a>
             </div>
             <hr style="border: 1px solid #000;">
-            <h1 style="font-weight: 700;" class="text-truncate">Comments</h1>
+            <h1 style="font-weight: 700;" class="text-truncate">Comments ({{ classroom.average_rating|floatformat:1 }}/5.0)</h1>
             <p>There are 11 comments on {{ classroom.name }}</p>
+            {% if not existing_comment %}
             <div class="d-flex pb-3">
                 <div class="user-icon mr-3">
                     <img src="{% static "account.png" %}" alt="User Icon">
                 </div>
                 <div class="comment-box">
-                    <div class="comment-content">
-                        <textarea placeholder="Write a comment..."></textarea>
-                    </div>
-                    <div class="send-button d-flex justify-content-between align-items-center">
-                        <div class="rating">
-                            <input type="radio" id="star-1" name="star-radio" value="star-1">
-                            <label for="star-1">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path pathLength="360" d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"></path></svg>
-                            </label>
-                            <input type="radio" id="star-2" name="star-radio" value="star-1">
-                            <label for="star-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path pathLength="360" d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"></path></svg>
-                            </label>
-                            <input type="radio" id="star-3" name="star-radio" value="star-1">
-                            <label for="star-3">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path pathLength="360" d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"></path></svg>
-                            </label>
-                            <input type="radio" id="star-4" name="star-radio" value="star-1">
-                            <label for="star-4">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path pathLength="360" d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"></path></svg>
-                            </label>
-                            <input type="radio" id="star-5" name="star-radio" value="star-1">
-                            <label for="star-5">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path pathLength="360" d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"></path></svg>
-                            </label>
-                            <div class="tooltip" style="font-family: Montserrat, sans-serif !important;">
-                                <span class="tooltip-text">Note: you can only rate once</span>
-                            </div>
+                    <form method="post" action="{% url 'classroom_detail' classroom.id %}">
+                        {% csrf_token %}
+                        <div class="comment-content">
+                            <textarea name="comment" placeholder="Please share your thoughts about the classroom after you've completed it. So that you know, you can only leave a comment once..."></textarea>
                         </div>
-                        <img src="{% static "rocket.png" %}" alt="Send Icon">
-                    </div>
+                        <div class="send-button d-flex justify-content-between align-items-center">
+                            <div class="rating">
+                                    <input type="radio" id="star-1" name="rating" value="5"><label for="star-1">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path pathLength="360" d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"></path></svg>
+                                    </label>
+                                    <input type="radio" id="star-2" name="rating" value="4"><label for="star-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path pathLength="360" d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"></path></svg>
+                                    </label>
+                                    <input type="radio" id="star-3" name="rating" value="3"><label for="star-3">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path pathLength="360" d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"></path></svg>
+                                    </label>
+                                    <input type="radio" id="star-4" name="rating" value="2"><label for="star-4">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path pathLength="360" d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"></path></svg>
+                                    </label>
+                                    <input type="radio" id="star-5" name="rating" value="1"><label for="star-5">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path pathLength="360" d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"></path></svg>
+                                    </label>
+                                    <div class="tooltip" style="font-family: Montserrat, sans-serif !important;">
+                                        <span class="tooltip-text">Note: you can only rate once</span>
+                                    </div>
+                            </div>
+                            <img src="{% static "rocket.png" %}" alt="Send Icon" onclick="this.closest('form').submit();">
+                        </div>
+                    </form>
                 </div>  
             </div>  
             <div class="divider pb-3">classroom comments</div>
+            {% endif %} 
             <div class="pb-5">
-                <div class="d-flex align-items-center">
+                {% for comment in comments %}
+                <div class="d-flex align-items-center mt-3 mb-3 ">
                     <div class="user-icon mr-3">
                         <img src="{% static "account.png" %}" alt="User Icon">
                     </div>
                     <div class="comment-content">
-                        <p class="m-0">{{classroom.subject.name}}<span class="ml-3 text-muted" style="font-size: 11px">24-10-2024</span></p>
+                        <p class="m-0">{{ comment.user.username }}<span class="ml-3 text-muted" style="font-size: 11px">{{ comment.created_at|date:"d-m-Y" }}</span></p>
+                        {% if comment.rating %}
                         <div class="star-rating">
-                            <span class="star">&#9733;</span>
-                            <span class="star">&#9733;</span>
-                            <span class="star">&#9733;</span>
-                            <span class="star">&#9733;</span>
-                            <span class="star">&#9733;</span>
-                        </div> 
-                        <p class="m-0">Your comment...</p>
+                            {% for i in range %}
+                            <span class="rating-star {% if i <= comment.rating %}rating-filled{% endif %}">&#9733;</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        <p class="m-0">{{ comment.text }}</p>
                     </div>
-                </div>     
-            </div>
+                </div>
+                {% endfor %}
+            </div>            
         </div>
         {% else %}
         <div id="section-content-{{ section.id }}" class="content-section hidden">
@@ -1561,42 +1574,78 @@
                 
                 <hr style="border: 1px solid #000;">
                 
-                <h1 style="font-weight: 700;" class="text-truncate">Submit assignment</h1>
-                <p>Deadline time: {{submission.open_date}} - {{submission.close_date}}</p>
-                <div class="d-flex align-items-end pt-3 pb-3">
-                    <div class="doc-icon mr-3">
-                        <img src="{% static "google-docs.png" %}" alt="Document Icon">
-                    </div>
-                    <button class="btn-doc bg-secondary text-white" style="outline: none; padding: 3px 6px;">Choose file to submit</button> 
-                </div>
-                <div class="d-flex justify-content-start">
-                    <button class="btn-doc" style="outline: none; padding: 5px 10px;">Submit</button> 
-                </div>
-                <hr>
-                <h1 style="font-weight: 700;" class="text-truncate">Submit assignment</h1>
-                <p>Deadline time: hour day/month/year - hour day/month/year</p>
-                <div class="d-flex align-items-end pt-3 pb-3">
-                    <div class="doc-icon mr-3">
-                        <img src="{% static "google-docs.png" %}" alt="Document Icon">
-                    </div>
-                    <p class="m-0">Name of the document</p> 
-                </div>
-                <div class="d-flex justify-content-start align-items-center">
-                    <button class="btn-doc mr-3" style="outline: none; padding: 5px 10px;">Update</button> 
-                    <button class="btn-doc" style="outline: none; padding: 5px 10px;">Delete</button> 
-                </div>
-                <hr>
-                <h1 style="font-weight: 700;" class="text-truncate">Submit assignment</h1>
-                <p>Deadline time: hour day/month/year - hour day/month/year</p>
-                <div class="d-flex align-items-end pt-3 pb-3">
-                    <div class="doc-icon mr-3">
-                        <img src="{% static "google-docs.png" %}" alt="Document Icon">
-                    </div>
-                    <p class="m-0">Name of the document</p> 
-                </div>
-                <div class="d-flex justify-content-start align-items-center">
-                    <p class="m-0 ml-1" style="font-weight: 700;">Your score: 7/10</p>
-                </div>
+                {% for student_file in student_files %}
+                    {% if student_file.score is not None %}
+                        <!-- Phần 3: Hiển thị điểm -->
+                        <h1 style="font-weight: 700;" class="text-truncate">Submit assignment</h1>
+                        <p>Deadline time: {{ student_file.submission.open_date }} - {{ student_file.submission.close_date }}</p>
+                        <div class="d-flex align-items-end pt-3 pb-3">
+                            <div class="doc-icon mr-3">
+                                <img src="{% static "google-docs.png" %}" alt="Document Icon">
+                            </div>
+                            <p class="m-0">{{ student_file.file.name|filename }}</p> 
+                        </div>
+                        <div class="d-flex justify-content-start align-items-center">
+                            <p class="m-0 ml-1" style="font-weight: 700;">Your score: {{ student_file.score }}/10.00</p>
+                        </div>
+                    {% else %}
+                        <!-- Phần 2: Đã nộp bài, có thể cập nhật hoặc xóa -->
+                        <h1 style="font-weight: 700;" class="text-truncate">Submit assignment</h1>
+                        <p>Deadline time: {{ student_file.submission.open_date }} - {{ student_file.submission.close_date }}</p>
+                        <div class="d-flex align-items-end pt-3 pb-3">
+                            <div class="doc-icon mr-3">
+                                <img src="{% static "google-docs.png" %}" alt="Document Icon">
+                            </div>
+                            <p class="m-0">{{ student_file.file.name|filename }}</p> 
+                        </div>
+                        <div class="d-flex justify-content-start align-items-center">
+                            {% if submission.is_open %}
+                                <!-- Cho phép cập nhật hoặc xóa trong khoảng thời gian cho phép -->
+                                <form action="{% url 'update_file_submission' student_file.id %}" method="post" enctype="multipart/form-data">
+                                    {% csrf_token %}
+                                    <input type="file" name="file" required>
+                                    <button type="submit" class="btn-doc mr-3" style="outline: none; padding: 5px 10px;">Update</button> 
+                                </form>
+                                <form action="{% url 'delete_file_submission' student_file.id %}" method="post">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn-doc" style="outline: none; padding: 5px 10px;">Delete</button> 
+                                </form>
+                            {% else %}
+                                <!-- Nếu ngoài thời gian cho phép, chỉ hiển thị file -->
+                                <p class="text-muted">Submission period has ended. You cannot update or delete your submission.</p>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+
+                {% if not student_files %}
+                    <!-- Nếu không có bất kỳ `student_file` nào -->
+                    {% if submission.is_open %}
+                        <!-- Phần 1: Nộp bài -->
+                        <h1 style="font-weight: 700;" class="text-truncate">Submit assignment</h1>
+                        <p>Deadline time: {{submission.open_date}} - {{submission.close_date}}</p>
+                        <form action="{% url 'submit_assignment' submission.id %}" method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="d-flex align-items-end pt-3 pb-3">
+                                <div class="doc-icon mr-3">
+                                    <img src="{% static "google-docs.png" %}" alt="Document Icon">
+                                </div>
+                                <input type="file" class="btn-doc bg-secondary text-white" style="outline: none; padding: 3px 6px; font-size: 12px;" name="file" required>
+                            </div>
+                            <div class="d-flex justify-content-start">
+                                <button type="submit" class="btn-doc" style="outline: none; padding: 5px 10px;">Submit</button> 
+                            </div>
+                        </form>
+                    {% elif submission.not_open_yet %}
+                        <h1 style="font-weight: 700;" class="text-truncate">Submit assignment</h1>
+                        <p>Deadline time: {{submission.open_date}} - {{submission.close_date}}</p>
+                        <p>Submit not open yet. Starts at {{ submission.open_date }}</p>
+                    {% elif submission.closed %}
+                        <h1 style="font-weight: 700;" class="text-truncate">Submit assignment</h1>
+                        <p>Deadline time: {{submission.open_date}} - {{submission.close_date}}</p>
+                        <p>Submit closed on {{ submission.close_date }}</p>
+                    {% endif %}
+                {% endif %}
             </div>
             {% elif submission.submission_type == 'question_test' %}
             <div id="submission-content-{{ submission.id }}" class="content-section hidden">
@@ -1666,27 +1715,56 @@
                 </div>
                 <hr style="border: 1px solid #000;">
                 
-                <h1 style="font-weight: 700;" class="text-truncate">Answer the question</h1>
-                <p class="m-0 mt-2 mb-2">There are a total of 10 questions</p>
-                <div class="d-flex align-items-end pb-3">
-                    <div class="doc-icon mr-3">
-                        <img src="{% static "option.png" %}" alt="Document Icon">
-                    </div> 
-                </div>
-                <div class="d-flex justify-content-start">
-                    <button class="btn-doc" style="outline: none; padding: 5px 10px;">Get started</button> 
-                </div>
-                <hr>
-                <h1 style="font-weight: 700;" class="text-truncate">Answer the question</h1>
-                <p>There are a total of 10 questions</p>
-                <div class="d-flex align-items-end pb-3">
-                    <div class="doc-icon mr-3">
-                        <img src="{% static "option.png" %}" alt="Document Icon">
-                    </div> 
-                </div>
-                <div class="d-flex justify-content-start align-items-center">
-                    <p class="m-0 ml-1" style="font-weight: 700;">Your score: 7/10</p>
-                </div>
+                {% if quiz_results and quiz_results|get_item:submission.id %}
+                    <!-- Phần 2: Hiển thị kết quả khi đã có điểm -->
+                    <div>
+                        <h1 style="font-weight: 700;" class="text-truncate">Answer the question</h1>
+                        {% with quiz_results|get_item:submission.id as result %}
+                            {% if result %}
+                                <p>There are a total of {{ result.total_questions }} questions</p>
+                            {% endif %}
+                        {% endwith %}
+                        <div class="d-flex align-items-end pb-3">
+                            <div class="doc-icon mr-3">
+                                <img src="{% static "option.png" %}" alt="Document Icon">
+                            </div> 
+                        </div>
+                        <div class="d-flex justify-content-start align-items-center">
+                            {% with quiz_results|get_item:submission.id as result %}
+                                {% if result %}
+                                    <p class="m-0 ml-1" style="font-weight: 700;">
+                                        Your score: {{ result.correct_answers }}/{{ result.total_questions }} ({{ result.score }}/10.00)
+                                    </p>
+                                    <p class="m-0 ml-1" style="font-weight: 700;">
+                                        Time taken: {{ result.time_taken }}
+                                    </p>
+                                {% endif %}
+                            {% endwith %}
+                        </div>
+                    </div>
+                {% else %}
+                    <!-- Phần 1: Hiển thị nút bắt đầu khi chưa có điểm -->
+                    <h1 style="font-weight: 700;" class="text-truncate">Answer the question</h1>
+                    <p class="m-0 mt-2 mb-2">There are a total of {{ submission.questions.count }} questions</p>
+                    <div class="d-flex align-items-end pb-3">
+                        <div class="doc-icon mr-3">
+                            <img src="{% static "option.png" %}" alt="Document Icon">
+                        </div> 
+                    </div>
+                    <div class="d-flex justify-content-start">
+                        {% if submission.questions.first %}
+                            {% if submission.is_open %}
+                                <a href="{% url 'take_quiz' submission.id submission.questions.first.id %}" class="btn-doc" style="outline: none; padding: 5px 10px;">Get started</a>
+                            {% elif submission.not_open_yet %}
+                                <button class="btn-doc" style="outline: none; padding: 5px 10px;" disabled>Quiz not open yet. Starts at {{ submission.open_date }}</button>
+                            {% elif submission.closed %}
+                                <button class="btn-doc" style="outline: none; padding: 5px 10px;" disabled>Quiz closed on {{ submission.close_date }}</button>
+                            {% endif %}
+                        {% else %}
+                            <button class="btn-doc" style="outline: none; padding: 5px 10px;" disabled>No questions available</button>
+                        {% endif %}
+                    </div>
+                {% endif %}
             </div>
             {% endif %}
         {% endfor %}

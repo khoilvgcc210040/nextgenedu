@@ -1,4 +1,5 @@
-from datetime import date
+from datetime import date, timedelta, timezone
+from django.db.models import Avg
 from urllib.parse import urlencode
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
@@ -6,7 +7,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.urls import reverse
-from home.models import AcademicYear, Answer, Classroom, CustomUser, Participant, Question, Section, StudentFile, Subjects, Submission, SubmissionFile, SubsectionFile
+from home.models import AcademicYear, Answer, Classroom, Comment, CustomUser, Participant, Question, QuizResult, Section, StudentFile, Subjects, Submission, SubmissionFile, SubsectionFile
 
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.forms import SetPasswordForm
@@ -16,6 +17,7 @@ from django.template.loader import render_to_string
 from django.core.mail import send_mail
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
+from django.utils.timezone import now
 
 User = get_user_model()
 
@@ -77,7 +79,7 @@ def authPage(request):
                     'month': month,
                     'year': year,
                     'role': role,
-                    'subject': subject_id,
+                    'subject': subject_id if subject else None,
                     'grade': grade,
                     'terms': terms
                 }
@@ -88,7 +90,7 @@ def authPage(request):
                 user.role = role
                 user.grade = grade if grade else ''
                 user.terms_accepted = terms
-                user.subject = subject.name if subject else ''
+                user.subject = subject.name if subject else None
                 user.save()
 
                 user = authenticate(request, email=email, password=password)   
@@ -317,43 +319,97 @@ def classrooms(request, subject_id, grade):
 def enter_password(request, classroom_id):
     classroom = get_object_or_404(Classroom, id=classroom_id)
     
-
     if request.method == 'POST':
         entered_password = request.POST.get('password')
         if entered_password == classroom.password:
-            Participant.objects.create(user=request.user, classroom=classroom)
+            participant_exists = Participant.objects.filter(user=request.user, classroom=classroom).exists()
+            
+            if not participant_exists:
+                Participant.objects.create(user=request.user, classroom=classroom)
+                
             return redirect('classroom_detail', id=classroom.id)
         else:
             return HttpResponse("Incorrect password")
 
     return redirect('classrooms', subject_id=classroom.subject.id, grade=classroom.grade)
 
+
+@login_required
 def classroom_detail(request, id):
     classroom = get_object_or_404(Classroom, id=id)
     sections = Section.objects.filter(classroom=classroom)
     participants = classroom.participants.all()
-    
+
     scores_data = []
     for participant in participants:
-        student_files = StudentFile.objects.filter(student=participant.user, submission__section__classroom=classroom)
-        total_score = sum(file.score for file in student_files if file.score is not None)
-        num_tests = student_files.filter(submission__submission_type='question_test').count()
-        total_time = sum(file.date_submitted.timestamp() - file.submission.open_date.timestamp() for file in student_files)
+        quiz_results = QuizResult.objects.filter(
+            submission__section__classroom=classroom,
+            student=participant.user,
+            submission__submission_type='question_test'
+        )
+
+        total_score = sum(result.score for result in quiz_results)
+        num_tests = quiz_results.count()
+        total_time = sum((result.time_taken for result in quiz_results if result.time_taken), timedelta())
+        
+        # Chuyển đổi total_time thành dạng h:m:s
+        total_time_hms = str(total_time)
 
         scores_data.append({
             'user': participant.user,
             'total_score': total_score,
             'num_tests': num_tests,
-            'total_time': total_time,
+            'total_time': total_time_hms,  # Convert to minutes
         })
+
+    # Sort by total_score and total_time for ranking purposes
+    scores_data.sort(key=lambda x: (-x['total_score'], x['total_time']))
+
+    # Lấy tất cả các submissions trong lớp học
+    submissions = Submission.objects.filter(section__classroom=classroom)
+
+    # Lấy kết quả bài kiểm tra của học sinh hiện tại (cho `question_test`)
+    quiz_results = {
+        quiz_result.submission.id: quiz_result
+        for quiz_result in QuizResult.objects.filter(submission__in=submissions.filter(submission_type='question_test'), student=request.user)
+    }
+
+    # Lấy StudentFile cho submission loại `assignment` nếu có
+    student_files = StudentFile.objects.filter(student=request.user, submission__in=submissions.filter(submission_type='assignment'))
+
+    existing_comment = Comment.objects.filter(user=request.user, classroom=classroom).exists()
+
+    if request.method == 'POST' and not existing_comment:
+        comment_text = request.POST.get('comment')
+        rating = request.POST.get('rating')
+
+        Comment.objects.create(user=request.user, classroom=classroom, text=comment_text, rating=rating)
+
+        average_rating = Comment.objects.filter(classroom=classroom).aggregate(Avg('rating'))['rating__avg'] or 0.00
+        classroom.average_rating = round(average_rating, 2)
+        classroom.save()
+
+        return redirect('classroom_detail', id=classroom.id)
+
+
+    comments = Comment.objects.filter(classroom=classroom).order_by('-created_at')
+
+    range_list = range(1, 6)
 
     context = {
         'classroom': classroom,
         'sections': sections,
         'participants': participants,
-        'scores_data': scores_data,
+        'scores_data': scores_data,  # Dữ liệu xếp hạng mới
+        'submissions': submissions,  # Tất cả submissions
+        'quiz_results': quiz_results,  # Kết quả của tất cả các bài kiểm tra của học sinh
+        'student_files': student_files,  # Danh sách các StudentFile cho các bài assignment
+        'comments': comments,
+        'existing_comment': existing_comment,
+        'range': range_list, 
     }
     return render(request, 'classroom_detail.html', context)
+
 
 def update_section(request, classroom_id, section_id):
     section = get_object_or_404(Section, id=section_id, classroom_id=classroom_id)
@@ -415,40 +471,122 @@ def update_classroom_description(request, classroom_id):
 @login_required
 def submit_assignment(request, submission_id):
     submission = get_object_or_404(Submission, id=submission_id)
+    classroom = submission.section.classroom  # Truy xuất lớp học từ bài nộp
     
     if not submission.is_open():
-        return redirect('submission_detail', submission_id=submission_id)
+        return redirect('classroom_detail', id=classroom.id)
 
     if request.method == 'POST':
         uploaded_file = request.FILES['file']
         StudentFile.objects.create(submission=submission, student=request.user, file=uploaded_file)
-        return redirect('submission_detail', submission_id=submission_id)
+        return redirect('classroom_detail', id=classroom.id)
 
     return render(request, 'submit_assignment.html', {'submission': submission})
 
+def take_quiz(request, submission_id, question_id):
+    submission = get_object_or_404(Submission, id=submission_id)
+    question = get_object_or_404(Question, id=question_id)
+
+    total_questions = submission.questions.count()
+
+    # Lấy số lượng câu hỏi đã được trả lời
+    quiz_result, created = QuizResult.objects.get_or_create(
+        submission=submission,
+        student=request.user,
+        defaults={'correct_answers': 0, 'total_questions': total_questions, 'score': 0.0}
+    )
+    answered_questions = quiz_result.answered_questions
+
+    # Lấy thời gian đã trôi qua nếu đã lưu trước đó
+    elapsed_time = quiz_result.time_taken.total_seconds() if quiz_result.time_taken else 0
+
+    return render(request, 'take_quiz.html', {
+        'submission': submission,
+        'current_question': question,
+        'total_questions': total_questions,
+        'answered_questions': answered_questions,
+        'elapsed_time': elapsed_time  # Truyền elapsed_time vào template
+    })
+
+
+def submit_answer(request, submission_id, question_id):
+    submission = get_object_or_404(Submission, id=submission_id)
+    question = get_object_or_404(Question, id=question_id)
+    selected_answer_id = request.POST.get('selected_answer')
+    selected_answer = get_object_or_404(Answer, id=selected_answer_id)
+
+    # Kiểm tra câu trả lời đúng hay sai
+    correct = selected_answer.is_correct
+
+    # Cập nhật hoặc tạo mới QuizResult nếu chưa có
+    quiz_result, created = QuizResult.objects.get_or_create(
+        submission=submission,
+        student=request.user,
+        defaults={'correct_answers': 0, 'total_questions': submission.questions.count(), 'score': 0.0}
+    )
+    
+    if correct:
+        quiz_result.correct_answers += 1
+     
+    quiz_result.answered_questions += 1
+    
+    # Tính toán điểm
+    quiz_result.total_questions = submission.questions.count()
+    quiz_result.score = (quiz_result.correct_answers / quiz_result.total_questions) * 10
+
+    # Lấy thời gian đã trôi qua (elapsed_time)
+    elapsed_time = int(request.POST.get('elapsed_time', '0'))
+
+    # Nếu là câu hỏi cuối cùng, lưu lại tổng thời gian làm bài
+    next_question = Question.objects.filter(submission=submission, id__gt=question_id).first()
+    if next_question:
+        # Chuyển đến câu hỏi tiếp theo, truyền elapsed_time để tiếp tục đếm
+        quiz_result.time_taken = timedelta(seconds=elapsed_time)
+        quiz_result.save()
+        return redirect('take_quiz', submission_id=submission.id, question_id=next_question.id)
+    else:
+        # Đây là câu hỏi cuối cùng, lưu thời gian tổng
+        quiz_result.time_taken = timedelta(seconds=elapsed_time)
+        quiz_result.save()
+        return redirect('quiz_result', submission_id=submission.id)
+
+
+def quiz_result(request, submission_id):
+    submission = get_object_or_404(Submission, id=submission_id)
+    classroom = submission.section.classroom
+
+    # Lấy kết quả bài kiểm tra của học sinh hiện tại
+    quiz_result = get_object_or_404(QuizResult, submission=submission, student=request.user)
+
+    # Chuyển hướng về trang classroom_detail và truyền các tham số cần thiết qua URL
+    return redirect('classroom_detail', id=classroom.id)
+
 
 @login_required
-def update_submission(request, file_id):
+def update_file_submission(request, file_id):
     student_file = get_object_or_404(StudentFile, id=file_id, student=request.user)
     submission = student_file.submission
+    classroom = submission.section.classroom  # Truy xuất lớp học từ bài nộp
 
     if not submission.is_open():
-        return redirect('submission_detail', submission_id=submission.id)
+        return redirect('classroom_detail', id=classroom.id)
 
     if request.method == 'POST':
         student_file.file = request.FILES['file']
         student_file.save()
-        return redirect('submission_detail', submission_id=submission.id)
+        return redirect('classroom_detail', id=classroom.id)
 
-    return render(request, 'update_submission.html', {'student_file': student_file})
-
+    return redirect('classroom_detail', id=classroom.id)
 
 @login_required
-def delete_submission(request, file_id):
+def delete_file_submission(request, file_id):
     student_file = get_object_or_404(StudentFile, id=file_id, student=request.user)
-    submission_id = student_file.submission.id
+    submission = student_file.submission
+    classroom = submission.section.classroom  # Truy xuất lớp học từ bài nộp
+    
     student_file.delete()
-    return redirect('submission_detail', submission_id=submission_id)
+    return redirect('classroom_detail', id=classroom.id)
+
 
 def setting_classroom(request, id):
     classroom = get_object_or_404(Classroom, id=id)

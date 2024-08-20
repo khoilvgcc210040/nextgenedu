@@ -39,6 +39,7 @@ class AcademicYear(models.Model):
 class Classroom(models.Model):
     teacher = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='classrooms', null=True, blank=True)
     name = models.CharField(max_length=200)
+    average_rating = models.DecimalField(max_digits=3, decimal_places=2, default=0.00)
     subject = models.ForeignKey(Subjects, on_delete=models.CASCADE)
     grade = models.IntegerField()
     description = models.TextField(null=True, blank=True)
@@ -63,6 +64,20 @@ class Classroom(models.Model):
 
     class Meta:
         unique_together = ('teacher', 'name')
+
+class Comment(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='comments')
+    classroom = models.ForeignKey(Classroom, on_delete=models.CASCADE, related_name='comments')
+    text = models.TextField()
+    rating = models.IntegerField(null=True, blank=True)  # Allow null for subsequent comments
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Comment by {self.user.username} on {self.classroom.name}"
+
+    class Meta:
+        unique_together = ('user', 'classroom', 'rating')  # Ensure one rating per classroom per user
+
 
 class Section(models.Model):
     classroom = models.ForeignKey('Classroom', on_delete=models.CASCADE, related_name='sections')
@@ -99,6 +114,14 @@ class Submission(models.Model):
     def is_open(self):
         now = timezone.now()
         return self.open_date <= now <= self.close_date
+    
+    def not_open_yet(self):
+        now = timezone.now()
+        return now < self.open_date
+
+    def closed(self):
+        now = timezone.now()
+        return now > self.close_date
 
 
     def __str__(self):
@@ -147,3 +170,21 @@ class Answer(models.Model):
 
     def __str__(self):
         return f"Answer: {self.text[:50]}"
+    
+class QuizResult(models.Model):
+    submission = models.ForeignKey(Submission, on_delete=models.CASCADE, related_name='quiz_results')
+    student = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='quiz_results')
+    correct_answers = models.IntegerField(default=0)  # Giá trị mặc định là 0
+    answered_questions = models.IntegerField(default=1)
+    total_questions = models.IntegerField(default=0)
+    score = models.DecimalField(max_digits=5, decimal_places=2, default=0.0)
+    time_taken = models.DurationField(null=True, blank=True)
+    date_submitted = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.student.username} - {self.submission.title} - Score: {self.score}"
+    
+    @property
+    def is_question_test(self):
+        return self.submission.submission_type == 'question_test'
+
