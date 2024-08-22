@@ -121,25 +121,43 @@
         <section>
             <div class="profile-container">
                 <img src="{% static "account.png" %}" alt="Profile Picture">
-                <h2>Username</h2>
-                <p>Date Joined: day / month / year</p>
+                <h2>{{ user.username }}</h2>
+                <p>Date Joined: {{ user.date_joined|date:"d / m / Y" }}</p>
             
                 <div class="achievements">
-                    <div class="achievement-item">
-                        <i class="fas fa-chalkboard-teacher"></i>
-                        <span>1</span>
-                        <p>Classroom</p>
-                    </div>
-                    <div class="achievement-item">
-                        <i class="fas fa-heart"></i>
-                        <span>1</span>
-                        <p>Likes</p>
-                    </div>
-                    <div class="achievement-item">
-                        <i class="fas fa-star"></i>
-                        <span>1</span>
-                        <p>Max Score</p>
-                    </div>
+                    {% if user.role == 'teacher' %}
+                        <div class="achievement-item">
+                            <i class="fas fa-chalkboard-teacher"></i>
+                            <span>{{ classrooms_created }}</span>
+                            <p>Classrooms Created</p>
+                        </div>
+                        <div class="achievement-item">
+                            <i class="fas fa-heart"></i>
+                            <span>{{ total_likes }}</span>
+                            <p>Total Likes</p>
+                        </div>
+                        <div class="achievement-item">
+                            <i class="fas fa-award"></i>
+                            <span>{{ average_rating }}</span>
+                            <p>Average Rating</p>
+                        </div>
+                    {% elif user.role == 'student' %}
+                        <div class="achievement-item">
+                            <i class="fas fa-chalkboard"></i>
+                            <span>{{ classrooms_joined }}</span>
+                            <p>Classrooms Joined</p>
+                        </div>
+                        <div class="achievement-item">
+                            <i class="fas fa-star"></i>
+                            <span>{{ highest_score }}</span>
+                            <p>Highest Score</p>
+                        </div>
+                        <div class="achievement-item">
+                            <i class="fas fa-trophy"></i>
+                            <span>{{ total_correct_answers }}</span>
+                            <p>Total Correct Answers</p>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         </section>

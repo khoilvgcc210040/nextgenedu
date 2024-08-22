@@ -8,7 +8,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.urls import reverse
-from home.models import AcademicYear, Answer, ChatMessage, Classroom, Comment, CustomUser, Participant, Question, QuizResult, Section, StudentFile, Subjects, Submission, SubmissionFile, SubsectionFile
+from home.models import AcademicYear, Answer, ChatMessage, Classroom, Comment, CustomUser, FavoriteClassroom, Participant, Question, QuizResult, Section, StudentFile, Subjects, Submission, SubmissionFile, SubsectionFile
 
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.forms import SetPasswordForm
@@ -340,6 +340,7 @@ def classroom_detail(request, id):
     classroom = get_object_or_404(Classroom, id=id)
     sections = Section.objects.filter(classroom=classroom)
     messages = ChatMessage.objects.filter(classroom=classroom).order_by('timestamp')
+    is_favorite = FavoriteClassroom.objects.filter(user=request.user, classroom=classroom).exists()
     participants = classroom.participants.all()
 
     scores_data = []
@@ -410,6 +411,7 @@ def classroom_detail(request, id):
         'existing_comment': existing_comment,
         'range': range_list, 
         'messages': messages, 
+        'is_favorite': is_favorite,
     }
     return render(request, 'classroom_detail.html', context)
 
@@ -669,6 +671,11 @@ def create_section_submission(request):
             )
             section.save()
             messages.success(request, 'Section/Subsection created successfully!')
+            
+            participants_to_notify = classroom.participants.filter(user__notify_sections=True)
+            print(participants_to_notify)
+            if participants_to_notify.exists():
+                notify_participants(classroom, 'section', title, participants_to_notify)
 
         elif action_type == 'submission':
             submission_type = request.POST.get('submission_type')
@@ -686,12 +693,43 @@ def create_section_submission(request):
             )
             submission.save()
             messages.success(request, 'Submission created successfully!')
+            
+            if classroom.participants.filter(user__notify_sections=True).exists():
+                notify_participants(classroom, 'submission', title)
 
         return redirect('manage_classroom_detail', id=classroom.id)
 
     return redirect('home')
 
+def notify_participants(classroom, item_type, item_title, participants):
+    subject = f'New {item_type} added to {classroom.name}'
+    message = f"""
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Notification</title>
+    </head>
+    <body>
+        <p>Dear Member,</p>
+        <p>A new {item_type} titled "{item_title}" has been added to the classroom "{classroom.name}".</p>
+        <p>Best regards,<br>Classroom Team</p>
+    </body>
+    </html>
+    """
+    recipient_list = [participant.user.email for participant in participants]
+    send_mail(subject, message, 'NextGenEdu <nextgenedu03.info@gmail.com>', recipient_list, fail_silently=False, html_message=message)
 
+@csrf_exempt
+@login_required
+def update_notification_preference(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        request.user.notify_sections = data.get('notify_sections', False)
+        request.user.save()
+        return JsonResponse({'status': 'success'})
+    return JsonResponse({'status': 'failed'}, status=400)
 
 def manage_classroom_list(request):
     user = request.user
@@ -845,13 +883,50 @@ def marking(request, assignment_id):
 
     return render(request, 'marking.html', context)
 
-
+from django.contrib.auth import update_session_auth_hash
+@login_required
 def setting(request):
-    # classroom = get_object_or_404(Classroom, id=id)
-    # context = {
-    #     'classroom': classroom
-    # }
-    return render(request, 'setting.html')
+    user = request.user
+
+    if request.method == 'POST':
+        if 'save_changes' in request.POST:
+            user.email = request.POST.get('email')
+            user.username = request.POST.get('username')
+            from datetime import date
+
+            year = int(request.POST.get('dob-year'))
+            month = int(request.POST.get('dob-month'))
+            day = int(request.POST.get('dob-day'))
+            user.date_of_birth = date(year, month, day)
+            user.save()
+            messages.success(request, 'Personal information updated successfully.')
+            return redirect('setting')
+
+        elif 'update_password' in request.POST:
+            current_password = request.POST.get('current-password')
+            new_password = request.POST.get('new-password')
+            confirm_password = request.POST.get('confirm-password')
+
+            if new_password == confirm_password:
+                if user.check_password(current_password):
+                    user.set_password(new_password)
+                    user.save()
+                    update_session_auth_hash(request, user)
+                    messages.success(request, 'Password updated successfully.')
+                    return redirect('setting')
+                else:
+                    messages.error(request, 'Current password is incorrect.')
+                    return redirect('setting')
+            else:
+                messages.error(request, 'New password and confirmation do not match.')
+                return redirect('setting')
+
+        elif 'delete_account' in request.POST:
+            user.delete()
+            messages.success(request, 'Account deleted successfully.')
+            return redirect('home')
+
+    return render(request, 'setting.html', {'user': user})
 
 def adminPage(request):
     # classroom = get_object_or_404(Classroom, id=id)
@@ -860,26 +935,92 @@ def adminPage(request):
     # }
     return render(request, 'adminPage.html')
 
-def achivement(request):
-    # classroom = get_object_or_404(Classroom, id=id)
-    # context = {
-    #     'classroom': classroom
-    # }
-    return render(request, 'achivement.html')
+from django.db.models import Sum, Max, Avg
+from django.contrib.auth.decorators import login_required
 
+@login_required
+def achivement(request):
+    user = request.user
+    context = {}
+
+    if user.role == 'teacher':
+        classrooms_created = user.classrooms.count()
+        total_likes = user.classrooms.aggregate(total_likes=Sum('likes'))['total_likes'] or 0
+        average_rating = user.classrooms.aggregate(average_rating=Avg('average_rating'))['average_rating'] or 0.0
+
+        context.update({
+            'classrooms_created': classrooms_created,
+            'total_likes': total_likes,
+            'average_rating': average_rating,
+        })
+
+    elif user.role == 'student':
+        classrooms_joined = user.participants.count()
+        highest_score = user.student_files.aggregate(max_score=Max('score'))['max_score'] or 0.0
+        total_correct_answers = user.quiz_results.aggregate(total_correct=Sum('correct_answers'))['total_correct'] or 0
+
+        context.update({
+            'classrooms_joined': classrooms_joined,
+            'highest_score': highest_score,
+            'total_correct_answers': total_correct_answers,
+        })
+
+    return render(request, 'achivement.html', context)
+
+@login_required
 def favorite(request):
-    # classroom = get_object_or_404(Classroom, id=id)
-    # context = {
-    #     'classroom': classroom
-    # }
-    return render(request, 'favorite.html')
+    user = request.user
+    status = request.GET.get('status', None)
+    favorite_classrooms = FavoriteClassroom.objects.filter(user=user)
+    public_classrooms = [fav.classroom for fav in favorite_classrooms if not fav.classroom.status]
+    private_classrooms = [fav.classroom for fav in favorite_classrooms if fav.classroom.status]
+
+    context = {
+        'public_classrooms': public_classrooms,
+        'private_classrooms': private_classrooms,
+        'status': status,
+    }
+    return render(request, 'favorite.html', context)
+
+@login_required
+@csrf_exempt
+def favorite_classroom(request, classroom_id):
+    classroom = Classroom.objects.get(id=classroom_id)
+    user = request.user
+    favorite, created = FavoriteClassroom.objects.get_or_create(user=user, classroom=classroom)
+
+    if not created:
+        favorite.delete()
+        classroom.likes = max(0, classroom.likes - 1)  # Đảm bảo likes không âm
+        is_favorite = False
+    else:
+        classroom.likes += 1
+        is_favorite = True
+
+    classroom.save()
+
+    return JsonResponse({'is_favorite': is_favorite})
 
 def myclassroom(request):
-    # classroom = get_object_or_404(Classroom, id=id)
-    # context = {
-    #     'classroom': classroom
-    # }
-    return render(request, 'myclassroom.html')
+    user = request.user
+    participants = Participant.objects.filter(user=user)
+    context = {
+        'participants': participants,
+        'subject': user.subject,
+        'grade': user.grade,
+        'status': request.GET.get('status')
+    }
+    return render(request, 'myclassroom.html', context)
+
+def searchPage(request):
+    query = request.GET.get('q', '')
+    public_classrooms = Classroom.objects.filter(status=False, name__icontains=query) | Classroom.objects.filter(status=False, teacher__username__icontains=query)
+    private_classrooms = Classroom.objects.filter(status=True, name__icontains=query) | Classroom.objects.filter(status=True, teacher__username__icontains=query)
+    return render(request, 'searchPage.html', {
+        'public_classrooms': public_classrooms,
+        'private_classrooms': private_classrooms,
+        'query': query
+    })
 
 
 

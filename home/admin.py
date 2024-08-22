@@ -1,13 +1,13 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import ChatMessage, Comment, CustomUser, Subjects, Classroom, AcademicYear, Section, Submission, StudentFile, Participant, Question, Answer, SubsectionFile, SubmissionFile, QuizResult
+from .models import FavoriteClassroom, ChatMessage, Comment, CustomUser, Subjects, Classroom, AcademicYear, Section, Submission, StudentFile, Participant, Question, Answer, SubsectionFile, SubmissionFile, QuizResult
 
 class CustomUserAdmin(UserAdmin):
     model = CustomUser
     list_display = ('username', 'email', 'first_name', 'last_name', 'subject', 'grade', 'role', 'is_staff')
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
-        ('Personal info', {'fields': ('first_name', 'last_name', 'email', 'date_of_birth', 'role', 'subject', 'grade', 'terms_accepted')}),
+        ('Personal info', {'fields': ('first_name', 'last_name', 'email', 'date_of_birth', 'role', 'subject', 'grade', 'terms_accepted', 'notify_sections')}),
         ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
         ('Important dates', {'fields': ('last_login', 'date_joined')}),
     )
@@ -27,3 +27,4 @@ admin.site.register(SubsectionFile)
 admin.site.register(QuizResult)
 admin.site.register(Comment)
 admin.site.register(ChatMessage)
+admin.site.register(FavoriteClassroom)

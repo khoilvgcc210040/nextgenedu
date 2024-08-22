@@ -937,6 +937,10 @@
             border-radius: 10px;
             margin-top: 10px;
         }
+
+        .favorite {
+            color: gold;
+        }
     </style>
 </head>
 <body style="padding: 80px 0;">
@@ -1468,7 +1472,9 @@
                         </ul>
                         </nav>
                     </label>                      
-                    <button class="btn-favorite mr-4" style="outline: none;"><i class="fa-regular fa-star fa-xl"></i></button>
+                    <button class="btn-favorite mr-4" style="outline: none;">
+                        <i class="fa-regular fa-star fa-xl {% if is_favorite %}favorite{% endif %}"></i>
+                    </button>
                 </div>
             </div>
             <div class="description mt-3 mb-3">
@@ -1579,7 +1585,7 @@
                         </ul>
                         </nav>
                     </label>                      
-                    <button class="btn-favorite mr-4" style="outline: none;"><i class="fa-regular fa-star fa-xl"></i></button>
+                    <button class="btn-favorite mr-4" style="outline: none;"><i class="fa-regular fa-star fa-xl {% if is_favorite %}favorite{% endif %}"></i></button>
                 </div>
             </div>
             <div class="description mt-3 mb-3">
@@ -1652,7 +1658,7 @@
                         </ul>
                         </nav>
                     </label>                      
-                    <button class="btn-favorite mr-4" style="outline: none;"><i class="fa-regular fa-star fa-xl"></i></button>
+                    <button class="btn-favorite mr-4" style="outline: none;"><i class="fa-regular fa-star fa-xl {% if is_favorite %}favorite{% endif %}"></i></button>
                 </div>
             </div>
             <div class="description mt-3 mb-3">
@@ -1726,7 +1732,7 @@
                             </ul>
                             </nav>
                         </label>                      
-                        <button class="btn-favorite mr-4" style="outline: none;"><i class="fa-regular fa-star fa-xl"></i></button>
+                        <button class="btn-favorite mr-4" style="outline: none;"><i class="fa-regular fa-star fa-xl {% if is_favorite %}favorite{% endif %}"></i></button>
                     </div>
                 </div>
                 <div class="description mt-3 mb-3">
@@ -1868,7 +1874,7 @@
                             </ul>
                             </nav>
                         </label>                      
-                        <button class="btn-favorite mr-4" style="outline: none;"><i class="fa-regular fa-star fa-xl"></i></button>
+                        <button class="btn-favorite mr-4" style="outline: none;"><i class="fa-regular fa-star fa-xl {% if is_favorite %}favorite{% endif %}"></i></button>
                     </div>
                 </div>
                 <div class="description mt-3 mb-3">
@@ -2175,6 +2181,38 @@
             var folderModal = new bootstrap.Modal(document.getElementById('chatModal'));
             folderModal.show();
         }  
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const favoriteButtons = document.querySelectorAll('.btn-favorite');
+            
+            favoriteButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    const classroomId = {{ classroom.id }};
+                    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    
+                    fetch(`/favorite_classroom/${classroomId}/`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': csrfToken
+                        },
+                        body: JSON.stringify({ classroom_id: classroomId })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        favoriteButtons.forEach(btn => {
+                            const icon = btn.querySelector('i');
+                            if (data.is_favorite) {
+                                icon.classList.add('favorite');
+                            } else {
+                                icon.classList.remove('favorite');
+                            }
+                        });
+                    });
+                });
+            });
+        });
     </script>
 </body>
 </html>

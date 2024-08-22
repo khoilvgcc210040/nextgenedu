@@ -23,6 +23,7 @@ class CustomUser(AbstractUser):
     role = models.CharField(max_length=10, null=True, blank=True)
     grade = models.CharField(max_length=10, null=True, blank=True)
     subject = models.ForeignKey(Subjects, on_delete=models.CASCADE, null=True, blank=True)
+    notify_sections = models.BooleanField(default=False)
     terms_accepted = models.BooleanField(default=False)
 
     def __str__(self):
@@ -206,4 +207,15 @@ class ChatMessage(models.Model):
     @property
     def is_image(self):
         return self.image is not None
+    
+class FavoriteClassroom(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='favorite_classrooms')
+    classroom = models.ForeignKey(Classroom, on_delete=models.CASCADE, related_name='favorited_by')
+    added_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'classroom')
+
+    def __str__(self):
+        return f"{self.user.username} - {self.classroom.name}"
 

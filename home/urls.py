@@ -39,4 +39,7 @@ urlpatterns = [
     path('submission/<int:submission_id>/question/<int:question_id>/submit/', views.submit_answer, name='submit_answer'),
     path('submission/<int:submission_id>/result/', views.quiz_result, name='quiz_result'),
     path('save_message/', views.save_message, name='save_message'),
+    path('favorite_classroom/<int:classroom_id>/', views.favorite_classroom, name='favorite_classroom'),
+    path('update-notification-preference/', views.update_notification_preference, name='update_notification_preference'),
+    path('search/', views.searchPage, name='searchPage'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
