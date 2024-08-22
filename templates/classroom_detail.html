@@ -888,7 +888,55 @@
             transform: translate(-50%, -70%);
             background-color: transparent;
         }
+
+        .chat-message {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
         
+        .my-message {
+            justify-content: flex-end;
+        }
+        
+        .other-message {
+            justify-content: flex-start;
+        }
+        
+        .my-message .user-icon, .other-message .user-icon {
+            width: 40px;
+            height: 40px;
+            margin: 0 10px;
+        }
+        
+        .my-message .message-content, .other-message .message-content {
+            background-color: #f1f1f1;
+            border-radius: 10px;
+            padding: 10px;
+            max-width: 60%;
+        }
+        
+        .my-message .message-content {
+            background-color: #d1f5d3; /* Màu nền khác để phân biệt tin nhắn của người dùng */
+            text-align: right; /* Canh phải cho nội dung */
+        }
+        
+        .other-message .message-content {
+            background-color: #f1f1f1;
+            text-align: left; /* Canh trái cho nội dung */
+        }
+        
+        .message-meta {
+            font-size: 0.8em;
+            color: #888;
+        } 
+        
+        .message-image img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body style="padding: 80px 0;">
@@ -1134,25 +1182,179 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content" style="border: 5px solid {{ classroom.subject.bg_color }}; border-radius: 15px;">
                 <div class="chat-header d-flex justify-content-between align-items-center">
-                    <h5 class="modal-title" id="folderModalLabel">Name of the classroom</h5>
+                    <h5 class="modal-title" id="folderModalLabel">Files and Images</h5>
                     <div class="folder-card">
                         <img src="{% static 'back.png' %}" onclick="openChatModal()" style="cursor: pointer;" alt="Folder Icon">
                     </div>
                 </div>
                 <div class="folder-body">
-                    <div class="d-flex justify-content-between align-items-center p-3">
-                        <p class="m-0">Name of the file</p>
-                        <span>🗑️</span>
-                    </div>
-                    <hr class="m-0">
-                    <div class="d-flex justify-content-between align-items-center p-3">
-                        <p class="m-0">Name of the file</p>
-                        <span>🗑️</span>
-                    </div>
+                    {% for message in messages %}
+                        {% if message.is_file and message.file %}
+                            <div class="d-flex justify-content-between align-items-center p-3">
+                                <p class="m-0">
+                                    <a href="{{ message.file.url }}" download>{{ message.file.name }}</a>
+                                </p>
+                                <span>🗑️</span>
+                            </div>
+                            <hr class="m-0">
+                        {% elif message.is_image and message.image %}
+                            <div class="d-flex justify-content-between align-items-center p-3">
+                                <p class="m-0">
+                                    <a href="{{ message.image.url }}" download>{{ message.image.name }}</a>
+                                </p>
+                                <span>🗑️</span>
+                            </div>
+                            <hr class="m-0">
+                        {% endif %}
+                    {% endfor %}
                 </div>
             </div>
         </div>
     </div>
+    
+    
+
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            let chatSocket;
+            const imageInput = document.getElementById('imageInput');
+            const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+            const imagePreview = document.getElementById('imagePreview');
+            const removeImageButton = document.getElementById('removeImageButton');
+            const currentUsername = '{{ request.user.username }}';
+        
+            document.querySelector('.btn-toggle-right-messenger').addEventListener('click', function() {
+                const classroomId = {{ classroom.id }};
+                const wsUrl = `ws://${window.location.host}/ws/chat/${classroomId}/`;
+                
+                if (!chatSocket || chatSocket.readyState === WebSocket.CLOSED) {
+                    chatSocket = new WebSocket(wsUrl);
+        
+                    chatSocket.onmessage = function(e) {
+                        const data = JSON.parse(e.data);
+                        console.log(data);
+                        const message = data.message;
+                        const imageUrl = data.image_url;
+                        const fileUrl = data.file_url;
+                        const username = data.username;
+
+                        
+                        const chatBody = document.getElementById('chatBody');
+                        const messageElement = document.createElement('div');
+                        messageElement.className = username === currentUsername ? 'chat-message my-message' : 'chat-message other-message'; 
+    
+                        messageElement.innerHTML = `
+                            <div class="user-icon">
+                                <img src="{% static 'account.png' %}" alt="User Icon" class="img-fluid">
+                            </div>
+                            <div class="message-content">
+                                <div class="message-meta">
+                                    ${username === currentUsername ? `<span class="text-muted">${new Date().toLocaleString()}</span> ${username}` : `${username} <span class="text-muted">${new Date().toLocaleString()}</span>`}
+                                </div>
+                                ${message ? `<div class="message-text">${message}</div>` : ''}
+                                ${imageUrl ? `<div class="image-content"><img src="${imageUrl}" alt="Image" class="img-fluid" style="max-width: 200px; border-radius: 10px;"></div>` : ''}
+                                ${fileUrl ? `<div class="file-content"><a href="${fileUrl}" download>Download file</a></div>` : ''}
+                            </div>
+                        `;
+    
+                        chatBody.appendChild(messageElement);
+                        chatBody.scrollTop = chatBody.scrollHeight;
+                    };
+                }
+            });
+        
+            document.getElementById('imageButton').onclick = function() {
+                imageInput.click(); // Kích hoạt input file để chọn hình ảnh
+            };
+
+            document.getElementById('fileButton').onclick = function() {
+                document.getElementById('fileInput').click(); // Kích hoạt input file để chọn file Word, PDF
+            };
+
+            document.getElementById('fileInput').onchange = function() {
+                const file = document.getElementById('fileInput').files[0];
+                if (file) {
+                    document.getElementById('filePreview').textContent = file.name; // Hiển thị tên file
+                    document.getElementById('filePreviewContainer').style.display = 'block'; // Hiển thị container chứa file
+                }
+            };
+            
+            document.getElementById('removeFileButton').onclick = function() {
+                document.getElementById('fileInput').value = ''; // Xóa giá trị input file
+                document.getElementById('filePreviewContainer').style.display = 'none'; // Ẩn preview
+                document.getElementById('filePreview').textContent = ''; // Xóa tên file hiển thị
+            };
+        
+            // Khi người dùng chọn hình ảnh, hiển thị hình ảnh nhỏ trên giao diện
+            imageInput.onchange = function() {
+                const file = imageInput.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        imagePreview.src = e.target.result;
+                        imagePreviewContainer.style.display = 'block';
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+        
+            // Khi người dùng nhấn vào nút xóa ảnh
+            removeImageButton.onclick = function() {
+                imageInput.value = ''; // Xóa giá trị input file
+                imagePreviewContainer.style.display = 'none'; // Ẩn preview
+            };
+        
+            document.getElementById('sendButton').onclick = function() {
+                const messageInput = document.getElementById('chatMessageInput');
+                const message = messageInput.value;
+                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                const classroomId = {{ classroom.id }};
+                const formData = new FormData();
+        
+                formData.append('classroom_id', classroomId);
+                formData.append('message', message);
+                formData.append('csrfmiddlewaretoken', csrfToken);
+        
+                if (imageInput.files.length > 0) {
+                    formData.append('image', imageInput.files[0]); 
+                }
+
+                if (document.getElementById('fileInput').files.length > 0) {
+                    formData.append('file', document.getElementById('fileInput').files[0]); // Thêm file đính kèm vào form
+                }
+        
+                fetch('{% url "save_message" %}', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (chatSocket && chatSocket.readyState === WebSocket.OPEN) {
+                        chatSocket.send(JSON.stringify({
+                            'message': data.message,
+                            'username': data.username,
+                            'image_url': data.image_url,
+                            'file_url': data.file_url,
+                        }));
+                    }
+        
+                    // Sau khi gửi, reset các giá trị
+                    messageInput.value = '';
+                    imageInput.value = '';
+                    document.getElementById('fileInput').value = '';
+                    imagePreviewContainer.style.display = 'none';
+                    filePreviewContainer.style.display = 'none'; // Ẩn file preview sau khi gửi
+                    document.getElementById('filePreview').textContent = ''; 
+                });
+            };
+        
+            document.getElementById('chatMessageInput').onkeyup = function(e) {
+                if (e.keyCode === 13) {  // Enter key
+                    document.getElementById('sendButton').click();
+                }
+            };
+        });                                                                                                            
+    </script>        
 
     <div class="modal fade" id="chatModal" tabindex="-1" aria-labelledby="chatModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
@@ -1163,80 +1365,64 @@
                         <img src="{% static 'folder.png' %}" onclick="openFolderModal()" style="cursor: pointer;" alt="Folder Icon">
                     </div>
                 </div>
-                <div class="chat-body">
-                    <div class="chat-message">
-                        <div class="user-icon">
-                            <img src="{% static 'account.png' %}" alt="User Icon" class="img-fluid">
-                        </div>
-                        <div class="message-content">
-                            <div class="message-meta">Username <span class="text-muted">day / month / year</span></div>
-                            <div class="file-card">
-                                <img src="{% static 'google-docs.png' %}" alt="File Icon">
-                                <div>
-                                    <p class="m-0">File name</p>
-                                    <p class="m-0 text-muted">File size</p>
+                <div class="chat-body" id="chatBody">
+                    <!-- Hiển thị các tin nhắn đã gửi -->
+                    {% for message in messages %}
+                        <div class="chat-message {% if message.user == request.user %}my-message{% else %}other-message{% endif %}">
+                            <div class="user-icon">
+                                <img src="{% static 'account.png' %}" alt="User Icon" class="img-fluid">
+                            </div>
+                            <div class="message-content">
+                                <div class="message-meta">
+                                    {% if message.user == request.user %}
+                                        <span class="text-muted">{{ message.timestamp|date:"d/m/Y H:i" }}</span> {{ message.user.username }}
+                                    {% else %}
+                                        {{ message.user.username }} <span class="text-muted">{{ message.timestamp|date:"d/m/Y H:i" }}</span>
+                                    {% endif %}
                                 </div>
+                                <div class="message-text">{{ message.message }}</div>
+                                <!-- Kiểm tra nếu có hình ảnh -->
+                                {% if message.image %}
+                                    <div class="message-image">
+                                        <img src="{{ message.image.url }}" alt="Image" class="img-fluid" style="max-width: 200px; border-radius: 10px;">
+                                    </div>
+                                {% endif %}
+
+                                {% if message.file %}
+                                    <div class="message-file">
+                                        <a href="{{ message.file.url }}" download class="btn btn-link">Download file: {{ message.file.name }}</a>
+                                    </div>
+                                {% endif %}
                             </div>
                         </div>
-                    </div>
-
-                    <div class="chat-message">
-                        <div class="user-icon position-relative">
-                            <img src="{% static 'account.png' %}" alt="User Icon" class="img-fluid">
-                            <div class="crown-icon">
-                                <img src="{% static 'crown.png' %}" alt="Crown Icon" width="20">
-                            </div>
-                        </div>
-                        <div class="message-content">
-                            <div class="message-meta">Username <span class="text-muted">day / month / year</span></div>
-                            <div class="recording-card">
-                                <img src="{% static 'play-button.png' %}" alt="Play Icon">
-                                <div>
-                                    <p class="m-0">Recording time</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="chat-message">
-                        <div class="user-icon">
-                            <img src="{% static 'account.png' %}" alt="User Icon" class="img-fluid">
-                        </div>
-                        <div class="message-content">
-                            <div class="message-meta">Username <span class="text-muted">day / month / year</span></div>
-                            <div class="message-text">User message...</div>
-                        </div>
-                    </div>
-
-                    <div class="chat-message">
-                        <div class="user-icon">
-                            <img src="{% static 'account.png' %}" alt="User Icon" class="img-fluid">
-                        </div>
-                        <div class="message-content">
-                            <div class="message-meta">Username <span class="text-muted">day / month / year</span></div>
-                            <div class="message-text">User message...</div>
-                        </div>
-                    </div>
-
-                    <div class="chat-message text-end d-flex justify-content-end">
-                        <div class="d-inline-block">
-                            <div class="message-meta">day / month / year <span class="text-muted">Username</span></div>
-                            <div class="message-text">User message...</div>
-                        </div>
-                        <div class="user-icon ms-2">
-                            <img src="{% static 'account.png' %}" alt="User Icon" class="img-fluid">
-                        </div>
-                    </div>
-                </div>
+                    {% endfor %}
+                </div>                
                 <div class="chat-footer">
-                    <input type="text" placeholder="Please input your message in here...">
-                    <button><i class="fa-solid fa-image"></i></button>
-                    <button><i class="fa-solid fa-file"></i></button>
-                    <button><i class="fa-solid fa-microphone"></i></button>
+                    {% csrf_token %}
+                    <input type="text" id="chatMessageInput" placeholder="Please input your message in here..." required>
+                    
+                    <div id="imagePreviewContainer" style="display: none; position: relative;">
+                        <img id="imagePreview" src="#" alt="Selected Image" style="max-width: 50px; max-height: 50px; margin-left: 10px; border-radius: 5px;">
+                        <button id="removeImageButton" style="position: absolute; top: 0; right: 0; background: red; color: white; border: none; border-radius: 50%;">&times;</button>
+                    </div>
+                    
+                    <div id="filePreviewContainer" style="display: none; position: relative;">
+                        <span id="filePreview" style="margin-left: 10px;"></span>
+                        <button id="removeFileButton" style="position: absolute; top: 0; right: 0; background: red; color: white; border: none; border-radius: 50%;">&times;</button>
+                    </div>
+                    
+                    <input type="file" id="imageInput" accept="image/*" style="display:none;"> <!-- Input file để chọn hình ảnh -->
+                    <input type="file" id="fileInput" accept=".pdf,.doc,.docx" style="display:none;"> <!-- Input file để chọn Word, PDF -->
+                    
+                    <button id="sendButton"><i class="fa-solid fa-paper-plane"></i></button>
+                    <button id="imageButton"><i class="fa-solid fa-image"></i></button> <!-- Nút để kích hoạt input file -->
+                    <button id="fileButton"><i class="fa-solid fa-file"></i></button> <!-- Nút để kích hoạt input file -->
                 </div>
             </div>
         </div>
     </div>
+    
+    
     
 
     <button class="btn-toggle-right-messenger" data-bs-toggle="modal" data-bs-target="#chatModal">

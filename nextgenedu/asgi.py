@@ -1,16 +1,22 @@
-"""
-ASGI config for nextgenedu project.
-
-It exposes the ASGI callable as a module-level variable named ``application``.
-
-For more information on this file, see
-https://docs.djangoproject.com/en/5.1/howto/deployment/asgi/
-"""
-
 import os
-
+import django
+from decouple import config
+from channels.auth import AuthMiddlewareStack
+from channels.routing import ProtocolTypeRouter, URLRouter
 from django.core.asgi import get_asgi_application
+import home.routing
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'nextgenedu.settings')
+# Thiết lập biến môi trường DJANGO_SETTINGS_MODULE từ tệp .env
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', config('DJANGO_SETTINGS_MODULE', default='nextgenedu.settings'))
 
-application = get_asgi_application()
+# Khởi tạo môi trường Django
+django.setup()
+
+application = ProtocolTypeRouter({
+    "http": get_asgi_application(),
+    "websocket": AuthMiddlewareStack(
+        URLRouter(
+            home.routing.websocket_urlpatterns
+        )
+    ),
+})
