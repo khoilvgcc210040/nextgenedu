@@ -38,4 +38,5 @@ urlpatterns = [
     path('submission/<int:submission_id>/question/<int:question_id>/', views.take_quiz, name='take_quiz'),
     path('submission/<int:submission_id>/question/<int:question_id>/submit/', views.submit_answer, name='submit_answer'),
     path('submission/<int:submission_id>/result/', views.quiz_result, name='quiz_result'),
+    path('save_message/', views.save_message, name='save_message'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -1,4 +1,5 @@
 from datetime import date, timedelta, timezone
+import json
 from django.db.models import Avg
 from urllib.parse import urlencode
 from django.db import IntegrityError
@@ -7,7 +8,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.urls import reverse
-from home.models import AcademicYear, Answer, Classroom, Comment, CustomUser, Participant, Question, QuizResult, Section, StudentFile, Subjects, Submission, SubmissionFile, SubsectionFile
+from home.models import AcademicYear, Answer, ChatMessage, Classroom, Comment, CustomUser, Participant, Question, QuizResult, Section, StudentFile, Subjects, Submission, SubmissionFile, SubsectionFile
 
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.forms import SetPasswordForm
@@ -338,6 +339,7 @@ def enter_password(request, classroom_id):
 def classroom_detail(request, id):
     classroom = get_object_or_404(Classroom, id=id)
     sections = Section.objects.filter(classroom=classroom)
+    messages = ChatMessage.objects.filter(classroom=classroom).order_by('timestamp')
     participants = classroom.participants.all()
 
     scores_data = []
@@ -407,8 +409,40 @@ def classroom_detail(request, id):
         'comments': comments,
         'existing_comment': existing_comment,
         'range': range_list, 
+        'messages': messages, 
     }
     return render(request, 'classroom_detail.html', context)
+
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+@login_required
+@csrf_exempt
+def save_message(request):
+    if request.method == 'POST':
+        classroom_id = request.POST.get('classroom_id')
+        message = request.POST.get('message')
+        image = request.FILES.get('image')  # Lấy file ảnh
+        file = request.FILES.get('file')  # Lấy file đính kèm (Word, PDF)
+        classroom = Classroom.objects.get(id=classroom_id)
+
+        chat_message = ChatMessage.objects.create(
+            user=request.user,
+            classroom=classroom,
+            message=message,
+            image=image,
+            file=file  # Lưu file vào model
+        )
+
+        return JsonResponse({
+            'status': 'success',
+            'username': request.user.username,
+            'message': chat_message.message,
+            'image_url': chat_message.image.url if chat_message.image else None,
+            'file_url': chat_message.file.url if chat_message.file else None  # Trả về URL của file
+        })
+
+    return JsonResponse({'status': 'error'}, status=400)
+
 
 
 def update_section(request, classroom_id, section_id):

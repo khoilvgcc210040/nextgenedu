@@ -187,4 +187,23 @@ class QuizResult(models.Model):
     @property
     def is_question_test(self):
         return self.submission.submission_type == 'question_test'
+    
+class ChatMessage(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    classroom = models.ForeignKey(Classroom, on_delete=models.CASCADE)
+    message = models.TextField()
+    image = models.ImageField(upload_to='chat_images/', null=True, blank=True) 
+    file = models.FileField(upload_to='chat_files/', null=True, blank=True) 
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username}: {self.message[:50]} - {self.classroom.name}"
+    
+    @property
+    def is_file(self):
+        return self.file is not None
+
+    @property
+    def is_image(self):
+        return self.image is not None
 
