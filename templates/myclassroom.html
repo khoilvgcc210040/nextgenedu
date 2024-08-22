@@ -137,27 +137,27 @@
                 <!-- Public Classrooms -->
                 <div class="tab-pane fade {% if status == None or status == '0' %}show active{% endif %}" id="public-tab-pane" role="tabpanel" aria-labelledby="public-tab" tabindex="0">
                     <ul class="list-unstyled">
-                        {% for classroom in classrooms %}
-                            {% if not classroom.status %}
+                        {% for participant in participants %}
+                            {% if not participant.classroom.status %}
                                 <li class="card-classroom mb-4">
                                     <div class="card-body">
                                         <div class="classroom-info">
                                             <div class="card-title d-flex jutify-content-center align-items-center">
                                                 <h4>🌐 &nbsp;</h4>
-                                                <a href="{% url 'classroom_detail' classroom.id %}">{{ classroom.name }}</a>
+                                                <a href="{% url 'classroom_detail' participant.classroom.id %}">{{ participant.classroom.name }}</a>
                                             </div>
-                                            <p class="card-text truncate mt-2" style="width: 900px;">&nbsp;📝{{ classroom.description }}</p>
+                                            <p class="card-text truncate mt-2" style="width: 900px;">&nbsp;📝{{ participant.classroom.description }}</p>
                                             <div class="classroom-meta text-muted d-flex align-items-center">
                                                 <div>
-                                                    <span class="me-3 mr-3">&nbsp;<i class="fas fa-user" style="color: {{ subject.bg_color }}"></i> Username</span>
-                                                    <span class="me-3 mr-3"><i class="fas fa-school" style="color: {{ subject.bg_color }}"></i> Name of school</span>
+                                                    <span class="me-3 mr-3">&nbsp;<i class="fas fa-user" style="color: {{ subject.bg_color }}"></i> {{ participant.user.username }}</span>
+                                                    <span class="me-3 mr-3"><i class="fas fa-school" style="color: {{ subject.bg_color }}"></i> {{ participant.classroom.school }}</span>
                                                     <span class="me-3 mr-3"><i class="fas fa-book" style="color: {{ subject.bg_color }}"></i> {{ subject.name }}</span>
-                                                    <span><i class="fas fa-calendar-alt" style="color: {{ subject.bg_color }}"></i> Academic year</span>
+                                                    <span><i class="fas fa-calendar-alt" style="color: {{ subject.bg_color }}"></i> {{ participant.classroom.academic_year }}</span>
                                                 </div>
                                             </div>
                                             <div class="text-end text-muted d-flex justify-content-end align-items-center">
-                                                <span class="mr-3" style="border: 2px solid {{ subject.bg_color }}; padding: 7px;"><i class="fa-solid fa-user" style="color: {{ subject.bg_color }}"></i>&nbsp; 3 Participants</span>
-                                                <span class="mr-3" style="border: 2px solid {{ subject.bg_color }}; padding: 7px;"><i class="fas fa-thumbs-up" style="color: {{ subject.bg_color }}"></i>&nbsp; 5 Likes</span>
+                                                <span class="mr-3" style="border: 2px solid {{ subject.bg_color }}; padding: 7px;"><i class="fa-solid fa-user" style="color: {{ subject.bg_color }}"></i>&nbsp; {{ participant.classroom.participants.count }} Participants</span>
+                                                <span class="mr-3" style="border: 2px solid {{ subject.bg_color }}; padding: 7px;"><i class="fas fa-thumbs-up" style="color: {{ subject.bg_color }}"></i>&nbsp; {{ participant.classroom.likes }} Likes</span>
                                             </div>
                                         </div>
                                     </div>
@@ -170,27 +170,27 @@
                 <!-- Private Classrooms -->
                 <div class="tab-pane fade {% if status == '1' %}show active{% endif %}" id="private-tab-pane" role="tabpanel" aria-labelledby="private-tab" tabindex="0">
                     <ul class="list-unstyled">
-                        {% for classroom in classrooms %}
-                            {% if classroom.status %}
+                        {% for participant in participants %}
+                            {% if participant.classroom.status %}
                                 <li class="card-classroom mb-4">
                                     <div class="card-body">
                                         <div class="classroom-info">
                                             <div class="card-title d-flex jutify-content-center align-items-center">
                                                 <h4>🔒 &nbsp;</h4>
-                                                <a href="" data-bs-toggle="modal" data-bs-target="#passwordModal" data-classroom-id="{{ classroom.id }}">{{ classroom.name }}</a>
+                                                <a href="" data-bs-toggle="modal" data-bs-target="#passwordModal" data-classroom-id="{{ participant.classroom.id }}">{{ participant.classroom.name }}</a>
                                             </div>
-                                            <p class="card-text truncate mt-2" style="width: 900px;">&nbsp;📝{{ classroom.description }}</p>
+                                            <p class="card-text truncate mt-2" style="width: 900px;">&nbsp;📝{{ participant.classroom.description }}</p>
                                             <div class="classroom-meta text-muted d-flex align-items-center">
                                                 <div>
-                                                    <span class="me-3 mr-3">&nbsp;<i class="fas fa-user" style="color: {{ subject.bg_color }}"></i> Username</span>
-                                                    <span class="me-3 mr-3"><i class="fas fa-school" style="color: {{ subject.bg_color }}"></i> Name of school</span>
+                                                    <span class="me-3 mr-3">&nbsp;<i class="fas fa-user" style="color: {{ subject.bg_color }}"></i> {{ participant.user.username }}</span>
+                                                    <span class="me-3 mr-3"><i class="fas fa-school" style="color: {{ subject.bg_color }}"></i> {{ participant.classroom.school }}</span>
                                                     <span class="me-3 mr-3"><i class="fas fa-book" style="color: {{ subject.bg_color }}"></i> {{ subject.name }}</span>
-                                                    <span><i class="fas fa-calendar-alt" style="color: {{ subject.bg_color }}"></i> Academic year</span>
+                                                    <span><i class="fas fa-calendar-alt" style="color: {{ subject.bg_color }}"></i> {{ participant.classroom.academic_year }}</span>
                                                 </div>
                                             </div>
                                             <div class="text-end text-muted d-flex justify-content-end align-items-center">
-                                                <span class="mr-3" style="border: 2px solid {{ subject.bg_color }}; padding: 7px;"><i class="fa-solid fa-user" style="color: {{ subject.bg_color }}"></i>&nbsp; 3 Participants</span>
-                                                <span class="mr-3" style="border: 2px solid {{ subject.bg_color }}; padding: 7px;"><i class="fas fa-thumbs-up" style="color: {{ subject.bg_color }}"></i>&nbsp; 5 Likes</span>
+                                                <span class="mr-3" style="border: 2px solid {{ subject.bg_color }}; padding: 7px;"><i class="fa-solid fa-user" style="color: {{ subject.bg_color }}"></i>&nbsp; {{ participant.classroom.participants.count }} Participants</span>
+                                                <span class="mr-3" style="border: 2px solid {{ subject.bg_color }}; padding: 7px;"><i class="fas fa-thumbs-up" style="color: {{ subject.bg_color }}"></i>&nbsp; {{ participant.classroom.likes }} Likes</span>
                                             </div>
                                         </div>
                                     </div>

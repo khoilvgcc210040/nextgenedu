@@ -154,44 +154,59 @@
 <div class="settings">
     <h2>Settings</h2>
 
-    <h3>Personal information</h3>
-    <div class="section">
-        <label for="email">Email</label>
-        <input type="email" id="email" value="khoileuiat03@gmail.com">
-
-        <label for="username">Username</label>
-        <input type="text" id="username" value="khoileuiat03">
-
-        <label for="dob">Date of birth</label>
-        <input type="number" id="dob-day" placeholder="13">
-        <input type="number" id="dob-month" placeholder="10">
-        <input type="number" id="dob-year" placeholder="2003">
-
-        <button>Save change</button>
-    </div>
-
-    <h3>Password</h3>
-    <div class="section">
-        <label for="current-password">Current password</label>
-        <input type="password" id="current-password" value="**********">
-
-        <label for="new-password">New password</label>
-        <input type="password" id="new-password" value="**********">
-
-        <label for="confirm-password">Confirm new password</label>
-        <input type="password" id="confirm-password" value="**********">
-
-        <button>Update password</button>
-    </div>
+    <form method="POST">
+        {% csrf_token %}
+        <h3>Personal Information</h3>
+        <div class="section">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" value="{{ user.email }}">
+    
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" value="{{ user.username }}">
+    
+            <label for="dob">Date of Birth</label>
+            <input type="number" id="dob-day" name="dob-day" max="31" min="1" placeholder="Day" 
+                   value="{{ user.date_of_birth.day }}" oninput="if(value>31)value=31;">
+            <input type="number" id="dob-month" name="dob-month" max="12" min="1" placeholder="Month" 
+                   value="{{ user.date_of_birth.month }}" oninput="if(value>12)value=12;">
+            <input type="number" id="dob-year" name="dob-year" max="2024" min="1900" placeholder="Year" 
+                   value="{{ user.date_of_birth.year }}" oninput="if(value>2024)value=2024;">
+    
+            <button type="submit" name="save_changes">Save Changes</button>
+        </div>
+    </form>
+    
+    <form method="POST">
+        {% csrf_token %}
+        <h3>Password</h3>
+        <div class="section">
+            <label for="current-password">Current Password</label>
+            <input type="password" id="current-password" name="current-password">
+    
+            <label for="new-password">New Password</label>
+            <input type="password" id="new-password" name="new-password">
+    
+            <label for="confirm-password">Confirm New Password</label>
+            <input type="password" id="confirm-password" name="confirm-password">
+    
+            <button type="submit" name="update_password">Update Password</button>
+        </div>
+    </form>
 
     <h3>Notifications</h3>
     <div class="section">
         <div class="switch-container">
+
             <label for="notify-sections">Notify me when sections are added to classrooms</label>
+
             <label class="switch">
-                <input type="checkbox" id="notify-sections">
+
+                <input type="checkbox" id="notify-sections" {% if user.notify_sections %}checked{% endif %}>
+
                 <span class="slider"></span>
+
             </label>
+
         </div>
 
         <div class="switch-container">
@@ -203,11 +218,57 @@
         </div>
     </div>
 
-    <h3>Delete account</h3>
-    <div class="section delete-section">
-        <button>Permanently delete your account</button>
-    </div>
+    <form method="POST">
+        {% csrf_token %}
+        <h3>Delete Account</h3>
+        <div class="section delete-section">
+            <button type="submit" name="delete_account">Permanently Delete Your Account</button>
+        </div>
+    </form>
 </div>
 
 </body>
 </html>
+<script>
+
+    document.addEventListener('DOMContentLoaded', function() {
+
+        const notifySectionsCheckbox = document.getElementById('notify-sections');
+
+        notifySectionsCheckbox.addEventListener('change', function() {
+
+            const isChecked = notifySectionsCheckbox.checked;
+
+            fetch('{% url "update_notification_preference" %}', {
+
+                method: 'POST',
+
+                headers: {
+                    'Content-Type': 'application/json',
+
+                    'X-CSRFToken': '{{ csrf_token }}'
+
+                },
+
+                body: JSON.stringify({ notify_sections: isChecked })
+
+            }).then(response => {
+
+                if (response.ok) {
+
+                    console.log('Notification preference updated successfully.');
+                } else {
+                    console.error('Failed to update notification preference.');
+
+                }
+
+            }).catch(error => {
+
+                console.error('Error:', error);
+
+            });
+
+        });
+
+    });
+</script>

@@ -29,6 +29,7 @@
         color: #000;
         font-weight: 700;
         text-decoration: none;
+        text-align: center;
         transition: all ease-in-out 0.3s;
     }
 
@@ -159,8 +160,6 @@
         font-size: 30px;
         margin-bottom: 5px;
         font-weight: 600;
-        position: absolute;
-        left: 2em;
         transition: all ease-in-out 0.3s;
     }
 
@@ -332,9 +331,15 @@
                         <a class="header-nav-link click-scroll" href="{% url "subjects" %}">Subjects</a>
                     </li>
 
+                    {% if user.role == 'teacher' %}
                     <li class="nav-item">
                         <a class="header-nav-link click-scroll" href="{% url "manage_classroom_list" %}">Manage</a>
                     </li>
+                    {% elif user.role == 'student' %}
+                    <li class="nav-item">
+                        <a class="header-nav-link click-scroll" href="{% url "myclassroom" %}">My Classroom</a>
+                    </li>
+                    {% endif %}
 
                     <li class="nav-item">
                         <a class="header-nav-link click-scroll" href="{% url "achivement" %}">Achievement</a>
@@ -345,10 +350,10 @@
                     </li>
 
                     <li>
-                        <div class="group header-nav-link click-scrol">
-                        <svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><g><path d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z"></path></g></svg>
-                        <input placeholder="Classroom name, teacher na..." type="search" class="input">
-                        </div>
+                        <form method="GET" action="{% url 'searchPage' %}" class="group header-nav-link click-scroll">
+                            <svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><g><path d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z"></path></g></svg>
+                            <input placeholder="Classroom name, teacher na..." type="search" class="input" name="q">
+                        </form>
                     </li>
                     {% if user.is_authenticated %}
                     <li class="nav-item dropdown">
@@ -363,7 +368,7 @@
                         <a class="header-nav-link d-flex flex-column align-items-center" style="padding-bottom: 0px;" href="#section_5" id="navbarLightDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fa-solid fa-user fa-xl mb-3"></i>{{user.username}}</a>
 
                         <ul class="dropdown-menu dropdown-menu-light" aria-labelledby="navbarLightDropdownMenuLink">
-                            <li><a class="dropdown-item" href="topics-listing.html">Setting</a></li>
+                            <li><a class="dropdown-item" href="{% url "setting" %}">Setting</a></li>
 
                             <li><a class="dropdown-item active" href="{% url "logout" %}">Logout</a></li>
                         </ul>

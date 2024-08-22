@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Classrooms - Favorite Classrooms</title>
+    <title>Search Results for "{{ query }}"</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <style>
@@ -109,27 +109,15 @@
 <body>
     {% include "header.html" %}
     <div class="container" style="padding: 100px 0;">
-        <div class="mb-4">
-            <button class="btn-back" onclick="window.location.href='{% url 'subjects' %}'" style="outline: none;">
-                <svg height="16" width="16" fill="currentColor" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 1024 1024">
-                    <path d="M874.690416 495.52477c0 11.2973-9.168824 20.466124-20.466124 20.466124l-604.773963 0 188.083679 188.083679c7.992021 7.992021 7.992021 20.947078 0 28.939099-4.001127 3.990894-9.240455 5.996574-14.46955 5.996574-5.239328 0-10.478655-1.995447-14.479783-5.996574l-223.00912-223.00912c-3.837398-3.837398-5.996574-9.046027-5.996574-14.46955 0-5.433756 2.159176-10.632151 5.996574-14.46955l223.019353-223.029586c7.992021-7.992021 20.957311-7.992021 28.949332 0 7.992021 8.002254 7.992021 20.957311 0 28.949332l-188.073446 188.073446 604.753497 0C865.521592 475.058646 874.690416 484.217237 874.690416 495.52477z"></path>
-                </svg>
-                <span>Back</span>
-            </button>
-        </div>        
-        <header class="mb-5">
-            <h1 class="display-4" style="font-weight: 600;">My favorite classroom</h1>
-            <p class="lead" style="text-align: justify;">"My Favorite Classroom lets users mark and save a classroom that they find most valuable or enjoyable. It’s a space where they've had meaningful learning experiences, connected with the subject, or appreciated the teaching style. This feature makes it easy to revisit and continue engaging with that classroom."</p>
-        </header>
-
+        <h1>Search Results for "{{ query }}"</h1>
         <section>
             <!-- Bootstrap Nav Tabs -->
-            <ul class="nav nav-tabs justify-content-center mb-4" id="classroomTab" role="tablist" style="border-bottom: 2px solid {{ subject.bg_color }};">
+            <ul class="nav nav-tabs justify-content-center mb-4" id="classroomTab" role="tablist">
                 <li class="nav-item" role="presentation">
-                    <button style="outline: none;" class="classroom-nav-link {% if status == None or status == '0' %}active{% endif %}" id="public-tab" data-bs-toggle="tab" data-bs-target="#public-tab-pane" type="button" role="tab" aria-controls="public-tab-pane" aria-selected="true">Public</button>
+                    <button style="outline: none;" class="classroom-nav-link active" id="public-tab" data-bs-toggle="tab" data-bs-target="#public-tab-pane" type="button" role="tab" aria-controls="public-tab-pane" aria-selected="true">Public</button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button style="outline: none;" class="classroom-nav-link {% if status == '1' %}active{% endif %}" id="private-tab" data-bs-toggle="tab" data-bs-target="#private-tab-pane" type="button" role="tab" aria-controls="private-tab-pane" aria-selected="false">Private</button>
+                    <button style="outline: none;" class="classroom-nav-link" id="private-tab" data-bs-toggle="tab" data-bs-target="#private-tab-pane" type="button" role="tab" aria-controls="private-tab-pane" aria-selected="false">Private</button>
                 </li>
             </ul>
 
@@ -149,19 +137,21 @@
                                         <p class="card-text truncate mt-2" style="width: 900px;">&nbsp;📝{{ classroom.description }}</p>
                                         <div class="classroom-meta text-muted d-flex align-items-center">
                                             <div>
-                                                <span class="me-3 mr-3">&nbsp;<i class="fas fa-user" style="color: #000;"></i> Username</span>
-                                                <span class="me-3 mr-3"><i class="fas fa-school" style="color: #000;"></i> Name of school</span>
-                                                <span class="me-3 mr-3"><i class="fas fa-book" style="color: #000;"></i> {{ classroom.subject.name }}</span>
-                                                <span><i class="fas fa-calendar-alt" style="color: #000;"></i> Academic year</span>
+                                                <span class="me-3 mr-3">&nbsp;<i class="fas fa-user"></i> {{ classroom.teacher.username }}</span>
+                                                <span class="me-3 mr-3"><i class="fas fa-school"></i> {{ classroom.school }}</span>
+                                                <span class="me-3 mr-3"><i class="fas fa-book"></i> {{ classroom.subject.name }}</span>
+                                                <span><i class="fas fa-calendar-alt"></i> {{ classroom.academic_year }}</span>
                                             </div>
                                         </div>
                                         <div class="text-end text-muted d-flex justify-content-end align-items-center">
-                                            <span class="mr-3" style="border: 2px solid #000; padding: 7px;"><i class="fa-solid fa-user" style="color: #000;"></i>&nbsp; 3 Participants</span>
-                                            <span class="mr-3" style="border: 2px solid #000; padding: 7px;"><i class="fas fa-thumbs-up" style="color: #000;"></i>&nbsp; 5 Likes</span>
+                                            <span class="mr-3" style="border: 2px solid; padding: 7px;"><i class="fa-solid fa-user"></i>&nbsp; {{ classroom.participants.count }} Participants</span>
+                                            <span class="mr-3" style="border: 2px solid; padding: 7px;"><i class="fas fa-thumbs-up"></i>&nbsp; {{ classroom.likes }} Likes</span>
                                         </div>
                                     </div>
                                 </div>
                             </li>
+                        {% empty %}
+                            <li>No public classrooms found matching your search criteria.</li>
                         {% endfor %}
                     </ul>
                 </div>
@@ -180,19 +170,21 @@
                                         <p class="card-text truncate mt-2" style="width: 900px;">&nbsp;📝{{ classroom.description }}</p>
                                         <div class="classroom-meta text-muted d-flex align-items-center">
                                             <div>
-                                                <span class="me-3 mr-3">&nbsp;<i class="fas fa-user" style="color: #000;"></i> Username</span>
-                                                <span class="me-3 mr-3"><i class="fas fa-school" style="color: #000;"></i> Name of school</span>
-                                                <span class="me-3 mr-3"><i class="fas fa-book" style="color: #000;"></i> {{ classroom.subject.name }}</span>
-                                                <span><i class="fas fa-calendar-alt" style="color: #000;"></i> Academic year</span>
+                                                <span class="me-3 mr-3">&nbsp;<i class="fas fa-user"></i> {{ classroom.teacher.username }}</span>
+                                                <span class="me-3 mr-3"><i class="fas fa-school"></i> {{ classroom.school }}</span>
+                                                <span class="me-3 mr-3"><i class="fas fa-book"></i> {{ classroom.subject.name }}</span>
+                                                <span><i class="fas fa-calendar-alt"></i> {{ classroom.academic_year }}</span>
                                             </div>
                                         </div>
                                         <div class="text-end text-muted d-flex justify-content-end align-items-center">
-                                            <span class="mr-3" style="border: 2px solid #000; padding: 7px;"><i class="fa-solid fa-user" style="color: #000;"></i>&nbsp; 3 Participants</span>
-                                            <span class="mr-3" style="border: 2px solid #000; padding: 7px;"><i class="fas fa-thumbs-up" style="color: #000;"></i>&nbsp; 5 Likes</span>
+                                            <span class="mr-3" style="border: 2px solid; padding: 7px;"><i class="fa-solid fa-user"></i>&nbsp; {{ classroom.participants.count }} Participants</span>
+                                            <span class="mr-3" style="border: 2px solid; padding: 7px;"><i class="fas fa-thumbs-up"></i>&nbsp; {{ classroom.likes }} Likes</span>
                                         </div>
                                     </div>
                                 </div>
                             </li>
+                        {% empty %}
+                            <li>No private classrooms found matching your search criteria.</li>
                         {% endfor %}
                     </ul>
                 </div>
@@ -205,9 +197,9 @@
         <div class="modal-dialog">
             <div class="modal-content d-flex justify-content-center align-items-center bg-transparent border-0">
                 <button type="button" class="btn-close position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close"></button>
-                <div class="card p-4" style="max-width: 400px; width: 100%; border: 5px solid #000;">
+                <div class="card p-4" style="max-width: 400px; width: 100%; border: 5px solid;">
                     <div class="card-body">
-                    <h5 class="card-title text-center mb-4 font-weight-bold" style="color: #000;">Classroom Password</h5>
+                    <h5 class="card-title text-center mb-4 font-weight-bold">Classroom Password</h5>
                     <form method="POST" action="{% url 'enter_password' classroom_id=0 %}" id="passwordForm">
                         {% csrf_token %}
                         <input type="hidden" id="classroomId" name="classroom_id">
@@ -215,7 +207,7 @@
                             <label for="password" class="form-label">Password</label>
                             <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" required>
                         </div>
-                        <button type="submit" class="submit-modal btn btn-dark w-100 border-0" style="background-color: #000; overflow: hidden; transition: all 0.3s ease;">
+                        <button type="submit" class="submit-modal btn btn-dark w-100 border-0">
                             <span class="btn-text">Join now ➜</span>
                         </button>
                     </form>                    
