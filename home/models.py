@@ -62,7 +62,6 @@ class Classroom(models.Model):
         self.full_clean() 
         super().save(*args, **kwargs)
 
-
     class Meta:
         unique_together = ('teacher', 'name')
 
