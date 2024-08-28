@@ -49,6 +49,7 @@ class Classroom(models.Model):
     status = models.BooleanField(default=False)
     password = models.TextField(max_length=20, null=True, blank=True)
     likes = models.IntegerField(default=0)
+    allow_chat = models.BooleanField(default=True)
     created_at = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
@@ -187,6 +188,14 @@ class QuizResult(models.Model):
     @property
     def is_question_test(self):
         return self.submission.submission_type == 'question_test'
+
+class AnsweredQuestion(models.Model):
+    quiz_result = models.ForeignKey(QuizResult, on_delete=models.CASCADE)
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    selected_answer = models.ForeignKey(Answer, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.quiz_result.student.username} - {self.question.submission.title} - Question: {self.question.text[:50]}"
     
 class ChatMessage(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
@@ -195,7 +204,8 @@ class ChatMessage(models.Model):
     image = models.ImageField(upload_to='chat_images/', null=True, blank=True) 
     file = models.FileField(upload_to='chat_files/', null=True, blank=True) 
     timestamp = models.DateTimeField(auto_now_add=True)
-
+    file_size = models.FloatField(null=True, blank=True)
+    
     def __str__(self):
         return f"{self.user.username}: {self.message[:50]} - {self.classroom.name}"
     

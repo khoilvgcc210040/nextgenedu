@@ -11,7 +11,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.min.js"></script>
     <style>
         .sidebar {
-            background-color: {{ classroom.subject.bg_color }};
+            background-color: var(--accent-color);
             padding: 30px 20px 100px 20px;
             min-height: 100%;
             position: fixed;
@@ -24,7 +24,7 @@
             overflow-y: scroll;
             scrollbar-width: none;
             -ms-overflow-style: none;
-            border-radius: 0 15px 5px 0;
+            border-radius: 0 5px 5px 0;
         }
 
         .sidebar::-webkit-scrollbar {
@@ -66,16 +66,15 @@
             left: 50px;
         }
 
-        .header {
+        .header-classroom {
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .btn-settings, .btn-favorite {
+        .btn-setting, .btn-favorite {
             background: none;
             border: none;
-            color: #000;
             font-size: 20px;
         }
 
@@ -88,21 +87,27 @@
         }
 
         .nav-item .nav-link{
-            border-bottom: 2px solid #000;
-            color: #000;
-            font-weight: 700;
+            border-bottom: 2px solid #fff;
+            color: #fff;
+            font-weight: 500;
             padding: 0.7rem 0.3rem;
+            font-size: 15px;
+        }
+
+        .nav-item .nav-link:focus, .nav-item .nav-link:hover{
+            color: #f97316;
         }
 
         .submenu .nav-item .nav-link{
-            border-bottom: 2px solid #000;
-            color: #000;
-            font-weight: 700;
+            border-bottom: 2px solid #fff;
+            color: #fff;
+            font-weight: 500;
             margin-left: 2rem;
             padding: 0.7rem 0;
+            font-size: 15px;
         }
 
-        .header{
+        .header-classroom{
             border-bottom: 2px solid #000;
         }
 
@@ -320,11 +325,11 @@
           }
 
         .navbar .navbar-brand span{
-            color: {{ classroom.subject.bg_color }} !important;
+            color: var(--accent-color) !important;
         }
     
         .navbar .navbar-nav .header-nav-link {
-            color: {{ classroom.subject.bg_color }} !important;
+            color: var(--accent-color) !important;
         }
         
         .comment-box {
@@ -469,7 +474,7 @@
             visibility: hidden;
             opacity: 0;
             transition: opacity 0.3s ease-in-out;
-            background-color: #6c757d;
+            background-color: var(--accent-color);
             color: white;
             padding: 5px;
             border-radius: 3px;
@@ -534,7 +539,7 @@
             color: #007bff;
             text-decoration: none;
             font-size: 18px;
-            color: {{ classroom.subject.bg_color }}; 
+            color: var(--accent-color); 
             transition: opacity 0.3s ease-in-out; 
         }
         
@@ -543,7 +548,7 @@
         } 
 
         .right-sidebar {
-            background-color: {{ classroom.subject.bg_color }};
+            background-color: var(--accent-color);
             padding: 30px 20px 100px 20px;
             min-height: 100%;
             position: fixed;
@@ -573,7 +578,7 @@
             transform: translateX(0);
             transform: translateY(280px);
             transition: right 0.7s ease-in-out;
-            background-color: #fff;
+            background-color: #f97316;
             border: 2px solid #000;
             border-right: none;
             border-radius: 30px 0 0 30px;
@@ -600,7 +605,7 @@
             visibility: hidden;
             opacity: 0;
             transition: opacity 0.3s ease-in-out;
-            background-color: #6c757d;
+            background-color: var(--accent-color);
             color: white;
             padding: 5px;
             border-radius: 3px;
@@ -619,14 +624,20 @@
         .btn-doc {
             padding: 5px 10px;
             border-radius: 5px;
-            background-color: {{ classroom.subject.bg_color }};
+            background-color: var(--accent-color);
             font-weight: 500;
             border: none;
             transition: transform 0.3s ease-in-out;
+            color: #fff;
+        }
+
+        .btn-doc a{
+            color: #fff;
         }
 
         .btn-doc:hover {
             transform: translateY(-5%);
+            color: #fff;
         }
 
         .tabs {
@@ -652,9 +663,10 @@
         }
         
         .tab.active {
-            background-color: #1e293b;
+            background-color: #f97316;
             border-bottom: none;
             color: #fff;
+            border: none;
         }
         
         .tab-content {
@@ -669,6 +681,7 @@
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 20px;
+            color: #fff;
         }
         
         table th, table td {
@@ -750,25 +763,24 @@
         .btn-toggle-right-messenger {
             position: fixed;
             right: 25px;
-            transform: translateY(580px);
-            transition: transform 0.7s ease-in-out;
-            background-color: #fff;
+            bottom: 25px;
+            background-color: transparent;
             border-radius: 50%;
             border: none;
-            height: 40px;
-            width: 40px;
-            outline: none;
             font-size: 25px;
             z-index: 1000;
             padding: 0;
             outline: none !important;
+            cursor: pointer; 
+            transition: transform 0.7s ease-in-out;
         }
 
-        .btn-toggle-right-messenger img:hover {
-            transform: translateY(-5%);
+        .btn-toggle-right-messenger i {
+            color: var(--accent-color);
         }
+
         .btn-toggle-right-messenger:hover {
-            background-color: {{ classroom.subject.bg_color }};
+            transform: translateY(-8%);
         }
 
         .modal-content {
@@ -776,7 +788,7 @@
         }
 
         .chat-header {
-            border-bottom: 1px solid #ddd;
+            border-bottom: 2px solid var(--accent-color);
             padding: 15px;
             text-align: center;
             position: relative;
@@ -799,6 +811,7 @@
             max-height: 500px;
             overflow-y: auto;
             background-color: #fff;
+            border-bottom: 2px solid var(--accent-color);
         }
 
         .chat-message {
@@ -837,7 +850,6 @@
 
         .chat-footer {
             padding: 15px;
-            border-top: 1px solid #ddd;
             display: flex;
             align-items: center;
         }
@@ -891,7 +903,6 @@
 
         .chat-message {
             display: flex;
-            align-items: center;
             margin-bottom: 10px;
         }
         
@@ -902,6 +913,16 @@
         .other-message {
             justify-content: flex-start;
         }
+
+        .my-message .user-icon {
+            order: 2; /* Đặt thứ tự của user-icon sau nội dung tin nhắn */
+            margin-left: 10px; /* Khoảng cách bên trái */
+            margin-right: 0; /* Xóa khoảng cách bên phải */
+        }
+        
+        .my-message .message-content {
+            order: 1; /* Đặt thứ tự của nội dung tin nhắn trước user-icon */
+        }
         
         .my-message .user-icon, .other-message .user-icon {
             width: 40px;
@@ -910,20 +931,20 @@
         }
         
         .my-message .message-content, .other-message .message-content {
-            background-color: #f1f1f1;
+            background-color: transparent;
             border-radius: 10px;
             padding: 10px;
-            max-width: 60%;
+            max-width: 30%;
         }
         
         .my-message .message-content {
-            background-color: #d1f5d3; /* Màu nền khác để phân biệt tin nhắn của người dùng */
-            text-align: right; /* Canh phải cho nội dung */
+            background-color: transparent; 
+            text-align: right;
         }
         
         .other-message .message-content {
-            background-color: #f1f1f1;
-            text-align: left; /* Canh trái cho nội dung */
+            background-color: transparent;
+            text-align: left;
         }
         
         .message-meta {
@@ -941,149 +962,179 @@
         .favorite {
             color: gold;
         }
+
+        .back-icon {
+            margin-bottom: 10px;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .back-icon:hover {
+            transform: translateX(-5%);
+        }
+
+        .btn-setting:hover .fa-gear {
+            transform: rotate(90deg);
+        }
     </style>
 </head>
-<body style="padding: 80px 0;">
-    {% include "header.html" %}
+<body>
+    {% include "headerMain.html" %}
 
     <!-- Modal for editing submission -->
     <div class="modal fade" id="editSubmissionModal" tabindex="-1" aria-labelledby="editSubmissionModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editSubmissionModalLabel">Edit Submission</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-content" style="border: 5px solid var(--accent-color); border-radius: 15px;">
+
+                <div class="modal-header d-flex justify-content-between align-items-center" style="background-color: var(--accent-color);">
+                    <h5 class="modal-title" id="editSubmissionModalLabel" style="color: #fff;">Edit Submission</h5>
+
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" style="background-color: #fff; border: none;" aria-label="Close"></button>
+
                 </div>
-                <div class="modal-body">
+
+                <div class="modal-body" style="border-bottom: 2px solid var(--accent-color);">
                     <form id="editSubmissionForm" method="post" enctype="multipart/form-data" action="{% url 'update_submission' classroom.id 0 %}">
                         {% csrf_token %}
                         <!-- Edit Description -->
                         <div class="mb-3">
-                            <label for="submissionDescription" class="form-label">Description</label>
-                            <textarea id="submissionDescription" name="description" class="form-control" rows="3"></textarea>
+                            <label for="submissionDescription" class="form-label" style="color: var(--accent-color); font-weight: 700;">Description</label>
+                            <textarea id="submissionDescription" name="description" class="form-control" rows="5" style="border: 2px solid var(--accent-color); text-align: justify;"></textarea>
                         </div>
 
                         <!-- Manage Files -->
+
                         <div class="mb-3">
-                            <label for="uploadFile" class="form-label">Upload New File</label>
-                            <input type="file" id="uploadFile" name="uploadFile" class="form-control">
+                            <label for="uploadFile" class="form-label" style="color: var(--accent-color); font-weight: 700;">Upload New File</label>
+
+                            <input type="file" id="uploadFile" name="uploadFile" class="form-control" style="border: 2px solid var(--accent-color);">
                         </div>
+
                         <div class="mb-3">
-                            <label for="deleteFileSubmission" class="form-label">Delete Existing File</label>
-                            <select id="deleteFileSubmission" name="deleteFileSubmission" class="form-select">
+                            <label for="deleteFileSubmission" class="form-label" style="color: var(--accent-color); font-weight: 700;">Delete Existing File</label>
+                            <select id="deleteFileSubmission" name="deleteFileSubmission" class="form-select" style="border: 2px solid var(--accent-color);">
                                 <option value="">Select a file to delete</option>
                                 <!-- File options will be populated dynamically -->
                             </select>
+
                         </div>
 
-                        <div class="modal-footer">
+                        <div class="modal-footer d-flex justify-content-end">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-primary">Save changes</button>
+                            <button type="submit" class="btn" style="background-color: var(--accent-color); color: #fff;">Save changes</button>
+
                         </div>
                     </form>
                 </div>
+
             </div>
         </div>
+
     </div>
 
     <!-- Edit Classroom Description Modal -->
     <div class="modal fade" id="editClassroomDescriptionModal" tabindex="-1" aria-labelledby="editClassroomDescriptionModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editClassroomDescriptionModalLabel">Edit Classroom Description</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content" style="border: 5px solid var(--accent-color); border-radius: 15px;">
+                <div class="modal-header d-flex justify-content-between align-items-center" style="background-color: var(--accent-color);">
+
+                    <h5 class="modal-title" id="editClassroomDescriptionModalLabel" style="color: #fff;">Edit Classroom Description</h5>
+
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" style="background-color: #fff; border: none;" aria-label="Close"></button>
                 </div>
                 <form id="editClassroomDescriptionForm" method="POST" action="{% url 'update_classroom_description' classroom.id %}">
                     {% csrf_token %}
-                    <div class="modal-body">
+                    <div class="modal-body" style="border-bottom: 2px solid var(--accent-color);">
+
                         <div class="mb-3">
-                            <label for="classroomDescription" class="form-label">Description</label>
-                            <textarea id="classroomDescription" name="description" rows="4" class="form-control">{{ classroom.description }}</textarea>
+                            <label for="classroomDescription" class="form-label" style="color: var(--accent-color); font-weight: 700;">Description</label>
+
+                            <textarea id="classroomDescription" name="description" rows="5" class="form-control" style="border: 2px solid var(--accent-color); text-align: justify;">{{ classroom.description }}</textarea>
+
                         </div>
                     </div>
-                    <div class="modal-footer">
+                    <div class="modal-footer d-flex justify-content-end">
+
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Save changes</button>
+                        <button type="submit" class="btn" style="background-color: var(--accent-color); color: #fff;">Save changes</button>
+
                     </div>
                 </form>
+
             </div>
+
         </div>
     </div>
 
+    <!-- Modal for editing description -->
 
-    <!-- Modal for editing description -->
     <div class="modal fade" id="editDescriptionModal" tabindex="-1" aria-labelledby="editDescriptionModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editDescriptionModalLabel">Edit Description</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content" style="border: 5px solid var(--accent-color); border-radius: 15px;">
+
+                <div class="modal-header d-flex justify-content-between align-items-center" style="background-color: var(--accent-color);">
+                    <h5 class="modal-title" id="editDescriptionModalLabel" style="color: #fff;">Edit Description</h5>
+
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" style="background-color: #fff; border: none;" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
+
+                <div class="modal-body" style="border-bottom: 2px solid var(--accent-color);">
                     <form id="editDescriptionForm" method="post" action="{% url 'update_section' classroom.id 0 %}">
+
                         {% csrf_token %}
                         <input type="hidden" id="editSectionId" name="section_id" value="">
                         <div class="mb-3">
-                            <label for="description" class="form-label">Description</label>
-                            <textarea id="description" name="description" class="form-control" rows="3"></textarea>
+                            <label for="description" class="form-label" style="color: var(--accent-color); font-weight: 700;">Description</label>
+                            <textarea id="description" name="description" class="form-control" rows="5" style="border: 2px solid var(--accent-color); text-align: justify;"></textarea>
+
                         </div>
-                        <button type="submit" class="btn btn-primary">Save changes</button>
+                        <div class="modal-footer d-flex justify-content-end">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn" style="background-color: var(--accent-color); color: #fff;">Save changes</button>
+                        </div>
+
                     </form>
                 </div>
+
             </div>
         </div>
+
     </div>
-    
-    <!-- Modal for editing description -->
-    <div class="modal fade" id="editDescriptionModal" tabindex="-1" aria-labelledby="editDescriptionModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editDescriptionModalLabel">Edit Description</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="editDescriptionForm" method="post" action="{% url 'update_section' classroom.id 0 %}">
-                        {% csrf_token %}
-                        <input type="hidden" id="editSectionId" name="section_id" value="">
-                        <div class="mb-3">
-                            <label for="description" class="form-label">Description</label>
-                            <textarea id="description" name="description" class="form-control" rows="3"></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Save changes</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-    
 
     <!-- Modal for uploading and deleting files -->
     <div class="modal fade" id="editFilesModal" tabindex="-1" aria-labelledby="editFilesModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editFilesModalLabel">Manage Files</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content" style="border: 5px solid var(--accent-color); border-radius: 15px;">
+                <div class="modal-header d-flex justify-content-between align-items-center" style="background-color: var(--accent-color);">
+
+                    <h5 class="modal-title" id="editFilesModalLabel" style="color: #fff;">Manage Files</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" style="background-color: #fff; border: none;" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body" style="border-bottom: 2px solid var(--accent-color);">
+
                     <form id="editFilesForm" method="post" enctype="multipart/form-data" action="{% url 'update_section' classroom.id 0 %}">
                         {% csrf_token %}
                         <input type="hidden" id="editFilesSectionId" name="section_id" value="">
+
                         <!-- Upload file -->
                         <div class="mb-3">
-                            <label for="uploadFile" class="form-label">Upload File</label>
-                            <input type="file" id="uploadFile" name="uploadFile" class="form-control">
+                            <label for="uploadFile" class="form-label" style="color: var(--accent-color); font-weight: 700;">Upload File</label>
+                            <input type="file" id="uploadFile" name="uploadFile" class="form-control" style="border: 2px solid var(--accent-color);">
                         </div>
+
                         <!-- Delete file -->
                         <div class="mb-3">
-                            <label for="deleteFile" class="form-label">Delete File</label>
-                            <select id="deleteFile" name="deleteFile" class="form-select">
+                            <label for="deleteFile" class="form-label" style="color: var(--accent-color); font-weight: 700;">Delete File</label>
+
+                            <select id="deleteFile" name="deleteFile" class="form-select" style="border: 2px solid var(--accent-color);">
                                 <option value="">Select a file to delete</option>
                             </select>
+
                         </div>
-                        <button type="submit" class="btn btn-primary">Save changes</button>
+                        <div class="modal-footer d-flex justify-content-end">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn" style="background-color: var(--accent-color); color: #fff;">Save changes</button>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -1096,7 +1147,7 @@
             {% for section in sections %}
                 {% if not section.parent_section %}
                 <li class="nav-item">
-                    <a class="nav-link toggle-link" data-content="section-content-{{ section.id }}" href="#">{{ section.title }} <i class="fas fa-caret-down"></i></a>
+                    <a class="nav-link toggle-link" data-content="section-content-{{ section.id }}" href="#">{{ section.title }}{% if section.subsections.all or section.submissions.all %} <i class="fas fa-caret-down"></i>{% endif %}</a>
                     <ul class="nav flex-column submenu" style="display: none;">
                         {% for subsection in sections %}
                             {% if subsection.parent_section == section %}
@@ -1132,7 +1183,7 @@
             <table>
                 <thead>
                     <tr>
-                        <th>First name / Last name</th>
+                        <th>Username</th>
                         <th>Roles</th>
                         <th>Action</th>
                     </tr>
@@ -1150,10 +1201,10 @@
         </div>
     
         <div id="scores" class="tab-content hidden">
-            <h3>"{{ classroom.subject.name }}" ranking</h3>
             <table>
                 <thead>
                     <tr>
+                        <th>Ranking</th>
                         <th>Username</th>
                         <th>Test</th>
                         <th>Time</th>
@@ -1163,6 +1214,7 @@
                 <tbody>
                     {% for score in scores_data %}
                     <tr>
+                        <td>{{ forloop.counter }}</td> 
                         <td>{{ score.user.username }}</td>
                         <td>{{ score.num_tests }}</td>
                         <td>{{ score.total_time }}</td>
@@ -1172,10 +1224,10 @@
                 </tbody>
             </table>
         </div>
-    </div>    
+    </div>        
     
     <button class="btn-toggle-right-sidebar">
-        <i class="fas fa-chevron-left"></i>
+        <i class="fas fa-chevron-left" style="color: #fff;"></i>
         <div class="tooltip" style="font-family: Montserrat, sans-serif !important;">
             <span class="tooltip-text">Participants and Scores</span>
         </div>
@@ -1184,7 +1236,7 @@
 
     <div class="modal fade" id="folderModal" tabindex="-1" aria-labelledby="folderModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
-            <div class="modal-content" style="border: 5px solid {{ classroom.subject.bg_color }}; border-radius: 15px;">
+            <div class="modal-content" style="border: 5px solid var(--accent-color); border-radius: 15px;">
                 <div class="chat-header d-flex justify-content-between align-items-center">
                     <h5 class="modal-title" id="folderModalLabel">Files and Images</h5>
                     <div class="folder-card">
@@ -1196,7 +1248,7 @@
                         {% if message.is_file and message.file %}
                             <div class="d-flex justify-content-between align-items-center p-3">
                                 <p class="m-0">
-                                    <a href="{{ message.file.url }}" download>{{ message.file.name }}</a>
+                                    <a href="{{ message.file.url }}" download>{{ message.file.name|cut:"chat_files/"|slice:":20" }}</a>
                                 </p>
                                 <span>🗑️</span>
                             </div>
@@ -1204,7 +1256,7 @@
                         {% elif message.is_image and message.image %}
                             <div class="d-flex justify-content-between align-items-center p-3">
                                 <p class="m-0">
-                                    <a href="{{ message.image.url }}" download>{{ message.image.name }}</a>
+                                    <a href="{{ message.image.url }}" download>{{ message.image.name|cut:"chat_files/"|slice:":20" }}</a>
                                 </p>
                                 <span>🗑️</span>
                             </div>
@@ -1241,6 +1293,8 @@
                         const imageUrl = data.image_url;
                         const fileUrl = data.file_url;
                         const username = data.username;
+                        const fileSize = data.file_size;
+
 
                         
                         const chatBody = document.getElementById('chatBody');
@@ -1252,12 +1306,25 @@
                                 <img src="{% static 'account.png' %}" alt="User Icon" class="img-fluid">
                             </div>
                             <div class="message-content">
-                                <div class="message-meta">
-                                    ${username === currentUsername ? `<span class="text-muted">${new Date().toLocaleString()}</span> ${username}` : `${username} <span class="text-muted">${new Date().toLocaleString()}</span>`}
+                                <div class="message-meta" style="word-wrap: break-word; white-space: normal; max-width: 200px;">
+                                    ${username === currentUsername ? `<span class="text-muted" style="font-weight: 500;"><span style="font-style: italic;">${new Date().toLocaleString('vi-VN')}</span> | ${username}</span>` : `<span class="text-muted" style="font-weight: 500;">${username} | <span style="font-style: italic;">${new Date().toLocaleString('vi-VN')}</span></span>`}
                                 </div>
-                                ${message ? `<div class="message-text">${message}</div>` : ''}
-                                ${imageUrl ? `<div class="image-content"><img src="${imageUrl}" alt="Image" class="img-fluid" style="max-width: 200px; border-radius: 10px;"></div>` : ''}
-                                ${fileUrl ? `<div class="file-content"><a href="${fileUrl}" download>Download file</a></div>` : ''}
+                                ${message ? `<div class="message-text" style="word-wrap: break-word; white-space: normal; max-width: 300px;">${message}</div>` : ''}
+                                ${imageUrl ? `<div class="message-image"><img src="${imageUrl}" alt="Image" class="img-fluid" style="max-width: 150px; border-radius: 10px;"></div>` : ''}
+                                ${fileUrl ? `
+                                <div class="file-content" style="display: flex; align-items: center; border: 1px solid black; border-radius: 10px; padding: 10px; margin-top: 10px;">
+                                    <div class="file-icon" style="flex-shrink: 0;">
+                                        <img src="{% static 'google-docs.png' %}" alt="File Icon" style="width: 50px; height: 50px;">
+                                    </div>
+                                    <div class="file-details" style="margin-left: 10px; word-wrap: break-word; white-space: normal; max-width: 115px; display: flex; flex-direction: column; text-align: center;">
+                                        <div class="file-name" style="font-weight: bold;">
+                                            <a href="${fileUrl}" download>
+                                                ${fileUrl.split('/').pop().length > 20 ? fileUrl.split('/').pop().substring(0, 20) + '...' : fileUrl.split('/').pop()}
+                                            </a>
+                                        </div>
+                                        <div class="file-size">${fileSize} KB</div>
+                                    </div>
+                                </div>` : ''}
                             </div>
                         `;
     
@@ -1311,6 +1378,11 @@
             document.getElementById('sendButton').onclick = function() {
                 const messageInput = document.getElementById('chatMessageInput');
                 const message = messageInput.value;
+                if (message === '' && imageInput.files.length === 0 && fileInput.files.length === 0) {
+    
+                    return;
+    
+                }
                 const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
                 const classroomId = {{ classroom.id }};
                 const formData = new FormData();
@@ -1339,6 +1411,7 @@
                             'username': data.username,
                             'image_url': data.image_url,
                             'file_url': data.file_url,
+                            'file_size': data.file_size
                         }));
                     }
         
@@ -1361,77 +1434,165 @@
     </script>        
 
     <div class="modal fade" id="chatModal" tabindex="-1" aria-labelledby="chatModalLabel" aria-hidden="true">
+
         <div class="modal-dialog modal-lg">
-            <div class="modal-content" style="border: 5px solid {{ classroom.subject.bg_color }}; border-radius: 15px;">
+
+            <div class="modal-content" style="border: 5px solid var(--accent-color); border-radius: 15px;">
+
                 <div class="chat-header d-flex justify-content-between align-items-center">
+
                     <h5 class="modal-title" id="chatModalLabel">Name of the classroom</h5>
                     <div class="folder-card">
+
                         <img src="{% static 'folder.png' %}" onclick="openFolderModal()" style="cursor: pointer;" alt="Folder Icon">
+
                     </div>
                 </div>
                 <div class="chat-body" id="chatBody">
-                    <!-- Hiển thị các tin nhắn đã gửi -->
                     {% for message in messages %}
                         <div class="chat-message {% if message.user == request.user %}my-message{% else %}other-message{% endif %}">
                             <div class="user-icon">
+
                                 <img src="{% static 'account.png' %}" alt="User Icon" class="img-fluid">
+
                             </div>
+
                             <div class="message-content">
-                                <div class="message-meta">
+                                <div class="message-meta" style="font-weight: 500;">
+
                                     {% if message.user == request.user %}
-                                        <span class="text-muted">{{ message.timestamp|date:"d/m/Y H:i" }}</span> {{ message.user.username }}
+
+                                        <span class="text-muted" style="font-style: italic;">{{ message.timestamp|date:"H:i:s d/m/Y" }}</span> | <span class="text-truncate" style="word-wrap: break-word; white-space: normal; max-width: 200px;">{{ message.user.username }}</span>
+
                                     {% else %}
-                                        {{ message.user.username }} <span class="text-muted">{{ message.timestamp|date:"d/m/Y H:i" }}</span>
+                                        <span style="word-wrap: break-word; white-space: normal; max-width: 200px;">{{ message.user.username }}</span> | <span style="font-style: italic;">{{ message.timestamp|date:"H:i:s j/n/Y" }}</span>
                                     {% endif %}
                                 </div>
-                                <div class="message-text">{{ message.message }}</div>
+                                <div class="message-text" style="word-wrap: break-word; white-space: normal; max-width: 300px;">{{ message.message }}</div>
                                 <!-- Kiểm tra nếu có hình ảnh -->
                                 {% if message.image %}
                                     <div class="message-image">
-                                        <img src="{{ message.image.url }}" alt="Image" class="img-fluid" style="max-width: 200px; border-radius: 10px;">
+                                        <img src="{{ message.image.url }}" alt="Image" class="img-fluid" style="max-width: 150px; border-radius: 10px;">
                                     </div>
                                 {% endif %}
 
+
                                 {% if message.file %}
-                                    <div class="message-file">
-                                        <a href="{{ message.file.url }}" download class="btn btn-link">Download file: {{ message.file.name }}</a>
+                                    <div class="file-content" style="display: flex; align-items: center; border: 1px solid black; border-radius: 10px; padding: 10px; margin-top: 10px;">
+                                        <div class="file-icon" style="flex-shrink: 0;">
+                                            <img src="{% static 'google-docs.png' %}" alt="File Icon" style="width: 50px; height: 50px;">
+                                        </div>
+                                        <div class="file-details" style="margin-left: 10px; word-wrap: break-word; white-space: normal; max-width: 115px; display: flex; flex-direction: column; text-align: center;">
+                                            <div class="file-name" style="font-weight: bold;">
+                                                <a href="{{ message.file.url }}" download>
+                                                    {{ message.file.name|cut:"chat_files/"|slice:":20" }}
+                                                </a>
+                                            </div>
+                                            <div class="file-size">{{ message.file_size }} KB</div>
+                                        </div>
                                     </div>
                                 {% endif %}
                             </div>
+
                         </div>
                     {% endfor %}
-                </div>                
-                <div class="chat-footer">
-                    {% csrf_token %}
-                    <input type="text" id="chatMessageInput" placeholder="Please input your message in here..." required>
-                    
-                    <div id="imagePreviewContainer" style="display: none; position: relative;">
-                        <img id="imagePreview" src="#" alt="Selected Image" style="max-width: 50px; max-height: 50px; margin-left: 10px; border-radius: 5px;">
-                        <button id="removeImageButton" style="position: absolute; top: 0; right: 0; background: red; color: white; border: none; border-radius: 50%;">&times;</button>
-                    </div>
-                    
-                    <div id="filePreviewContainer" style="display: none; position: relative;">
-                        <span id="filePreview" style="margin-left: 10px;"></span>
-                        <button id="removeFileButton" style="position: absolute; top: 0; right: 0; background: red; color: white; border: none; border-radius: 50%;">&times;</button>
-                    </div>
-                    
-                    <input type="file" id="imageInput" accept="image/*" style="display:none;"> <!-- Input file để chọn hình ảnh -->
-                    <input type="file" id="fileInput" accept=".pdf,.doc,.docx" style="display:none;"> <!-- Input file để chọn Word, PDF -->
-                    
-                    <button id="sendButton"><i class="fa-solid fa-paper-plane"></i></button>
-                    <button id="imageButton"><i class="fa-solid fa-image"></i></button> <!-- Nút để kích hoạt input file -->
-                    <button id="fileButton"><i class="fa-solid fa-file"></i></button> <!-- Nút để kích hoạt input file -->
+                </div>   
+                
+                <div id="imagePreviewContainer" style="display: none; padding: 10px 0 0 25px;">
+
+                    <img id="imagePreview" src="#" alt="Selected Image" style="max-width: 50px; max-height: 50px; border-radius: 5px;">
+
+                    <button id="removeImageButton" style="background: red; color: white; border: none; border-radius: 50%; position: absolute; left: 50px;">&times;</button>
                 </div>
+                
+                <div id="filePreviewContainer" style="display: none; padding: 16px 0 0 28px;">
+                    <span id="filePreview"></span>
+                    <button id="removeFileButton" style="background: red; color: white; border: none; border-radius: 50%;">&times;</button>
+                </div>
+                {% if classroom.allow_chat %}
+                    <div class="chat-footer d-flex justify-content-between align-items-center">
+                        {% csrf_token %}
+                        <button id="imageButton" class="btn btn-secondary"><i class="fa-solid fa-image"></i></button> <!-- Nút để kích hoạt input file -->
+
+                        <button id="fileButton" class="btn btn-secondary"><i class="fa-solid fa-file"></i></button> 
+                        
+                        <input type="file" id="imageInput" accept="image/*" style="display:none;"> 
+
+                        <input type="file" id="fileInput" accept=".pdf,.doc,.docx" style="display:none;"> 
+
+                        
+                        <input type="text" id="chatMessageInput" placeholder="Please input your message in here..." required class="form-control">
+                        
+                        <button id="sendButton" class="btn"><i class="fa-solid fa-paper-plane"></i></button>
+                    </div>
+                {% else %}
+                    <div class="chat-footer d-flex justify-content-center align-items-center ">
+                        <p style="font-weight: 500; font-size: 18px; color: #808080; margin: 0;">Chat is disabled for this classroom.</p>
+                    </div>
+                {% endif %}
+
+                <script>
+                    function updateSendButtonColor() {
+                        const sendButtonIcon = document.querySelector('#sendButton i');
+                        const chatMessageInput = document.getElementById('chatMessageInput');
+                        const imageInput = document.getElementById('imageInput');
+                        const fileInput = document.getElementById('fileInput');
+
+                        if (chatMessageInput.value.trim() !== '' || imageInput.files.length > 0 || fileInput.files.length > 0) {
+                            sendButtonIcon.style.color = 'var(--bs-primary)';
+                        } else {
+                            sendButtonIcon.style.color = '';
+                        }
+                    }
+
+                    document.getElementById('chatMessageInput').addEventListener('input', updateSendButtonColor);
+                    document.getElementById('imageInput').addEventListener('change', function() {
+                        if (this.files.length === 0) {
+                            this.value = null;
+                        }
+                        updateSendButtonColor();
+                    });
+                    document.getElementById('fileInput').addEventListener('change', function() {
+                        if (this.files.length === 0) {
+                            this.value = null;
+                        }
+                        updateSendButtonColor();
+                    });
+
+                    document.getElementById('removeImageButton').addEventListener('click', function() {
+                        document.getElementById('imageInput').value = null;
+                        updateSendButtonColor();
+                    });
+
+                    document.getElementById('removeFileButton').addEventListener('click', function() {
+                        document.getElementById('fileInput').value = null;
+                        updateSendButtonColor();
+                    });
+
+                    document.addEventListener('DOMContentLoaded', function () {
+                        var chatModal = document.getElementById('chatModal');
+                        chatModal.addEventListener('shown.bs.modal', function () {
+                            var chatBody = document.getElementById('chatBody');
+                            chatBody.scrollTop = chatBody.scrollHeight;
+                        });
+                    });
+                </script>
+                
+                
+                
             </div>
         </div>
+
     </div>
+
+
     
     
     
 
     <button class="btn-toggle-right-messenger" data-bs-toggle="modal" data-bs-target="#chatModal">
         <div class="messenger-icon mr-3">
-            <img src="{% static 'messenger.png' %}" alt="messenger Icon">
+            <i class="fa-solid fa-comment-dots fa-xl"></i>
         </div>
     </button>
 
@@ -1439,39 +1600,17 @@
         {% for section in sections %}
         {% if forloop.first %}
         <div id="section-content-{{ section.id }}" class="content-section active">
-            <div class="header">
+            <div class="header-classroom">
+                <div class="back-icon">
+                    <a href="{% url 'classrooms' classroom.subject.id classroom.grade %}">
+                        <i class="fa-solid fa-circle-chevron-left" style="font-size: 25px; color: var(--accent-color);"></i>
+                    </a>
+                </div>
                 <h1 style="font-weight: 700;" class="text-truncate">Welcome to {{classroom.name}}</h1>
                 <div class="d-flex justify-content-between align-items-center">
-                    <label class="cd-popup m-0 mr-3">
-                        <input type="checkbox">
-                        <div class="cd-burger" tabindex="0">
-                            <span></span>
-                            <span></span>
-                            <span></span>
-                        </div>
-                        <nav class="cd-popup-window mt-1">
-                        <ul>
-                            <li>
-                            <button onclick="window.location.href='{% url 'setting_classroom' classroom.id %}'">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="{{ classroom.subject.bg_color }}" class="bi bi-gear" viewBox="0 0 16 16">
-                                    <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492M5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0"/>
-                                    <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115z"/>
-                                </svg>
-                                <span style="font-weight: 500;">Settings</span>
-                            </button>
-                            </li>
-                            <li>
-                            <button onclick="window.location.href='{% url 'classrooms' classroom.subject.id classroom.grade %}'">
-                                <svg stroke-linejoin="round" stroke-linecap="round" stroke-width="2" stroke="{{ classroom.subject.bg_color }}" fill="{{ classroom.subject.bg_color }}" viewBox="0 0 24 24" height="14" width="14" xmlns="http://www.w3.org/2000/svg">
-                                <line y2="18" x2="6" y1="6" x1="18"></line>
-                                <line y2="18" x2="18" y1="6" x1="6"></line>
-                                </svg>
-                                <span style="font-weight: 500;">Classrooms</span>
-                            </button>
-                            </li>
-                        </ul>
-                        </nav>
-                    </label>                      
+                    <button onclick="window.location.href='{% url 'setting_classroom' classroom.id %}'" class="btn-setting mr-4" style="outline: none; border: none; background-color: transparent;">
+                        <i class="fa-solid fa-gear fa-xl" style="transition: transform 0.3s;"></i>
+                    </button> 
                     <button class="btn-favorite mr-4" style="outline: none;">
                         <i class="fa-regular fa-star fa-xl {% if is_favorite %}favorite{% endif %}"></i>
                     </button>
@@ -1489,43 +1628,114 @@
             </div>
             <hr style="border: 1px solid #000;">
             <h1 style="font-weight: 700;" class="text-truncate">Comments ({{ classroom.average_rating|floatformat:1 }}/5.0)</h1>
-            <p>There are 11 comments on {{ classroom.name }}</p>
+            <p>There are {{ comments.count }} comments on {{ classroom.name }}</p>
             {% if not existing_comment %}
             <div class="d-flex pb-3">
                 <div class="user-icon mr-3">
                     <img src="{% static "account.png" %}" alt="User Icon">
                 </div>
                 <div class="comment-box">
-                    <form method="post" action="{% url 'classroom_detail' classroom.id %}">
+
+                    <form id="commentForm" method="post" action="{% url 'classroom_detail' classroom.id %}">
+
                         {% csrf_token %}
+
                         <div class="comment-content">
                             <textarea name="comment" placeholder="Please share your thoughts about the classroom after you've completed it. So that you know, you can only leave a comment once..."></textarea>
                         </div>
                         <div class="send-button d-flex justify-content-between align-items-center">
+
                             <div class="rating">
                                     <input type="radio" id="star-1" name="rating" value="5"><label for="star-1">
+
                                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path pathLength="360" d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"></path></svg>
+
                                     </label>
+
                                     <input type="radio" id="star-2" name="rating" value="4"><label for="star-2">
                                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path pathLength="360" d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"></path></svg>
+
                                     </label>
+
                                     <input type="radio" id="star-3" name="rating" value="3"><label for="star-3">
+
                                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path pathLength="360" d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"></path></svg>
+
                                     </label>
                                     <input type="radio" id="star-4" name="rating" value="2"><label for="star-4">
                                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path pathLength="360" d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"></path></svg>
+
                                     </label>
+
                                     <input type="radio" id="star-5" name="rating" value="1"><label for="star-5">
+
                                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path pathLength="360" d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"></path></svg>
                                     </label>
                                     <div class="tooltip" style="font-family: Montserrat, sans-serif !important;">
+
                                         <span class="tooltip-text">Note: you can only rate once</span>
+
                                     </div>
+
                             </div>
-                            <img src="{% static "rocket.png" %}" alt="Send Icon" onclick="this.closest('form').submit();">
+
+                            <img src="{% static "rocket.png" %}" alt="Send Icon" onclick="submitCommentForm();">
+
                         </div>
                     </form>
                 </div>  
+
+                <!-- Modal for confirming comment without rating -->
+                <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+
+                    <div class="modal-dialog">
+
+                        <div class="modal-content">
+
+                            <div class="modal-header">
+
+                                <h5 class="modal-title" id="confirmModalLabel">Confirm Comment</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                Are you sure you want to comment without a rating?
+                            </div>
+                            <div class="modal-footer">
+
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+
+                                <button type="button" class="btn btn-primary" onclick="submitFormWithoutRating()">Confirm</button>
+
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <script>
+
+                    function submitCommentForm() {
+                        const rating = document.querySelector('input[name="rating"]:checked');
+
+                        if (!rating) {
+
+                            const confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+                            confirmModal.show();
+                        } else {
+                            document.getElementById('commentForm').submit();
+
+                        }
+
+                    }
+
+                    function submitFormWithoutRating() {
+
+                        document.getElementById('commentForm').submit();
+                    }
+
+                </script>
             </div>  
             <div class="divider pb-3">classroom comments</div>
             {% endif %} 
@@ -1536,7 +1746,7 @@
                         <img src="{% static "account.png" %}" alt="User Icon">
                     </div>
                     <div class="comment-content">
-                        <p class="m-0">{{ comment.user.username }}<span class="ml-3 text-muted" style="font-size: 11px">{{ comment.created_at|date:"d-m-Y" }}</span></p>
+                        <p class="m-0">{{ comment.user.username }}<span class="ml-3 text-muted" style="font-size: 11px">&nbsp;({{ comment.created_at|date:"H:i, d-m-Y"}})</span></p>
                         {% if comment.rating %}
                         <div class="star-rating">
                             {% for i in range %}
@@ -1552,39 +1762,12 @@
         </div>
         {% else %}
         <div id="section-content-{{ section.id }}" class="content-section hidden">
-            <div class="header">
+            <div class="header-classroom">
                 <h1 style="font-weight: 700;" class="text-truncate">{{section.title}}</h1>
                 <div class="d-flex justify-content-between align-items-center">
-                    <label class="cd-popup m-0 mr-3">
-                        <input type="checkbox">
-                        <div class="cd-burger" tabindex="0">
-                            <span></span>
-                            <span></span>
-                            <span></span>
-                        </div>
-                        <nav class="cd-popup-window mt-1">
-                        <ul>
-                            <li>
-                            <button onclick="window.location.href='{% url 'subjects' %}'">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="{{ classroom.subject.bg_color }}" class="bi bi-gear" viewBox="0 0 16 16">
-                                    <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492M5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0"/>
-                                    <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115z"/>
-                                </svg>
-                                <span style="font-weight: 500;">Settings</span>
-                            </button>
-                            </li>
-                            <li>
-                            <button onclick="window.location.href='{% url 'classrooms' classroom.subject.id classroom.grade %}'">
-                                <svg stroke-linejoin="round" stroke-linecap="round" stroke-width="2" stroke="{{ classroom.subject.bg_color }}" fill="{{ classroom.subject.bg_color }}" viewBox="0 0 24 24" height="14" width="14" xmlns="http://www.w3.org/2000/svg">
-                                <line y2="18" x2="6" y1="6" x1="18"></line>
-                                <line y2="18" x2="18" y1="6" x1="6"></line>
-                                </svg>
-                                <span style="font-weight: 500;">Classrooms</span>
-                            </button>
-                            </li>
-                        </ul>
-                        </nav>
-                    </label>                      
+                    <button onclick="window.location.href='{% url 'setting_classroom' classroom.id %}'" class="btn-setting mr-4" style="outline: none; border: none; background-color: transparent;">
+                        <i class="fa-solid fa-gear fa-xl" style="transition: transform 0.3s;"></i>
+                    </button>                      
                     <button class="btn-favorite mr-4" style="outline: none;"><i class="fa-regular fa-star fa-xl {% if is_favorite %}favorite{% endif %}"></i></button>
                 </div>
             </div>
@@ -1606,13 +1789,13 @@
                 <div class="doc-icon mr-3">
                     <img src="{% static 'google-docs.png' %}" alt="Document Icon">
                 </div>
-                <div class="file-name-container" style="flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                <div class="file-name-container" style="flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500;">
                     <p class="m-0">{{ file.file.name|filename }}</p>
                 </div>
                 <button class="btn-doc" style="outline: none; margin-left: 15px;" onclick="openPDFModal('{{ file.file.url }}')">Open</button>
                 <span style="margin-left: 10px;">|</span>
                 <button class="btn-doc" style="outline: none; margin-left: 10px;">
-                    <a href="{{ file.file.url }}" download style="text-decoration: none; color: #000;">Download</a>
+                    <a href="{{ file.file.url }}" download style="text-decoration: none;">Download</a>
                 </button>
             </div>            
             {% endfor %}
@@ -1625,39 +1808,12 @@
         {% endif %}
         {% for subsection in section.subsections.all %}
         <div id="subsection-content-{{ subsection.id }}" class="content-section hidden">
-            <div class="header">
+            <div class="header-classroom">
                 <h1 style="font-weight: 700;" class="text-truncate">{{subsection.title}}</h1>
                 <div class="d-flex justify-content-between align-items-center">
-                    <label class="cd-popup m-0 mr-3">
-                        <input type="checkbox">
-                        <div class="cd-burger" tabindex="0">
-                            <span></span>
-                            <span></span>
-                            <span></span>
-                        </div>
-                        <nav class="cd-popup-window mt-1">
-                        <ul>
-                            <li>
-                            <button onclick="window.location.href='{% url 'subjects' %}'">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="{{ classroom.subject.bg_color }}" class="bi bi-gear" viewBox="0 0 16 16">
-                                    <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492M5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0"/>
-                                    <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115z"/>
-                                </svg>
-                                <span style="font-weight: 500;">Settings</span>
-                            </button>
-                            </li>
-                            <li>
-                            <button onclick="window.location.href='{% url 'classrooms' classroom.subject.id classroom.grade %}'">
-                                <svg stroke-linejoin="round" stroke-linecap="round" stroke-width="2" stroke="{{ classroom.subject.bg_color }}" fill="{{ classroom.subject.bg_color }}" viewBox="0 0 24 24" height="14" width="14" xmlns="http://www.w3.org/2000/svg">
-                                <line y2="18" x2="6" y1="6" x1="18"></line>
-                                <line y2="18" x2="18" y1="6" x1="6"></line>
-                                </svg>
-                                <span style="font-weight: 500;">Classrooms</span>
-                            </button>
-                            </li>
-                        </ul>
-                        </nav>
-                    </label>                      
+                    <button onclick="window.location.href='{% url 'setting_classroom' classroom.id %}'" class="btn-setting mr-4" style="outline: none; border: none; background-color: transparent;">
+                        <i class="fa-solid fa-gear fa-xl" style="transition: transform 0.3s;"></i>
+                    </button>                          
                     <button class="btn-favorite mr-4" style="outline: none;"><i class="fa-regular fa-star fa-xl {% if is_favorite %}favorite{% endif %}"></i></button>
                 </div>
             </div>
@@ -1679,13 +1835,13 @@
                 <div class="doc-icon mr-3">
                     <img src="{% static 'google-docs.png' %}" alt="Document Icon">
                 </div>
-                <div class="file-name-container" style="flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                <div class="file-name-container" style="flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500;">
                     <p class="m-0">{{ file.file.name|filename }}</p>
                 </div>
                 <button class="btn-doc" style="outline: none; margin-left: 15px;" onclick="openPDFModal('{{ file.file.url }}')">Open</button>
                 <span style="margin-left: 10px;">|</span>
                 <button class="btn-doc" style="outline: none; margin-left: 10px;">
-                    <a href="{{ file.file.url }}" download style="text-decoration: none; color: #000;">Download</a>
+                    <a href="{{ file.file.url }}" download style="text-decoration: none;">Download</a>
                 </button>
             </div>  
             {% endfor %}
@@ -1699,39 +1855,12 @@
         {% for submission in section.submissions.all %}
             {% if submission.submission_type == 'assignment' %}
             <div id="submission-content-{{ submission.id }}" class="content-section hidden">
-                <div class="header">
+                <div class="header-classroom">
                     <h1 style="font-weight: 700;" class="text-truncate">{{submission.title}}</h1>
                     <div class="d-flex justify-content-between align-items-center">
-                        <label class="cd-popup m-0 mr-3">
-                            <input type="checkbox">
-                            <div class="cd-burger" tabindex="0">
-                                <span></span>
-                                <span></span>
-                                <span></span>
-                            </div>
-                            <nav class="cd-popup-window mt-1">
-                            <ul>
-                                <li>
-                                <button onclick="window.location.href='{% url 'subjects' %}'">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="{{ classroom.subject.bg_color }}" class="bi bi-gear" viewBox="0 0 16 16">
-                                        <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492M5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0"/>
-                                        <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115z"/>
-                                    </svg>
-                                    <span style="font-weight: 500;">Settings</span>
-                                </button>
-                                </li>
-                                <li>
-                                <button onclick="window.location.href='{% url 'classrooms' classroom.subject.id classroom.grade %}'">
-                                    <svg stroke-linejoin="round" stroke-linecap="round" stroke-width="2" stroke="currentColor" fill="{{ classroom.subject.bg_color }}" viewBox="0 0 24 24" height="14" width="14" xmlns="http://www.w3.org/2000/svg">
-                                    <line y2="18" x2="6" y1="6" x1="18"></line>
-                                    <line y2="18" x2="18" y1="6" x1="6"></line>
-                                    </svg>
-                                    <span style="font-weight: 500;">Classrooms</span>
-                                </button>
-                                </li>
-                            </ul>
-                            </nav>
-                        </label>                      
+                        <button onclick="window.location.href='{% url 'setting_classroom' classroom.id %}'" class="btn-setting mr-4" style="outline: none; border: none; background-color: transparent;">
+                            <i class="fa-solid fa-gear fa-xl" style="transition: transform 0.3s;"></i>
+                        </button>                         
                         <button class="btn-favorite mr-4" style="outline: none;"><i class="fa-regular fa-star fa-xl {% if is_favorite %}favorite{% endif %}"></i></button>
                     </div>
                 </div>
@@ -1750,7 +1879,7 @@
                                 </a>
                             </div>
                             <div class="file-name-container" style="flex: 1;">
-                                <p class="m-0" style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="{{ file.file.name|filename }}">
+                                <p class="m-0" style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;  font-weight: 500;" title="{{ file.file.name|filename }}">
                                     {{ file.file.name|filename }}
                                 </p>
                             </div>
@@ -1768,7 +1897,6 @@
                 
                 {% for student_file in student_files %}
                     {% if student_file.score is not None %}
-                        <!-- Phần 3: Hiển thị điểm -->
                         <h1 style="font-weight: 700;" class="text-truncate">Submit assignment</h1>
                         <p>Deadline time: {{ student_file.submission.open_date }} - {{ student_file.submission.close_date }}</p>
                         <div class="d-flex align-items-end pt-3 pb-3">
@@ -1781,29 +1909,26 @@
                             <p class="m-0 ml-1" style="font-weight: 700;">Your score: {{ student_file.score }}/10.00</p>
                         </div>
                     {% else %}
-                        <!-- Phần 2: Đã nộp bài, có thể cập nhật hoặc xóa -->
                         <h1 style="font-weight: 700;" class="text-truncate">Submit assignment</h1>
                         <p>Deadline time: {{ student_file.submission.open_date }} - {{ student_file.submission.close_date }}</p>
                         <div class="d-flex align-items-end pt-3 pb-3">
                             <div class="doc-icon mr-3">
                                 <img src="{% static "google-docs.png" %}" alt="Document Icon">
                             </div>
-                            <p class="m-0">{{ student_file.file.name|filename }}</p> 
+                            <p class="m-0" style="font-weight: 500;">{{ student_file.file.name|filename }}</p> 
                         </div>
                         <div class="d-flex justify-content-start align-items-center">
                             {% if submission.is_open %}
-                                <!-- Cho phép cập nhật hoặc xóa trong khoảng thời gian cho phép -->
-                                <form action="{% url 'update_file_submission' student_file.id %}" method="post" enctype="multipart/form-data">
+                                <form action="{% url 'update_file_submission' student_file.id %}" method="post" enctype="multipart/form-data" style="margin-right: 10px;">
                                     {% csrf_token %}
-                                    <input type="file" name="file" required>
-                                    <button type="submit" class="btn-doc mr-3" style="outline: none; padding: 5px 10px;">Update</button> 
+                                    <input type="file" name="file" class="btn-doc text-white" style="outline: none; padding: 3px 6px; font-size: 12px; background-color: var(--accent-color);" required>
+                                    <button type="submit" class="btn-doc mr-3" style="outline: none; padding: 5px 10px; background-color: var(--accent-color);">Update</button> 
                                 </form>
                                 <form action="{% url 'delete_file_submission' student_file.id %}" method="post">
                                     {% csrf_token %}
                                     <button type="submit" class="btn-doc" style="outline: none; padding: 5px 10px;">Delete</button> 
                                 </form>
                             {% else %}
-                                <!-- Nếu ngoài thời gian cho phép, chỉ hiển thị file -->
                                 <p class="text-muted">Submission period has ended. You cannot update or delete your submission.</p>
                             {% endif %}
                         </div>
@@ -1811,9 +1936,7 @@
                 {% endfor %}
 
                 {% if not student_files %}
-                    <!-- Nếu không có bất kỳ `student_file` nào -->
                     {% if submission.is_open %}
-                        <!-- Phần 1: Nộp bài -->
                         <h1 style="font-weight: 700;" class="text-truncate">Submit assignment</h1>
                         <p>Deadline time: {{submission.open_date}} - {{submission.close_date}}</p>
                         <form action="{% url 'submit_assignment' submission.id %}" method="post" enctype="multipart/form-data">
@@ -1822,7 +1945,7 @@
                                 <div class="doc-icon mr-3">
                                     <img src="{% static "google-docs.png" %}" alt="Document Icon">
                                 </div>
-                                <input type="file" class="btn-doc bg-secondary text-white" style="outline: none; padding: 3px 6px; font-size: 12px;" name="file" required>
+                                <input type="file" class="btn-doc text-white" style="outline: none; padding: 3px 6px; font-size: 12px; background-color: var(--accent-color);" name="file" required>
                             </div>
                             <div class="d-flex justify-content-start">
                                 <button type="submit" class="btn-doc" style="outline: none; padding: 5px 10px;">Submit</button> 
@@ -1841,39 +1964,17 @@
             </div>
             {% elif submission.submission_type == 'question_test' %}
             <div id="submission-content-{{ submission.id }}" class="content-section hidden">
-                <div class="header">
+                <div class="header-classroom">
                     <h1 style="font-weight: 700;" class="text-truncate">Welcome to {{classroom.name}}</h1>
                     <div class="d-flex justify-content-between align-items-center">
-                        <label class="cd-popup m-0 mr-3">
-                            <input type="checkbox">
-                            <div class="cd-burger" tabindex="0">
-                                <span></span>
-                                <span></span>
-                                <span></span>
-                            </div>
-                            <nav class="cd-popup-window mt-1">
-                            <ul>
-                                <li>
-                                <button onclick="window.location.href='{% url 'subjects' %}'">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="{{ classroom.subject.bg_color }}" class="bi bi-gear" viewBox="0 0 16 16">
-                                        <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492M5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0"/>
-                                        <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115z"/>
-                                    </svg>
-                                    <span style="font-weight: 500;">Settings</span>
-                                </button>
-                                </li>
-                                <li>
-                                <button onclick="window.location.href='{% url 'classrooms' classroom.subject.id classroom.grade %}'">
-                                    <svg stroke-linejoin="round" stroke-linecap="round" stroke-width="2" stroke="{{ classroom.subject.bg_color }}" fill="none" viewBox="0 0 24 24" height="14" width="14" xmlns="http://www.w3.org/2000/svg">
-                                    <line y2="18" x2="6" y1="6" x1="18"></line>
-                                    <line y2="18" x2="18" y1="6" x1="6"></line>
-                                    </svg>
-                                    <span style="font-weight: 500;">Classrooms</span>
-                                </button>
-                                </li>
-                            </ul>
-                            </nav>
-                        </label>                      
+                        <button onclick="window.location.href='{% url 'setting_classroom' classroom.id %}'" class="btn-setting mr-4" style="outline: none; border: none; background-color: transparent;">
+                            <i class="fa-solid fa-gear fa-xl" style="transition: transform 0.3s;"></i>
+                        </button>            
+                        <style>
+                            .btn-setting:hover .fa-gear {
+                                transform: rotate(90deg);
+                            }
+                        </style>                    
                         <button class="btn-favorite mr-4" style="outline: none;"><i class="fa-regular fa-star fa-xl {% if is_favorite %}favorite{% endif %}"></i></button>
                     </div>
                 </div>
@@ -1892,7 +1993,7 @@
                                 </a>
                             </div>
                             <div class="file-name-container" style="flex: 1;">
-                                <p class="m-0" style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="{{ file.file.name|filename }}">
+                                <p class="m-0" style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500;" title="{{ file.file.name|filename }}">
                                     {{ file.file.name|filename }}
                                 </p>
                             </div>
@@ -1908,7 +2009,6 @@
                 <hr style="border: 1px solid #000;">
                 
                 {% if quiz_results and quiz_results|get_item:submission.id %}
-                    <!-- Phần 2: Hiển thị kết quả khi đã có điểm -->
                     <div>
                         <h1 style="font-weight: 700;" class="text-truncate">Answer the question</h1>
                         {% with quiz_results|get_item:submission.id as result %}
@@ -1924,18 +2024,20 @@
                         <div class="d-flex justify-content-start align-items-center">
                             {% with quiz_results|get_item:submission.id as result %}
                                 {% if result %}
-                                    <p class="m-0 ml-1" style="font-weight: 700;">
-                                        Your score: {{ result.correct_answers }}/{{ result.total_questions }} ({{ result.score }}/10.00)
-                                    </p>
-                                    <p class="m-0 ml-1" style="font-weight: 700;">
-                                        Time taken: {{ result.time_taken }}
-                                    </p>
+                                    <div class="result-info">
+                                        <p class="m-0" style="font-weight: 700;">
+                                            Your score: <span>{{ result.correct_answers }}/{{ result.total_questions }}</span> 
+                                            <span class="text-muted">(<span style="color: {% if result.score <= 5 %}orange{% elif result.score <= 8 %}blue{% else %}green{% endif %};">{{ result.score }}</span>/10.00)</span>
+                                        </p>
+                                        <p class="m-0" style="font-weight: 700;">
+                                            Time taken: <span class="text-success">{{ result.time_taken }}</span>
+                                        </p>
+                                    </div>
                                 {% endif %}
                             {% endwith %}
                         </div>
                     </div>
                 {% else %}
-                    <!-- Phần 1: Hiển thị nút bắt đầu khi chưa có điểm -->
                     <h1 style="font-weight: 700;" class="text-truncate">Answer the question</h1>
                     <p class="m-0 mt-2 mb-2">There are a total of {{ submission.questions.count }} questions</p>
                     <div class="d-flex align-items-end pb-3">
@@ -2212,6 +2314,122 @@
                     });
                 });
             });
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+
+            const imageInput = document.getElementById('imageInput');
+            const fileInput = document.getElementById('fileInput');
+            const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+    
+            const filePreviewContainer = document.getElementById('filePreviewContainer');
+            const imagePreview = document.getElementById('imagePreview');
+            const filePreview = document.getElementById('filePreview');
+            const removeImageButton = document.getElementById('removeImageButton');
+            const removeFileButton = document.getElementById('removeFileButton');
+    
+            imageInput.onchange = function() {
+    
+                const file = imageInput.files[0];
+    
+                if (file) {
+    
+                    const reader = new FileReader();
+    
+                    reader.onload = function(e) {
+    
+                        imagePreview.src = e.target.result;
+                        imagePreviewContainer.style.display = 'block';
+                    };
+                    reader.readAsDataURL(file);
+                    fileInput.value = ''; // Xóa giá trị input file
+                    filePreviewContainer.style.display = 'none'; // Ẩn preview file
+    
+                    filePreview.textContent = ''; // Xóa tên file hiển thị
+                }
+            };
+    
+    
+            fileInput.onchange = function() {
+    
+                const file = fileInput.files[0];
+                if (file) {
+    
+                    filePreview.textContent = file.name; // Hiển thị tên file
+    
+                    filePreviewContainer.style.display = 'block'; // Hiển thị container chứa file
+                    imageInput.value = ''; // Xóa giá trị input image
+                    imagePreviewContainer.style.display = 'none'; // Ẩn preview ảnh
+                }
+            };
+    
+            removeImageButton.onclick = function() {
+                imageInput.value = ''; // Xóa giá trị input file
+    
+                imagePreviewContainer.style.display = 'none'; // Ẩn preview
+    
+            };
+    
+    
+            removeFileButton.onclick = function() {
+    
+                fileInput.value = ''; // Xóa giá trị input file
+                filePreviewContainer.style.display = 'none'; // Ẩn preview
+    
+                filePreview.textContent = ''; // Xóa tên file hiển thị
+            };
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            const sectionId = urlParams.get('section_id');
+            const parentSectionId = urlParams.get('parent_section_id');
+            
+            if (sectionId) {
+                // Ẩn tất cả các content-section
+                document.querySelectorAll('.content-section').forEach(section => {
+                    section.classList.add('hidden');
+                    section.classList.remove('active');
+                });
+
+                // Hiển thị section tương ứng
+                const targetSection = document.getElementById(`section-content-${sectionId}`);
+                if (targetSection) {
+                    targetSection.classList.remove('hidden');
+                    targetSection.classList.add('active');
+                }
+
+                // Mở rộng sidebar để hiển thị các subsection
+                const sidebarLink = document.querySelector(`.nav-link[data-content="section-content-${sectionId}"]`);
+                if (sidebarLink) {
+                    const submenu = sidebarLink.nextElementSibling;
+                    if (submenu) {
+                        submenu.style.display = 'block';
+                        const icon = sidebarLink.querySelector('i');
+                        if (icon) {
+                            icon.classList.remove('fa-caret-down');
+                            icon.classList.add('fa-caret-up');
+                        }
+                    }
+                }
+
+                // Mở rộng parent section nếu có
+                if (parentSectionId) {
+                    const parentSectionLink = document.querySelector(`.nav-link[data-content="section-content-${parentSectionId}"]`);
+                    if (parentSectionLink) {
+                        const parentSubmenu = parentSectionLink.nextElementSibling;
+                        if (parentSubmenu) {
+                            parentSubmenu.style.display = 'block';
+                            const parentIcon = parentSectionLink.querySelector('i');
+                            if (parentIcon) {
+                                parentIcon.classList.remove('fa-caret-down');
+                                parentIcon.classList.add('fa-caret-up');
+                            }
+                        }
+                    }
+                }
+            }
         });
     </script>
 </body>
