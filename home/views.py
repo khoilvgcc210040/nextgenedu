@@ -1,5 +1,6 @@
 from datetime import date, timedelta, timezone
 import json
+import math
 from django.db.models import Avg
 from urllib.parse import urlencode
 from django.db import IntegrityError
@@ -8,7 +9,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.urls import reverse
-from home.models import AcademicYear, Answer, ChatMessage, Classroom, Comment, CustomUser, FavoriteClassroom, Participant, Question, QuizResult, Section, StudentFile, Subjects, Submission, SubmissionFile, SubsectionFile
+from home.models import AcademicYear, Answer, AnsweredQuestion, ChatMessage, Classroom, Comment, CustomUser, FavoriteClassroom, Participant, Question, QuizResult, Section, StudentFile, Subjects, Submission, SubmissionFile, SubsectionFile
 
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.forms import SetPasswordForm
@@ -19,6 +20,7 @@ from django.core.mail import send_mail
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.utils.timezone import now
+from django.views.decorators.csrf import csrf_exempt
 
 User = get_user_model()
 
@@ -28,7 +30,16 @@ def home(request):
     if 'signup_data' in request.session:
         del request.session['signup_data']
 
-    context = {}
+    subjects = Subjects.objects.all().order_by('grade')
+    grouped_subjects = {}
+    for subject in subjects:
+        if subject.grade not in grouped_subjects:
+            grouped_subjects[subject.grade] = []
+        grouped_subjects[subject.grade].append(subject)
+
+    context = {
+        'grouped_subjects': grouped_subjects
+    }
     return render(request, 'home.html', context)
 
 def authPage(request):
@@ -303,37 +314,99 @@ def upload_subsection_file(request, subsection_id):
 def classrooms(request, subject_id, grade):
     subject = get_object_or_404(Subjects, id=subject_id, grade=grade)
     status = request.GET.get('status', None)
+    user = request.user
 
     if status is not None:
         classrooms = Classroom.objects.filter(subject=subject, grade=grade, status=status)
     else:
         classrooms = Classroom.objects.filter(subject=subject, grade=grade)
 
+    participant_classrooms = Participant.objects.filter(user=user, classroom__in=classrooms).values_list('classroom_id', flat=True)
+
     context = {
         'subject': subject,
         'grade': grade,
         'classrooms': classrooms,
         'status': status,
+        'participant_classrooms': participant_classrooms,
     }
     return render(request, 'classrooms.html', context)
 
 def enter_password(request, classroom_id):
+
     classroom = get_object_or_404(Classroom, id=classroom_id)
     
     if request.method == 'POST':
         entered_password = request.POST.get('password')
         if entered_password == classroom.password:
             participant_exists = Participant.objects.filter(user=request.user, classroom=classroom).exists()
+
             
             if not participant_exists:
                 Participant.objects.create(user=request.user, classroom=classroom)
                 
-            return redirect('classroom_detail', id=classroom.id)
+            return JsonResponse({'status': 'success', 'redirect_url': reverse('classroom_detail', args=[classroom.id])})
         else:
-            return HttpResponse("Incorrect password")
 
-    return redirect('classrooms', subject_id=classroom.subject.id, grade=classroom.grade)
+            return JsonResponse({'status': 'error', 'message': 'Incorrect password'})
 
+
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=400)
+
+
+@csrf_exempt
+def update_classroom(request, classroom_id):
+    if request.method == 'POST':
+        try:
+            classroom = get_object_or_404(Classroom, id=classroom_id)
+            name = request.POST.get('name')
+            status = request.POST.get('status')
+            password = request.POST.get('password')
+            if name:
+                classroom.name = name
+            if status:
+                classroom.status = True if status == 'Private' else False
+                classroom.password = password
+                try:
+                    classroom.clean()
+                except ValidationError as e:
+                    return JsonResponse({'status': 'error', 'message': e.message_dict})
+
+            try:
+                classroom.full_clean()
+                classroom.save()
+                return JsonResponse({'status': 'success', 'message': 'Classroom updated successfully.'})
+            except ValidationError as e:
+                return JsonResponse({'status': 'error', 'message': e.message_dict})
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)})
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=400)
+
+@csrf_exempt
+def update_allow_chat(request, classroom_id):
+    if request.method == 'POST':
+        classroom = get_object_or_404(Classroom, id=classroom_id)
+        try:
+            data = json.loads(request.body)
+            print(data)
+            allow_chat = data.get('allow_chat')
+            classroom.allow_chat = allow_chat
+            classroom.save()
+            return JsonResponse({'status': 'success'})
+        except json.JSONDecodeError:
+            return JsonResponse({'status': 'failed', 'message': 'Invalid JSON'}, status=400)
+    return JsonResponse({'status': 'failed', 'message': 'Invalid request method'}, status=400)
+
+@csrf_exempt
+def delete_classroom(request, classroom_id):
+    if request.method == 'POST':
+        try:
+            classroom = get_object_or_404(Classroom, id=classroom_id)
+            classroom.delete()
+            return JsonResponse({'status': 'success', 'redirect_url': reverse('classrooms', args=[classroom.subject.id, classroom.grade])})
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)})
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=400)
 
 @login_required
 def classroom_detail(request, id):
@@ -345,25 +418,26 @@ def classroom_detail(request, id):
 
     scores_data = []
     for participant in participants:
-        quiz_results = QuizResult.objects.filter(
-            submission__section__classroom=classroom,
-            student=participant.user,
-            submission__submission_type='question_test'
-        )
+        if participant.user.role == 'student':  # Chỉ so sánh các role student
+            quiz_results = QuizResult.objects.filter(
+                submission__section__classroom=classroom,
+                student=participant.user,
+                submission__submission_type='question_test'
+            )
 
-        total_score = sum(result.score for result in quiz_results)
-        num_tests = quiz_results.count()
-        total_time = sum((result.time_taken for result in quiz_results if result.time_taken), timedelta())
-        
-        # Chuyển đổi total_time thành dạng h:m:s
-        total_time_hms = str(total_time)
+            total_score = sum(result.score for result in quiz_results)
+            num_tests = quiz_results.count()
+            total_time = sum((result.time_taken for result in quiz_results if result.time_taken), timedelta())
+            
+            # Chuyển đổi total_time thành dạng h:m:s
+            total_time_hms = str(total_time)
 
-        scores_data.append({
-            'user': participant.user,
-            'total_score': total_score,
-            'num_tests': num_tests,
-            'total_time': total_time_hms,  # Convert to minutes
-        })
+            scores_data.append({
+                'user': participant.user,
+                'total_score': total_score,
+                'num_tests': num_tests,
+                'total_time': total_time_hms,  # Convert to minutes
+            })
 
     # Sort by total_score and total_time for ranking purposes
     scores_data.sort(key=lambda x: (-x['total_score'], x['total_time']))
@@ -423,7 +497,7 @@ def save_message(request):
     if request.method == 'POST':
         classroom_id = request.POST.get('classroom_id')
         message = request.POST.get('message')
-        image = request.FILES.get('image')  # Lấy file ảnh
+        image = request.FILES.get('image') 
         file = request.FILES.get('file')  # Lấy file đính kèm (Word, PDF)
         classroom = Classroom.objects.get(id=classroom_id)
 
@@ -432,15 +506,18 @@ def save_message(request):
             classroom=classroom,
             message=message,
             image=image,
-            file=file  # Lưu file vào model
+            file=file,
+            file_size=(math.ceil(file.size / 1024)) if file else 0
         )
+
 
         return JsonResponse({
             'status': 'success',
             'username': request.user.username,
             'message': chat_message.message,
             'image_url': chat_message.image.url if chat_message.image else None,
-            'file_url': chat_message.file.url if chat_message.file else None  # Trả về URL của file
+            'file_url': chat_message.file.url if chat_message.file else None, 
+            'file_size': chat_message.file_size if chat_message.file else 0
         })
 
     return JsonResponse({'status': 'error'}, status=400)
@@ -525,7 +602,6 @@ def take_quiz(request, submission_id, question_id):
 
     total_questions = submission.questions.count()
 
-    # Lấy số lượng câu hỏi đã được trả lời
     quiz_result, created = QuizResult.objects.get_or_create(
         submission=submission,
         student=request.user,
@@ -533,17 +609,27 @@ def take_quiz(request, submission_id, question_id):
     )
     answered_questions = quiz_result.answered_questions
 
-    # Lấy thời gian đã trôi qua nếu đã lưu trước đó
     elapsed_time = quiz_result.time_taken.total_seconds() if quiz_result.time_taken else 0
 
+    previous_question = Question.objects.filter(submission=submission, id__lt=question_id).last()
+
+    # Kiểm tra xem câu hỏi hiện tại đã được trả lời chưa
+    answered = AnsweredQuestion.objects.filter(quiz_result=quiz_result, question=question).exists()
+
+    # Giảm số lượng câu hỏi đã trả lời nếu người dùng quay lại câu hỏi trước đó
+    if 'previous' in request.GET:
+        quiz_result.answered_questions -= 1
+        quiz_result.save()
+        
     return render(request, 'take_quiz.html', {
         'submission': submission,
         'current_question': question,
         'total_questions': total_questions,
-        'answered_questions': answered_questions,
-        'elapsed_time': elapsed_time  # Truyền elapsed_time vào template
+        'answered_questions': quiz_result.answered_questions,
+        'elapsed_time': elapsed_time,
+        'previous_question': previous_question,
+        'answered': answered
     })
-
 
 def submit_answer(request, submission_id, question_id):
     submission = get_object_or_404(Submission, id=submission_id)
@@ -551,41 +637,51 @@ def submit_answer(request, submission_id, question_id):
     selected_answer_id = request.POST.get('selected_answer')
     selected_answer = get_object_or_404(Answer, id=selected_answer_id)
 
-    # Kiểm tra câu trả lời đúng hay sai
     correct = selected_answer.is_correct
 
-    # Cập nhật hoặc tạo mới QuizResult nếu chưa có
     quiz_result, created = QuizResult.objects.get_or_create(
         submission=submission,
         student=request.user,
         defaults={'correct_answers': 0, 'total_questions': submission.questions.count(), 'score': 0.0}
     )
-    
-    if correct:
-        quiz_result.correct_answers += 1
-     
-    quiz_result.answered_questions += 1
-    
-    # Tính toán điểm
+
+    answered_question, created = AnsweredQuestion.objects.get_or_create(
+        quiz_result=quiz_result,
+        question=question,
+        defaults={'selected_answer': selected_answer}
+    )
+
+    if Question.objects.filter(submission=submission, id__gt=question_id).exists():
+        quiz_result.answered_questions += 1
+        quiz_result.save()
+
+    if created:
+        if correct:
+            quiz_result.correct_answers += 1
+    else:
+        # Nếu câu hỏi đã được trả lời trước đó, cập nhật câu trả lời nếu cần
+        if answered_question.selected_answer != selected_answer:
+            if answered_question.selected_answer.is_correct:
+                quiz_result.correct_answers -= 1
+            if correct:
+                quiz_result.correct_answers += 1
+            answered_question.selected_answer = selected_answer
+            answered_question.save()
+
     quiz_result.total_questions = submission.questions.count()
     quiz_result.score = (quiz_result.correct_answers / quiz_result.total_questions) * 10
 
-    # Lấy thời gian đã trôi qua (elapsed_time)
     elapsed_time = int(request.POST.get('elapsed_time', '0'))
 
-    # Nếu là câu hỏi cuối cùng, lưu lại tổng thời gian làm bài
     next_question = Question.objects.filter(submission=submission, id__gt=question_id).first()
     if next_question:
-        # Chuyển đến câu hỏi tiếp theo, truyền elapsed_time để tiếp tục đếm
         quiz_result.time_taken = timedelta(seconds=elapsed_time)
         quiz_result.save()
         return redirect('take_quiz', submission_id=submission.id, question_id=next_question.id)
     else:
-        # Đây là câu hỏi cuối cùng, lưu thời gian tổng
         quiz_result.time_taken = timedelta(seconds=elapsed_time)
         quiz_result.save()
         return redirect('quiz_result', submission_id=submission.id)
-
 
 def quiz_result(request, submission_id):
     submission = get_object_or_404(Submission, id=submission_id)
@@ -595,6 +691,14 @@ def quiz_result(request, submission_id):
     quiz_result = get_object_or_404(QuizResult, submission=submission, student=request.user)
 
     # Chuyển hướng về trang classroom_detail và truyền các tham số cần thiết qua URL
+    return redirect('classroom_detail', id=classroom.id)
+
+def exit_quiz(request, submission_id):
+    submission = get_object_or_404(Submission, id=submission_id)
+    classroom = submission.section.classroom
+    quiz_result = QuizResult.objects.filter(submission=submission, student=request.user).first()
+    if quiz_result:
+        quiz_result.delete()
     return redirect('classroom_detail', id=classroom.id)
 
 
@@ -884,6 +988,7 @@ def marking(request, assignment_id):
     return render(request, 'marking.html', context)
 
 from django.contrib.auth import update_session_auth_hash
+
 @login_required
 def setting(request):
     user = request.user
@@ -899,8 +1004,7 @@ def setting(request):
             day = int(request.POST.get('dob-day'))
             user.date_of_birth = date(year, month, day)
             user.save()
-            messages.success(request, 'Personal information updated successfully.')
-            return redirect('setting')
+            return JsonResponse({'status': 'success', 'message': 'Personal information updated successfully.'})
 
         elif 'update_password' in request.POST:
             current_password = request.POST.get('current-password')
@@ -912,21 +1016,23 @@ def setting(request):
                     user.set_password(new_password)
                     user.save()
                     update_session_auth_hash(request, user)
-                    messages.success(request, 'Password updated successfully.')
-                    return redirect('setting')
+                    return JsonResponse({'status': 'success', 'message': 'Password updated successfully.'})
                 else:
-                    messages.error(request, 'Current password is incorrect.')
-                    return redirect('setting')
+                    return JsonResponse({'status': 'error', 'message': 'Current password is incorrect.'})
             else:
-                messages.error(request, 'New password and confirmation do not match.')
-                return redirect('setting')
+                return JsonResponse({'status': 'error', 'message': 'New password and confirmation do not match.'})
 
         elif 'delete_account' in request.POST:
             user.delete()
-            messages.success(request, 'Account deleted successfully.')
-            return redirect('home')
+            return JsonResponse({'status': 'success', 'message': 'Account deleted successfully.', 'redirect_url': reverse('home')})
 
     return render(request, 'setting.html', {'user': user})
+
+def delete_section(request, section_id):
+    if request.method == 'POST':
+        section = get_object_or_404(Section, id=section_id)
+        section.delete()
+        return JsonResponse({'success': True})
 
 def adminPage(request):
     # classroom = get_object_or_404(Classroom, id=id)

@@ -15,12 +15,11 @@
         align-items: center;
         justify-content: center;
         background-color: #eeeeee4b;
-        border-radius: 3px;
         letter-spacing: 1px;
         transition: all 0.2s linear;
         cursor: pointer;
         border: none;
-        color: {{ subject.bg_color }};
+        color: var(--accent-color);
         background: #fff;
     }
 
@@ -40,19 +39,20 @@
         transform: translateY(-2px);
     }
 
-    header {
+    .classroom-header {
         border: 2px solid #000;
-        border-radius: 20px;
+        border-radius: 5px;
         padding: 70px;
     }
 
     .nav-tabs .classroom-nav-link.active {
-        border-color: {{subject.bg_color}} {{subject.bg_color}} #fff;
-        background-color: {{subject.bg_color}};
+        border-color: var(--accent-color) var(--accent-color) #fff;
+        background-color: var(--accent-color);
+        color: #fff;
     }
 
     .nav-tabs .classroom-nav-link {
-        border-color: {{subject.bg_color}} {{subject.bg_color}} transparent;
+        border-color: var(--accent-color) var(--accent-color) transparent;
         border-radius: 3px;
         background-color: transparent;
         padding: .5rem 1rem;
@@ -60,8 +60,8 @@
     }
 
     .card-classroom {
-        border: 2px solid {{subject.bg_color}};
-        border-radius: 20px;
+        border: 2px solid var(--accent-color);
+        border-radius: 5px;
         transition: all ease-in-out 0.3s;
     }
 
@@ -77,7 +77,7 @@
 
     .card-title a {
         text-decoration: underline;
-        color: {{ subject.bg_color }};
+        color: var(--accent-color);
         font-size: 28px;
         margin-bottom: 12px;
         font-weight: 500;
@@ -85,7 +85,8 @@
     }
 
     .card-title a:hover {
-        opacity: 0.7;
+        opacity: 0.9;
+        text-decoration: underline;
     }
 
     .submit-modal .btn-text {
@@ -97,36 +98,29 @@
         transform: translateX(10px);
     }
 
-    .navbar .navbar-brand span{
-        color: {{ subject.bg_color }} !important;
-    }
-
-    .navbar .navbar-nav .header-nav-link {
-        color: {{ subject.bg_color }} !important;
+    .card-body {
+        padding: 20px !important;
     }
 </style>
 <body>
-    {% include "header.html" %}
-    <div class="container" style="padding: 100px 0;">
+    {% include "headerMain.html" %}
+    <div class="container" style="padding: 30px 0;">
         <div class="mb-4">
             <button class="btn-back" onclick="window.location.href='{% url 'subjects' %}'" style="outline: none;">
-                <svg height="16" width="16" fill="{{ subject.bg_color }}" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 1024 1024">
+                <svg height="16" width="16" fill="var(--accent-color)" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 1024 1024">
                     <path d="M874.690416 495.52477c0 11.2973-9.168824 20.466124-20.466124 20.466124l-604.773963 0 188.083679 188.083679c7.992021 7.992021 7.992021 20.947078 0 28.939099-4.001127 3.990894-9.240455 5.996574-14.46955 5.996574-5.239328 0-10.478655-1.995447-14.479783-5.996574l-223.00912-223.00912c-3.837398-3.837398-5.996574-9.046027-5.996574-14.46955 0-5.433756 2.159176-10.632151 5.996574-14.46955l223.019353-223.029586c7.992021-7.992021 20.957311-7.992021 28.949332 0 7.992021 8.002254 7.992021 20.957311 0 28.949332l-188.073446 188.073446 604.753497 0C865.521592 475.058646 874.690416 484.217237 874.690416 495.52477z"></path>
                 </svg>
                 <span>Back</span>
             </button>
         </div>        
-        <header class="text-center mb-5" style="background-color: {{ subject.bg_color }};">
-            <h1 class="display-4" style="font-weight: 600;">{{ subject.name }} - Grade {{ subject.grade }}</h1>
-            <p class="lead">{{ subject.description }}</p>
+        <header class="classroom-header text-center mb-1" style="background-color: var(--accent-color);">
+            <h1 class="display-4" style="font-weight: 600; color: #fff;">{{ subject.name }} - Grade {{ subject.grade }}</h1>
+            <p class="lead" style="color: #fff;">{{ subject.description }}</p>
         </header>
 
         <section>
-            <h2 class="mb-4" style="font-weight: 600; color:{{ subject.bg_color }};">Our Classroom</h2>
-            <p class="text-muted mb-5">Explore a variety of classrooms designed to enhance your knowledge and skills in this subject.</p>
-
             <!-- Bootstrap Nav Tabs -->
-            <ul class="nav nav-tabs justify-content-center mb-4" id="classroomTab" role="tablist" style="border-bottom: 2px solid {{ subject.bg_color }};">
+            <ul class="nav nav-tabs justify-content-center mb-4" id="classroomTab" role="tablist" style="border-bottom: 2px solid var(--accent-color);">
                 <li class="nav-item" role="presentation">
                     <button style="outline: none;" class="classroom-nav-link {% if status == None or status == '0' %}active{% endif %}" id="public-tab" data-bs-toggle="tab" data-bs-target="#public-tab-pane" type="button" role="tab" aria-controls="public-tab-pane" aria-selected="true">Public</button>
                 </li>
@@ -152,15 +146,15 @@
                                             <p class="card-text truncate mt-2" style="width: 900px;">&nbsp;📝{{ classroom.description }}</p>
                                             <div class="classroom-meta text-muted d-flex align-items-center">
                                                 <div>
-                                                    <span class="me-3 mr-3">&nbsp;<i class="fas fa-user" style="color: {{ subject.bg_color }}"></i> Username</span>
-                                                    <span class="me-3 mr-3"><i class="fas fa-school" style="color: {{ subject.bg_color }}"></i> Name of school</span>
-                                                    <span class="me-3 mr-3"><i class="fas fa-book" style="color: {{ subject.bg_color }}"></i> {{ subject.name }}</span>
-                                                    <span><i class="fas fa-calendar-alt" style="color: {{ subject.bg_color }}"></i> Academic year</span>
+                                                    <span class="me-3 mr-3">&nbsp;<i class="fas fa-user" style="color: var(--accent-color)"></i> {{ classroom.teacher.username }}</span>
+                                                    <span class="me-3 mr-3"><i class="fas fa-school" style="color: var(--accent-color)"></i> {{ classroom.school }}</span>
+                                                    <span class="me-3 mr-3"><i class="fas fa-book" style="color: var(--accent-color)"></i> {{ classroom.subject.name }}</span>
+                                                    <span><i class="fas fa-calendar-alt" style="color: var(--accent-color)"></i> {{ classroom.academic_year.open_year }} - {{ classroom.academic_year.close_year }}</span>
                                                 </div>
                                             </div>
                                             <div class="text-end text-muted d-flex justify-content-end align-items-center">
-                                                <span class="mr-3" style="border: 2px solid {{ subject.bg_color }}; padding: 7px;"><i class="fa-solid fa-user" style="color: {{ subject.bg_color }}"></i>&nbsp; 3 Participants</span>
-                                                <span class="mr-3" style="border: 2px solid {{ subject.bg_color }}; padding: 7px;"><i class="fas fa-thumbs-up" style="color: {{ subject.bg_color }}"></i>&nbsp; 5 Likes</span>
+                                                <span class="mr-3" style="border: 2px solid var(--accent-color); padding: 7px;"><i class="fa-solid fa-user" style="color: var(--accent-color)"></i>&nbsp; {{ classroom.participants.count }} Participants</span>
+                                                <span class="mr-3" style="border: 2px solid var(--accent-color); padding: 7px;"><i class="fas fa-thumbs-up" style="color: var(--accent-color)"></i>&nbsp; {{ classroom.likes }} Likes</span>
                                             </div>
                                         </div>
                                     </div>
@@ -179,21 +173,26 @@
                                     <div class="card-body">
                                         <div class="classroom-info">
                                             <div class="card-title d-flex jutify-content-center align-items-center">
-                                                <h4>🔒 &nbsp;</h4>
-                                                <a href="" data-bs-toggle="modal" data-bs-target="#passwordModal" data-classroom-id="{{ classroom.id }}">{{ classroom.name }}</a>
+                                                {% if classroom.id in participant_classrooms %}
+                                                    <h4>🔓 &nbsp;</h4>
+                                                    <a href="{% url 'classroom_detail' classroom.id %}">{{ classroom.name }}</a>
+                                                {% else %}
+                                                    <h4>🔒 &nbsp;</h4>
+                                                    <a href="" data-bs-toggle="modal" data-bs-target="#passwordModal" data-classroom-id="{{ classroom.id }}">{{ classroom.name }}</a>
+                                                {% endif %}
                                             </div>
                                             <p class="card-text truncate mt-2" style="width: 900px;">&nbsp;📝{{ classroom.description }}</p>
                                             <div class="classroom-meta text-muted d-flex align-items-center">
                                                 <div>
-                                                    <span class="me-3 mr-3">&nbsp;<i class="fas fa-user" style="color: {{ subject.bg_color }}"></i> Username</span>
-                                                    <span class="me-3 mr-3"><i class="fas fa-school" style="color: {{ subject.bg_color }}"></i> Name of school</span>
-                                                    <span class="me-3 mr-3"><i class="fas fa-book" style="color: {{ subject.bg_color }}"></i> {{ subject.name }}</span>
-                                                    <span><i class="fas fa-calendar-alt" style="color: {{ subject.bg_color }}"></i> Academic year</span>
+                                                    <span class="me-3 mr-3">&nbsp;<i class="fas fa-user" style="color: var(--accent-color)"></i> {{ classroom.teacher.username }}</span>
+                                                    <span class="me-3 mr-3"><i class="fas fa-school" style="color: var(--accent-color)"></i> {{ classroom.school }}</span>
+                                                    <span class="me-3 mr-3"><i class="fas fa-book" style="color: var(--accent-color)"></i> {{ classroom.subject.name }}</span>
+                                                    <span><i class="fas fa-calendar-alt" style="color: var(--accent-color)"></i> {{ classroom.academic_year.open_year }} - {{ classroom.academic_year.close_year }}</span>
                                                 </div>
                                             </div>
                                             <div class="text-end text-muted d-flex justify-content-end align-items-center">
-                                                <span class="mr-3" style="border: 2px solid {{ subject.bg_color }}; padding: 7px;"><i class="fa-solid fa-user" style="color: {{ subject.bg_color }}"></i>&nbsp; 3 Participants</span>
-                                                <span class="mr-3" style="border: 2px solid {{ subject.bg_color }}; padding: 7px;"><i class="fas fa-thumbs-up" style="color: {{ subject.bg_color }}"></i>&nbsp; 5 Likes</span>
+                                                <span class="mr-3" style="border: 2px solid var(--accent-color); padding: 7px;"><i class="fa-solid fa-user" style="color: var(--accent-color)"></i>&nbsp; {{ classroom.participants.count }} Participants</span>
+                                                <span class="mr-3" style="border: 2px solid var(--accent-color); padding: 7px;"><i class="fas fa-thumbs-up" style="color: var(--accent-color)"></i>&nbsp; {{ classroom.likes }} Likes</span>
                                             </div>
                                         </div>
                                     </div>
@@ -202,7 +201,6 @@
                         {% endfor %}
                     </ul>
                 </div>
-            </div>
         </section>
     </div>
 
@@ -210,10 +208,10 @@
     <div class="modal fade" id="passwordModal" tabindex="-1" aria-labelledby="passwordModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content d-flex justify-content-center align-items-center bg-transparent border-0">
+                <div class="card p-4" style="max-width: 400px; width: 100%; border: 5px solid #fff; position: relative;">
                 <button type="button" class="btn-close position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close"></button>
-                <div class="card p-4" style="max-width: 400px; width: 100%; border: 5px solid {{ subject.bg_color }}">
                     <div class="card-body">
-                    <h5 class="card-title text-center mb-4 font-weight-bold" style="color: {{ subject.bg_color }}">Classroom Password</h5>
+                    <h5 class="card-title text-center mb-4 font-weight-bold" style="color: var(--accent-color)">Classroom Password</h5>
                     <form method="POST" action="{% url 'enter_password' classroom_id=0 %}" id="passwordForm">
                         {% csrf_token %}
                         <input type="hidden" id="classroomId" name="classroom_id">
@@ -221,7 +219,8 @@
                             <label for="password" class="form-label">Password</label>
                             <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" required>
                         </div>
-                        <button type="submit" class="submit-modal btn btn-dark w-100 border-0" style="background-color: {{ subject.bg_color }}; overflow: hidden; transition: all 0.3s ease;">
+                        <div id="passwordError" class="text-danger mb-3 text-center" style="display: none; border: 1px solid #dc3545; padding: 2px 4px;">Incorrect password</div>
+                        <button type="submit" class="submit-modal btn btn-dark w-100 border-0" style="background-color: var(--accent-color); overflow: hidden; transition: all 0.3s ease;">
                             <span class="btn-text">Join now ➜</span>
                         </button>
                     </form>                    
@@ -234,15 +233,60 @@
 </html>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+    document.getElementById('passwordForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        var form = event.target;
+
+        var formData = new FormData(form);
+        var classroomId = document.getElementById('classroomId').value;
+
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+
+            headers: {
+                'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+            }
+
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                window.location.href = data.redirect_url;
+
+            } else {
+                document.getElementById('passwordError').innerText = data.message;
+                document.getElementById('passwordError').style.display = 'block';
+                
+                var passwordInput = document.getElementById('password');
+                passwordInput.value = '';
+                passwordInput.style.border = '1px solid #dc3545';
+
+                passwordInput.addEventListener('input', function() {
+                    passwordInput.style.border = '';
+                    document.getElementById('passwordError').style.display = 'none';
+                });
+            }
+
+        })
+        .catch(error => console.error('Error:', error));
+    });
+
     var passwordModal = document.getElementById('passwordModal');
+
     passwordModal.addEventListener('show.bs.modal', function (event) {
         var button = event.relatedTarget; 
         var classroomId = button.getAttribute('data-classroom-id'); 
 
         var form = document.getElementById('passwordForm');
+
         form.action = form.action.replace('/0/', '/' + classroomId + '/'); 
 
         var classroomIdInput = document.getElementById('classroomId');
         classroomIdInput.value = classroomId; 
+
+        document.getElementById('passwordError').style.display = 'none';
+
     });
 </script>

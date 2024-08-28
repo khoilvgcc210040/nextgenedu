@@ -26,6 +26,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         message = text_data_json['message']
         image_url = text_data_json['image_url']
         file_url = text_data_json['file_url']
+        file_size = text_data_json['file_size']
         username = self.scope['user'].username
 
         # Send message to room group
@@ -37,6 +38,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 'username': username,
                 'image_url': image_url,
                 'file_url': file_url,
+                'file_size': file_size
             }
         )
 
@@ -45,11 +47,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
         username = event['username']
         image_url = event['image_url']
         file_url = event['file_url']
-
+        file_size = event['file_size']
         # Send message to WebSocket
         await self.send(text_data=json.dumps({
             'message': message,
             'username': username,
             'image_url': image_url,
             'file_url': file_url,
+            'file_size': file_size
         }))

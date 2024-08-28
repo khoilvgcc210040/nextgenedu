@@ -1,0 +1,434 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <!-- Favicons -->
+    <link href="{% static 'assets/img/favicon.png' %}" rel="icon">
+    <link href="{% static 'assets/img/apple-touch-icon.png' %}" rel="apple-touch-icon">
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect">
+    <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800&family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+
+    <!-- Vendor CSS Files -->
+    <link href="{% static 'assets/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'assets/vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+    <link href="{% static 'assets/vendor/aos/aos.css' %}" rel="stylesheet">
+    <link href="{% static 'assets/vendor/glightbox/css/glightbox.min.css' %}" rel="stylesheet">
+    <link href="{% static 'assets/vendor/swiper/swiper-bundle.min.css' %}" rel="stylesheet">
+
+    <!-- Main CSS File -->
+    <link href="{% static 'assets/css/main.css' %}" rel="stylesheet">
+</head>
+<style>
+    .navmenu ul li a {
+        font-weight: 500;
+    }
+
+    .InputContainer {
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: rgb(255, 255, 255);
+        border-radius: 10px;
+        overflow: hidden;
+        cursor: pointer;
+        padding-left: 15px;
+        box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.075);
+    }
+
+    .InputContainer button {
+        transition-duration: 0.3s;
+        transition: transform 0.3s;
+    }
+
+    .InputContainer button:hover {
+        transform: translateY(-3px);
+    }
+
+    .input {
+        width: 350px;
+        height: 100%;
+        border: none;
+        outline: none;
+        font-size: 0.9em;
+        caret-color: rgb(255, 81, 0);
+    }
+
+    .labelforsearch {
+        cursor: text;
+        padding: 0px 12px;
+    }
+
+    .searchIcon {
+        width: 13px;
+    }
+
+    .border {
+        height: 40%;
+        width: 1.3px;
+        background-color: rgb(223, 223, 223);
+    }
+
+    .micIcon {
+        width: 12px;
+    }
+
+    .micButton {
+        padding: 0px 15px 0px 12px;
+        border: none;
+        background-color: transparent;
+        height: 40px;
+        cursor: pointer;
+        transition-duration: 0.3s;
+    }
+
+    .searchIcon path {
+        fill: rgb(114, 114, 114);
+    }
+
+    .micIcon path {
+        fill: rgb(255, 81, 0);
+    }
+
+    .micButton:hover {
+        background-color: rgb(255, 230, 230);
+        transition-duration: 0.3s;
+    }
+
+    /* CSS for modal */
+    .add-icon img{
+        margin-right: 10px;
+        width: 60px;
+        height: 60px;
+    }
+
+    .card-body input[type="text"],
+    .card-body input[type="password"] {
+        padding: 5px;
+        width: 100%;
+        border-radius: 5px;
+    }
+
+    .card-body textarea {
+        padding: 5px;
+        width: 100%;
+        border-radius: 5px;
+        border: 2px solid #000;
+        resize: none;
+        height: 70px !important;
+    }
+
+    .btn-status button{
+        padding: 10px 70px;
+        border: 2px solid #000;
+        border-radius: 5px;
+    }
+
+    .submit-modal {
+        padding: 12px 0;
+    }
+
+    .status-btn {
+        background-color: #ffffff;
+        border: none;
+        padding: 10px 20px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .status-btn.active {
+        background-color: #343a40;
+        color: white;
+    }
+    
+    #passwordInputContainer .modal-input {
+        padding-right: 40px;
+    }
+    
+    #togglePassword {
+        font-size: 1.2em;
+        top: 35% !important;
+    }
+
+    .modal select{
+        padding: 5px 10px;
+        border: 2px solid #000;
+        border-radius: 5px;
+    }
+
+    .error-signup{
+        border: 2px solid #dc2626;
+        margin-bottom: 35px;
+        border-radius: 10px;
+        padding: 20px 10px;
+        font-weight: 600;
+    }
+
+    .error-signup ul:last-of-type {
+        margin-bottom: 0;
+    }
+
+    .message-list-login li {
+        display: list-item; 
+        color: #dc2626; 
+        line-height: 25px;
+    }
+
+    .submit-modal:hover {
+        opacity: 0.8;
+    }
+</style>
+<body>
+    <div class="modal fade" id="createClassroomModal" tabindex="-1" aria-labelledby="createClassroomModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content d-flex justify-content-center align-items-center bg-transparent border-0">
+                <button type="button" class="btn-close position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="card p-4" style="width: 100%; border: 5px solid #fff;">
+                    <div class="card-body">
+                        <div class="add-icon d-flex justify-content-center">
+                            <img src="{% static 'add.png' %}" alt="Add Icon">
+                        </div>
+                        <h5 class="card-title text-center mb-4 mt-4 font-weight-bold" style="font-size: 27px;">Create your free classroom</h5>
+                        <h6 class="card-title text-center mb-4 mt-4 ">Give your students uninterrupted access to Learn and Test modes for all content in your class. It’s free!</h6>
+                        <form method="POST" action="{% url 'create_classroom' %}" id="createClassroomForm">
+                            {% csrf_token %}
+                            <input type="hidden" name="next_template" value="{{ request.resolver_match.view_name }}">
+                            <input type="text" class="modal-input mb-3" name="name" placeholder="Enter a classroom name..." value="{{ name|default_if_none:'' }}" required>
+                            <input type="text" class="modal-input mb-3" name="school" placeholder="Enter the name of the school..." value="{{ school|default_if_none:'' }}" required>
+                            <textarea type="text" class="modal-input mb-3" name="description" placeholder="Enter a class description (you should describe about 50-60 words)...">{{ description|default_if_none:'' }}</textarea>
+                            <select class="modal-input mb-3" name="academic_year" required>
+                                {% for year in academic_years %}
+                                <option value="{{ year.id }}" {% if year.id == academic_year_id %}selected{% endif %}>{{ year.open_year }} - {{ year.close_year }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="btn-status d-flex justify-content-between align-items-center mb-3">
+                                <input type="hidden" id="statusInput" name="status" value="{{ status|default_if_none:'public' }}">
+                                <button type="button" id="publicBtn" class="status-btn">Public</button>
+                                <button type="button" id="privateBtn" class="status-btn">Private</button>
+                            </div>
+                            <div id="passwordInputContainer"></div>
+                            {% if errors %}
+                                <div class="error-signup">
+                                    <ul class="message-list-login">
+                                        {% for error in errors %}
+                                            <li style="color: #dc2626; margin-bottom:10px; line-height: 25px; display: list-item;">
+                                                {{ error }}
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            {% endif %}
+                            <button type="submit" class="submit-modal btn btn-dark w-100 border-0" style="background-color: var(--accent-color); transition: opacity 0.3s;">
+                                <span class="btn-text">Submit</span>
+                            </button>
+                        </form>                     
+                    </div>
+                </div>                
+            </div>
+        </div>
+    </div>
+    <header id="header" class="header sticky-top" style="background-color: #fff; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+        <div class="topbar d-flex align-items-center">
+          <div class="container d-flex justify-content-center justify-content-md-between">
+            <div class="contact-info d-flex align-items-center">
+              <i class="bi bi-envelope d-flex align-items-center"><a href="mailto:contact@example.com">nextgenedu03.info@gmail.com</a></i>
+              <i class="bi bi-phone d-flex align-items-center ms-4"><span>+84 814 74 2238</span></i>
+            </div>
+            <div class="social-links d-none d-md-flex align-items-center">
+              <a href="#" class="twitter"><i class="bi bi-twitter-x"></i></a>
+              <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
+              <a href="#" class="instagram"><i class="bi bi-instagram"></i></a>
+              <a href="#" class="linkedin"><i class="bi bi-linkedin"></i></a>
+            </div>
+          </div>
+        </div><!-- End Top Bar -->
+      
+        <div class="branding d-flex align-items-cente">
+          <div class="container position-relative d-flex align-items-center justify-content-between">
+            <a href="{% url "home" %}" class="logo d-flex align-items-center">
+              <h1 class="sitename" style="color: var(--accent-color);">NextGenEdu™️</h1>
+            </a>
+
+            <form method="GET" action="{% url 'searchPage' %}" class="InputContainer">
+                <input
+                    placeholder="Search"
+                    id="input"
+                    class="input"
+                    name="q"
+                    type="text"
+                />
+
+                <button type="submit" class="labelforsearch" style="border: none; background-color: transparent;">
+                    <svg class="searchIcon" viewBox="0 0 512 512">
+                    <path
+                        d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"
+                    ></path>
+                    </svg>
+                </button>
+            </form>
+
+      
+            <nav id="navmenu" class="navmenu">
+              <ul>
+                <li><a href="{% url "home" %}">Home</a></li>
+                {% if user.is_authenticated %}
+                <li><a href="{% url "subjects" %}">Subjects</a></li>
+                {% if user.role == 'teacher' %}
+                <li><a href="{% url "manage_classroom_list" %}">Manage</a></li>
+                {% elif user.role == 'student' %}
+                <li><a href="{% url "myclassroom" %}">My Classroom</a></li>
+                {% endif %}
+                <li class="dropdown">
+                    <a href="#">
+                        <span style="display: flex; align-items: center; gap: 5px;"><i class="fa-solid fa-plus"></i> Create</span> 
+                        <i class="bi bi-chevron-down toggle-dropdown"></i>
+                    </a>
+                    <ul>
+                      <li><a href="#" data-bs-toggle="modal" data-bs-target="#createClassroomModal"><i class="fa-solid fa-plus"></i>&nbsp; Create a classroom</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown" style="padding: 0 40px 0 10px;"><a href="#"><img style="width: 30px; height: 30px; border-radius: 50%;" src="{% static 'account.png' %}" alt="user"><i class="bi bi-chevron-down toggle-dropdown d-xl-none"></i></a>
+                    <ul style="padding: 0;">
+                      <li style="padding: 0;">
+                        <div style="display: flex; align-items: center; gap: 10px; padding: 10px; border-bottom: 1px solid #e0e0e0;">
+                            <img style="width: 30px; height: 30px; border-radius: 50%;" src="{% static 'account.png' %}" alt="user">
+                            <div>
+                                <p style="font-weight: 700; font-size: 14px; margin: 0;">{{user.username}}</p>
+                                <p style="font-size: 12px; margin: 0;">{{user.email}}</p>
+                            </div>
+                        </div>
+                      </li>
+                      <hr style="margin: 0;">
+                      <li><a href="{% url "achivement" %}" style="display: flex; align-items: center; justify-content: left; gap: 10px;"><i class="fa-solid fa-trophy"></i> Achievement</a></li>
+                      <li><a href="{% url "favorite" %}" style="display: flex; align-items: center; justify-content: left; gap: 10px;"><i class="fa-solid fa-star"></i> Favorite</a></li>
+                      <li><a href="{% url "setting" %}" style="display: flex; align-items: center; justify-content: left; gap: 10px;"><i class="fa-solid fa-gear"></i> Setting</a></li>
+                      <li><a href="{% url "logout" %}" style="display: flex; align-items: center; justify-content: left; gap: 10px;"><i class="fa-solid fa-arrow-left"></i> Logout</a></li>
+                    </ul>
+                </li>
+                {% else %}
+                    <li class="dropdown"><a href="#"><span>Subject</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+                        <ul>
+                            {% for grade, subjects in grouped_subjects.items %}
+                            <li class="dropdown"><a href="#"><span>Grade {{ grade }}</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+                                <ul>
+                                    {% for subject in subjects %}
+                                        <li><a href="{% url "classrooms" subject.id subject.grade %}">{{ subject.name }}</a></li>
+                                    {% endfor %}
+                                </ul>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                    <li><a href="{% url "auth" %}?form=login" style="font-weight: 700; background-color: #a3a3a3; color: #fff; padding: 10px 15px; border-radius: 5px; transition: opacity 0.3s;" onmouseover="this.style.opacity=0.7;" onmouseout="this.style.opacity=1;">Log in</a></li>
+                    <li style="padding: 0 10px;"><a href="{% url "auth" %}?form=signup" style="font-weight: 700; background-color: #000; color: #fff; padding: 10px 15px; border-radius: 5px; transition: opacity 0.3s;" onmouseover="this.style.opacity=0.7;" onmouseout="this.style.opacity=1;">Sign up</a></li>
+                {% endif %}
+              </ul>
+              <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+            </nav>
+            <script>
+                document.querySelector('.mobile-nav-toggle').addEventListener('click', function() {
+                    document.getElementById('navmenu').classList.toggle('navmenu-active');
+                });
+            </script>
+          </div>
+        </div>
+      </header>
+</body>
+</html>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const messageListItems = document.querySelectorAll('.message-list-signup li');
+    
+        if (messageListItems.length === 1) {
+            messageListItems[0].style.marginBottom = '0';
+        } else if (messageListItems.length > 1) {
+            messageListItems[messageListItems.length - 1].style.marginBottom = '0';
+        }
+
+        const messageListItems1 = document.querySelectorAll('.message-list-login li');
+    
+        if (messageListItems1.length === 1) {
+            messageListItems1[0].style.marginBottom = '0';
+        } else if (messageListItems1.length > 1) {
+            messageListItems1[messageListItems1.length - 1].style.marginBottom = '0';
+        }
+
+        {% if errors %}
+            var createClassroomModal = new bootstrap.Modal(document.getElementById('createClassroomModal'));
+            createClassroomModal.show();
+        {% endif %}
+    });
+    
+    document.getElementById('publicBtn').addEventListener('click', function() {
+        document.getElementById('statusInput').value = 'public';
+        document.getElementById('passwordInputContainer').style.display = 'none';
+    });
+
+    document.getElementById('privateBtn').addEventListener('click', function() {
+        document.getElementById('statusInput').value = 'private';
+        document.getElementById('passwordInputContainer').style.display = 'block';
+    });
+
+    document.getElementById('privateBtn').addEventListener('click', function() {
+        toggleActiveStatus(this);
+        const passwordContainer = document.getElementById('passwordInputContainer');
+        if (!document.getElementById('passwordInput')) {
+            const passwordWrapper = document.createElement('div');
+            passwordWrapper.style.position = 'relative';
+            passwordWrapper.id = 'passwordWrapper';
+    
+            const passwordInput = document.createElement('input');
+            passwordInput.type = 'password';
+            passwordInput.id = 'passwordInput';
+            passwordInput.name = 'classroom_password';
+            passwordInput.className = 'modal-input mb-3'; // Sử dụng cùng lớp CSS
+            passwordInput.placeholder = 'Enter a classroom password...';
+            
+            const eyeIcon = document.createElement('span');
+            eyeIcon.id = 'togglePassword';
+            eyeIcon.innerHTML = '👁️'; // Sử dụng biểu tượng con mắt
+            eyeIcon.style.position = 'absolute';
+            eyeIcon.style.right = '10px';
+            eyeIcon.style.top = '50%';
+            eyeIcon.style.transform = 'translateY(-50%)';
+            eyeIcon.style.cursor = 'pointer';
+    
+            passwordWrapper.appendChild(passwordInput);
+            passwordWrapper.appendChild(eyeIcon);
+            passwordContainer.appendChild(passwordWrapper);
+    
+            eyeIcon.addEventListener('click', function() {
+                const passwordField = document.getElementById('passwordInput');
+                if (passwordField.type === 'password') {
+                    passwordField.type = 'text';
+                    eyeIcon.innerHTML = '👁️'; 
+                } else {
+                    passwordField.type = 'password';
+                    eyeIcon.innerHTML = '🙈';
+                }
+            });
+        }
+    });
+    
+    document.getElementById('publicBtn').addEventListener('click', function() {
+        toggleActiveStatus(this);
+        const passwordWrapper = document.getElementById('passwordWrapper');
+        if (passwordWrapper) {
+            passwordWrapper.remove();
+        }
+    });
+    
+    function toggleActiveStatus(activeButton) {
+        const buttons = document.querySelectorAll('.status-btn');
+        buttons.forEach(button => {
+            button.classList.remove('active');
+        });
+        activeButton.classList.add('active');
+    }    
+</script>
