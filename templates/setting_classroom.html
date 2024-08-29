@@ -199,6 +199,14 @@
         .btn-back:hover {
             transform: translateX(-5%);
         }
+
+        .btn-unblock {
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .btn-unblock:hover {
+            transform: translateY(-5%);
+        }   
     </style>
 </head>
 <body>
@@ -211,6 +219,9 @@
             </li>
             <li class="nav-item">
                 <a class="nav-link toggle-link" data-content="title-content" href="#">Chat</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link toggle-link" data-content="blocked-content" href="#">Blocked Participants</a>
             </li>
             <li class="nav-item">
                 <a class="btn-back nav-link-back toggle-link" href="{% url "classroom_detail" classroom.id %}"><i class="fa-solid fa-backward"></i>&nbsp;Back</a>
@@ -289,6 +300,64 @@
                 </div>
             </div>
         </div>
+
+        <div id="blocked-content" class="content-section pb-lg-5">
+            <div class="text-center">
+                <h1 style="font-weight: 700;" class="text-truncate ">BLOCKED PARTICIPANTS</h1>
+            </div>
+            <hr style="border: 1px solid #000;">
+            <div class="description">
+                <table class="table text-center">
+                    <thead>
+                        <tr>
+                            <th scope="col" style="width: 33%;">Username</th>
+                            <th scope="col" style="width: 33%;">Reason</th>
+                            <th scope="col" style="width: 33%;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for participant in blocked_participants %}
+                        <tr>
+                            <td style="font-weight: 500;">{{ participant.user.username }}</td>
+                            <td style="font-weight: 500; text-align: center;">
+                                {% if participant.reason|length > 20 %}
+                                    {{ participant.reason|slice:":20" }}...
+                                {% else %}
+                                    {{ participant.reason }}
+                                {% endif %}
+                            </td>
+                            <td>
+                                <button class="btn-unblock" style="font-weight: 500; color: #fff; background-color: var(--accent-color); border: 2px solid var(--accent-color); border-radius: 10px;" data-bs-toggle="modal" data-bs-target="#unblockModal" data-username="{{ participant.user.username }}" data-id="{{ participant.id }}">Unblock</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for unblocking participant -->
+    <div class="modal fade" id="unblockModal" tabindex="-1" aria-labelledby="unblockModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content" style="border: 5px solid var(--accent-color); border-radius: 15px;">
+                <div class="modal-header d-flex justify-content-between align-items-center" style="background-color: var(--accent-color);">
+                    <h5 class="modal-title" id="unblockModalLabel" style="color: #fff;">Unblock Participant</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" style="background-color: #fff; border: none;" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" style="border-bottom: 2px solid var(--accent-color);">
+                    <p>Are you sure you want to unblock this participant?</p>
+                </div>
+                <div class="modal-footer d-flex justify-content-end">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <form id="unblockForm" method="POST" action="{% url 'unblock_participant' classroom.id %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="participant_id" id="unblockParticipantId">
+                        <button type="submit" class="btn btn-danger">Unblock</button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Modal for editing classroom information -->
@@ -350,10 +419,28 @@
         </div>
     </div>
 
+    <div id="preloader">
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+    </div>
+
+    <!-- Main JS File -->
+    <script src="{% static 'assets/js/main.js' %}"></script>
+
     <!-- FontAwesome Icons -->
     <script src="https://kit.fontawesome.com/a076d05399.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            const unblockButtons = document.querySelectorAll('.btn-unblock');
+            unblockButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    const participantId = this.getAttribute('data-id');
+                    document.getElementById('unblockParticipantId').value = participantId;
+                });
+            });
+
             const navLinks = document.querySelectorAll('.nav-link');
             navLinks.forEach(link => {
                 link.addEventListener('click', function(event) {

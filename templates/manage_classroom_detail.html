@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Classroom Page</title>
-    <link rel="stylesheet" href="styles.css">
 </head>
 <style>
     .classroom-header {
@@ -89,7 +88,8 @@
     }
 
     .date-joined, .section-description {
-        color: #f97316;
+        color: #fff;
+        opacity: 0.6;
         font-size: 12px;
     }
 
@@ -104,25 +104,31 @@
     }
 
     .invitation-link {
-        margin-bottom: 20px;
+        margin-bottom: 30px;
     }
 
     .invitation-link input {
         flex: 1;
-        padding: 5px;
+        padding: 8px;
         border: 2px solid #000;
         border-radius: 5px;
         margin-right: 10px;
-        font-size: 12px;
+        font-size: 14px;
+        font-weight: 600;
+        background-color: var(--accent-color);
+        color: #fff;
     }
 
     .copy-btn {
-        padding: 5px 10px;
-        border: 2px solid #000;
+        padding: 8px 13px;
+        border: 2px solid #f97316;
         border-radius: 5px;
         cursor: pointer;
-        background-color: #ddd;
+        background-color: #fff;
         font-size: 12px;
+        font-weight: 600;
+        color: #f97316;
+        font-size: 14px;
     }
 
     .classroom-details .detail-item {
@@ -368,23 +374,70 @@
 
       .modal .dropdown {
         position: relative;
-        padding: 5px;
+        padding: 7px;
         width: 100%;
         border-radius: 5px;
         border: 2px solid #000;
       }
 
-      .card-body input[type="text"] {
+      .card-body-create-section-submission select {
+        color: #000;
+        border: 1px solid var(--accent-color);
+        border-radius: 3px;
+        padding: 5px 10px;
+        outline: none;
+        cursor: pointer;
+      }
+
+      .card-body-create-section-submission label {
+        font-weight: 700;
+        margin-bottom: 10px;
+      }
+
+      .card-body-create-section-submission input[type="text"] {
         padding: 5px;
         width: 100%;
         border-radius: 5px;
+        cursor: pointer;
+        background-color: #fff;
+        color: #000;
+        border: 2px solid var(--accent-color);
       }
 
-      .card-body input[type="datetime-local"] {
+      .card-body-create-section-submission input[type="text"]::placeholder {
+        color: #000;
+        opacity: 1;
+      }
+
+      .card-body-create-section-submission textarea {
+        padding: 5px;
+        width: 100%;
+        border-radius: 5px;
+        cursor: pointer;
+        background-color: #fff;
+        color: #000;
+        border: 2px solid var(--accent-color);
+      }
+
+      .card-body-create-section-submission textarea::placeholder {
+        color: #000;
+        opacity: 1;
+      }
+
+      .card-body-create-section-submission input[type="datetime-local"] {
         padding: 5px 10px;
         width: 100%;
-        border: 2px solid #000;
         border-radius: 5px;
+        background-color: #fff;
+        color: #000;
+        border: 2px solid var(--accent-color);
+      }
+
+      .card-body-create-section-submission .submit-modal {
+        background-color: var(--accent-color);
+        color: #fff;
+        border: 2px solid var(--accent-color);
+        font-weight: 700;
       }
 
       .back-icon {
@@ -491,15 +544,73 @@
         </div>
     </div>
 
+    <!-- Modal for delete submission confirmation -->
+    <div class="modal fade" id="deleteSubmissionModal" tabindex="-1" aria-labelledby="deleteSubmissionModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteSubmissionModalLabel">Confirm Deletion</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>  
+                <div class="modal-body">
+                    Are you sure you want to delete this submission?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteSubmissionBtn">Delete</button>
+                </div>
+            </div>  
+        </div>
+    </div>
+
+    <!-- Modal for delete member confirmation -->
+    <div class="modal fade" id="deleteMemberModal" tabindex="-1" aria-labelledby="deleteMemberModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteMemberModalLabel">Confirm Deletion</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete this member?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteMemberBtn">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for block member confirmation -->
+    <div class="modal fade" id="blockMemberModal" tabindex="-1" aria-labelledby="blockMemberModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="blockMemberModalLabel">Confirm Block</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="blockReason" class="form-label">Reason for blocking:</label>
+                        <input type="text" class="form-control" id="blockReason" placeholder="Enter reason...">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmBlockMemberBtn">Block</button>
+                </div>
+            </div>
+        </div>
+    </div>
     
 
     <div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="createModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content d-flex justify-content-center align-items-center bg-transparent border-0">
-                <button type="button" class="btn-close position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close"></button>
-                <div class="card p-4" style="max-width: 400px; width: 100%; border: 5px solid {{ subject.bg_color }}">
-                    <div class="card-body">
-                        <h5 id="modalTitle" class="card-title text-center mb-4 font-weight-bold"></h5>
+                <div class="card p-4" style="max-width: 500px; width: 100%; border: 5px solid var(--accent-color)">
+                    <div class="card-body-create-section-submission">
+                        <h5 id="modalTitle" class="card-title text-center mb-4 font-weight-bold" style="color: #fff; background-color: #f97316; padding: 10px; margin: 20px 0; border-radius: 5px 0 5px 0;"></h5>
                         <form method="POST" action="{% url 'create_section_submission' %}" id="createForm">
                             {% csrf_token %}
                             <input type="hidden" id="actionType" name="action_type">
@@ -524,10 +635,16 @@
                                 </select>
                             </div>                            
                             <div id="submissionFields" style="display: none;">
-                                <label for="open_date">Open date:</label>
-                                <input type="datetime-local" class="modal-input mb-3" name="open_date" placeholder="Open date">
-                                <label for="close_date">Close date:</label>
-                                <input type="datetime-local" class="modal-input mb-3" name="close_date" placeholder="Close date">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label for="open_date">Open date:</label>
+                                        <input type="datetime-local" class="modal-input mb-3" name="open_date" placeholder="Open date">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="close_date">Close date:</label>
+                                        <input type="datetime-local" class="modal-input mb-3" name="close_date" placeholder="Close date">
+                                    </div>
+                                </div>
                                 <label for="open_date">Submissions type:</label>
                                 <select class="dropdown mb-3" name="submission_type">
                                     <option value="">Choose a submission type</option>
@@ -539,7 +656,7 @@
                             <input type="text" name="title" class="modal-input mb-3" placeholder="Name of the section...">
                             <label for="open_date">Section description:</label>
                             <textarea name="description" class="mb-4" id="" placeholder="Description of the section (you should describe about 50-60 words)..."></textarea>
-                            <button type="submit" class="submit-modal btn btn-dark w-100 border-0" style="background-color: {{ subject.bg_color }}; overflow: hidden; transition: all 0.3s ease;">
+                            <button type="submit" class="submit-modal btn btn-dark w-100 border-0" style="background-color: var(--accent-color); overflow: hidden; transition: all 0.3s ease;">
                                 <span class="btn-text">Create a section</span>
                             </button>
                         </form>                    
@@ -577,22 +694,20 @@
                         <nav class="cd-popup-window mt-1">
                         <ul>
                             <li>
-                            <button id="createSectionBtn" onclick="updateModalTitle('Create a section')" data-bs-toggle="modal" data-bs-target="#createModal">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle" viewBox="0 0 16 16">
-                                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
-                                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
-                                </svg>
-                                <span style="font-weight: 500;">Create a section</span>
-                            </button>
-                            </li>
-                            <li>
-                            <button id="createSubmissionBtn" onclick="updateModalTitle('Create a submission')" data-bs-toggle="modal" data-bs-target="#createModal">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle" viewBox="0 0 16 16">
-                                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
-                                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
-                                </svg>
-                                <span style="font-weight: 500;">Create a submission</span>
-                            </button>
+                                <button id="createSectionBtn" data-action="section" onclick="updateModalTitle('Create a section')" data-bs-toggle="modal" data-bs-target="#createModal">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle" viewBox="0 0 16 16">
+                                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                                        <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
+                                    </svg>
+                                    <span style="font-weight: 500;">Create a section</span>
+                                </button>
+                                <button id="createSubmissionBtn" data-action="submission" onclick="updateModalTitle('Create a submission')" data-bs-toggle="modal" data-bs-target="#createModal">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle" viewBox="0 0 16 16">
+                                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                                        <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
+                                    </svg>
+                                    <span style="font-weight: 500;">Create a submission</span>
+                                </button>
                             </li>
                         </ul>
                         </nav>
@@ -608,7 +723,6 @@
                 <button id="sections-btn" class="active">Sections</button>
                 <button id="members-btn">Members</button>
                 <button id="submissions-btn">Submissions</button>
-                <button id="marking-btn">Marking</button>
             </div>
             
         </div>
@@ -644,19 +758,19 @@
             </div>
             <div class="invitation-details">
                 <div class="invitation-link">
-                    <label style="font-weight: 700;">INVITATION LINK</label><br>
+                    <label style="font-weight: 700; font-size: 18px; margin-bottom: 10px;">INVITATION LINK</label><br>
                     <input type="text" value="https://invitation.link" readonly>
                     <button class="copy-btn">Copy</button>
                 </div>
                 <div class="classroom-details">
-                    <label style="font-weight: 700;">CLASSROOM DETAILS</label><br>
+                    <label style="font-weight: 700; font-size: 18px; margin-bottom: 10px;">CLASSROOM DETAILS</label><br>
                     <div class="detail-item">
                         <span class="detail-icon">📚</span>
-                        <span>Number of sections: {{ num_sections }}</span>
+                        <span style="font-weight: 500;">Number of sections: {{ num_sections }}</span>
                     </div>
                     <div class="detail-item">
                         <span class="detail-icon">👥</span>
-                        <span>Number of participants: {{ num_participants }}</span>
+                        <span style="font-weight: 500;">Number of participants: {{ num_participants }}</span>
                     </div>
                 </div>                
             </div>
@@ -668,25 +782,33 @@
                     <div class="section-card">
                         <span class="username text-uppercase">{{ participant.user.username }}</span>
                         <span class="date-joined">Date Joined: {{ participant.date_joined|date:"d/m/Y" }}</span>
-                        <div class="member-options">•••</div>
+                        <div class="section-options dropdown">
+                            <button class="btn btn-secondary dropdown-section" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                •••
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <li><a class="dropdown-item" href="#" onclick="deleteMember({{ participant.id }})">Delete</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="blockMember({{ participant.id }})">Delete and Block</a></li>
+                            </ul>
+                        </div>
                     </div>
                 {% endfor %}
             </div>
             <div class="invitation-details">
                 <div class="invitation-link">
-                    <label style="font-weight: 700;">INVITATION LINK</label><br>
+                    <label style="font-weight: 700; font-size: 18px; margin-bottom: 10px;">INVITATION LINK</label><br>
                     <input type="text" value="https://invitation.link" readonly>
                     <button class="copy-btn">Copy</button>
                 </div>
                 <div class="classroom-details">
-                    <label style="font-weight: 700;">CLASSROOM DETAILS</label><br>
+                    <label style="font-weight: 700; font-size: 18px; margin-bottom: 10px;">CLASSROOM DETAILS</label><br>
                     <div class="detail-item">
                         <span class="detail-icon">📚</span>
-                        <span>Number of sections: {{ num_sections }}</span>
+                        <span style="font-weight: 500;">Number of sections: {{ num_sections }}</span>
                     </div>
                     <div class="detail-item">
                         <span class="detail-icon">👥</span>
-                        <span>Number of participants: {{ num_participants }}</span>
+                        <span style="font-weight: 500;">Number of participants: {{ num_participants }}</span>
                     </div>
                 </div>                
             </div>
@@ -696,68 +818,65 @@
             <div class="sections-list">
                 {% for section in sections %}
                     {% for submission in section.submissions.all %}
-                        <div class="section-card"
-                             {% if submission.submission_type == 'question_test' %}
-                                 onclick="window.location.href='{% url 'question_list' submission.id %}'"
-                             {% endif %}>
+                        <div class="section-card">
                             <span class="section-name text-uppercase">{{ submission.title }} ({{ submission.get_submission_type_display }})</span>
+
                             <div class="section-description">
+
                                 Parent Section: <strong>{{ submission.section.title }}</strong>
+
                             </div>
                             <span class="date-joined">Date Created: {{ submission.date_created|date:"d/m/Y" }}</span>
-                            <div class="section-options"><i class="fas fa-edit fa-lg"></i></div>
+
+                            <div class="section-options dropdown">
+                                <button class="btn btn-secondary dropdown-section" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                    •••
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                    {% if submission.submission_type == 'question_test' %}
+                                        <li><a class="dropdown-item" href="#" onclick="window.location.href='{% url 'question_test_marking' submission.id %}'">View scores</a></li>
+                                        <li><a class="dropdown-item" href="#" onclick="window.location.href='{% url 'question_list' submission.id %}'">Edit questions</a></li>
+                                    {% elif submission.submission_type == 'assignment' %}
+                                        <li><a class="dropdown-item" href="#" onclick="window.location.href='{% url 'marking' submission.id %}'">Marking</a></li>
+                                        <li><a class="dropdown-item" href="#" onclick="window.location.href='{% url 'classroom_detail' classroom.id %}?submission_id={{ submission.id }}&section_id={{ section.id }}'">Edit assignment</a></li>
+                                    {% endif %}
+                                    <li><a class="dropdown-item" href="#" onclick="deleteSubmission({{ submission.id }})">Delete</a></li>
+                                </ul>
+                            </div>
                         </div>
                     {% endfor %}
                 {% endfor %}
             </div>
             <div class="invitation-details">
                 <div class="invitation-link">
-                    <label style="font-weight: 700;">INVITATION LINK</label><br>
+                    <label style="font-weight: 700; font-size: 18px; margin-bottom: 10px;">INVITATION LINK</label><br>
                     <input type="text" value="https://invitation.link" readonly>
                     <button class="copy-btn">Copy</button>
                 </div>
                 <div class="classroom-details">
-                    <label style="font-weight: 700;">CLASSROOM DETAILS</label><br>
+                    <label style="font-weight: 700; font-size: 18px; margin-bottom: 10px;">CLASSROOM DETAILS</label><br>
                     <div class="detail-item">
                         <span class="detail-icon">📚</span>
-                        <span>Number of sections: {{ num_sections }}</span>
+                        <span style="font-weight: 500;">Number of sections: {{ num_sections }}</span>
                     </div>
                     <div class="detail-item">
                         <span class="detail-icon">👥</span>
-                        <span>Number of participants: {{ num_participants }}</span>
-                    </div>
-                </div>                
-            </div>
-        </div>
-
-        <div id="marking-content" class="classroom-content hidden">
-            <div class="sections-list">
-                {% for assignment in assignments %}
-                    <div class="section-card" onclick="window.location.href='{% url 'marking' assignment.id %}'">
-                        <span class="section-name">{{ assignment.title }} (Assignment)</span>
-                    </div>
-                {% endfor %}
-            </div>
-            <div class="invitation-details">
-                <div class="invitation-link">
-                    <label style="font-weight: 700;">INVITATION LINK</label><br>
-                    <input type="text" value="https://invitation.link" readonly>
-                    <button class="copy-btn">Copy</button>
-                </div>
-                <div class="classroom-details">
-                    <label style="font-weight: 700;">CLASSROOM DETAILS</label><br>
-                    <div class="detail-item">
-                        <span class="detail-icon">📚</span>
-                        <span>Number of sections: {{ num_sections }}</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-icon">👥</span>
-                        <span>Number of participants: {{ num_participants }}</span>
+                        <span style="font-weight: 500;">Number of participants: {{ num_participants }}</span>
                     </div>
                 </div>                
             </div>
         </div>
     </main>
+
+    <div id="preloader">
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+    </div>
+
+    <!-- Main JS File -->
+    <script src="{% static 'assets/js/main.js' %}"></script>
 </body>
 </html>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
@@ -766,19 +885,16 @@
     const sectionsBtn = document.getElementById('sections-btn');
     const membersBtn = document.getElementById('members-btn');
     const submissionsBtn = document.getElementById('submissions-btn');
-    const markingBtn = document.getElementById('marking-btn');
 
     const sectionsContent = document.getElementById('sections-content');
     const membersContent = document.getElementById('members-content');
     const submissionsContent = document.getElementById('submissions-content');
-    const markingContent = document.getElementById('marking-content');
 
     // Hàm để ẩn tất cả nội dung
     function hideAllContents() {
         sectionsContent.classList.add('hidden');
         membersContent.classList.add('hidden');
         submissionsContent.classList.add('hidden');
-        markingContent.classList.add('hidden');
     }
 
     // Hàm để xóa class 'active' từ tất cả các nút
@@ -786,7 +902,6 @@
         sectionsBtn.classList.remove('active');
         membersBtn.classList.remove('active');
         submissionsBtn.classList.remove('active');
-        markingBtn.classList.remove('active');
     }
 
     // Gán sự kiện click cho từng nút
@@ -811,11 +926,32 @@
         submissionsBtn.classList.add('active');
     });
 
-    markingBtn.addEventListener('click', function() {
-        hideAllContents();
-        removeActiveClass();
-        markingContent.classList.remove('hidden');
-        markingBtn.classList.add('active');
+
+    document.getElementById('createForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const form = event.target;
+        const formData = new FormData(form);
+
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                alert(data.message);
+                location.reload();  // Reload the page to reflect changes
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred. Please try again.');
+        });
     });
 
     document.getElementById('sectionType').addEventListener('change', function() {
@@ -846,6 +982,12 @@
         deleteModal.show();
     }
 
+    function deleteSubmission(submissionId) {
+        submissionIdToDelete = submissionId;
+        const deleteModal = new bootstrap.Modal(document.getElementById('deleteSubmissionModal'));
+        deleteModal.show();
+    }
+
     document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
         if (sectionIdToDelete !== null) {
             fetch(`{% url 'delete_section' 0 %}`.replace('0', sectionIdToDelete), {
@@ -868,6 +1010,28 @@
         }
     });
 
+    document.getElementById('confirmDeleteSubmissionBtn').addEventListener('click', function() {
+        if (submissionIdToDelete !== null) {
+            fetch(`{% url 'delete_submission' 0 %}`.replace('0', submissionIdToDelete), {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json'
+                },  
+                body: JSON.stringify({ submission_id: submissionIdToDelete })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Failed to delete submission.');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    });
+
     document.getElementById('createSectionBtn').addEventListener('click', function() {
         document.getElementById('actionType').value = 'section';
         var sectionTypeElement = document.getElementById('sectionType');
@@ -884,5 +1048,86 @@
 
         var event = new Event('change');
         sectionTypeElement.dispatchEvent(event);
+    });
+
+    let memberIdToDelete = null;
+    let memberIdToBlock = null;
+
+    function deleteMember(memberId) {
+        memberIdToDelete = memberId;
+        const deleteModal = new bootstrap.Modal(document.getElementById('deleteMemberModal'));
+        deleteModal.show();
+    }
+
+    function blockMember(memberId) {
+        memberIdToBlock = memberId;
+        const blockModal = new bootstrap.Modal(document.getElementById('blockMemberModal'));
+        blockModal.show();
+    }
+
+    document.getElementById('confirmDeleteMemberBtn').addEventListener('click', function() {
+        if (memberIdToDelete !== null) {
+            fetch(`{% url 'delete_member' %}`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ member_id: memberIdToDelete })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Failed to delete member.');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    });
+
+    document.getElementById('confirmBlockMemberBtn').addEventListener('click', function() {
+        if (memberIdToBlock !== null) {
+            const blockReason = document.getElementById('blockReason').value;
+            fetch(`{% url 'block_member' %}`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ member_id: memberIdToBlock, reason: blockReason })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Failed to block member.');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    });
+
+    document.querySelectorAll('[data-action]').forEach(button => {
+        button.addEventListener('click', function() {
+            const action = this.getAttribute('data-action');
+            const sectionTypeSelect = document.getElementById('sectionType');
+            const options = sectionTypeSelect.options;
+
+            for (let i = 0; i < options.length; i++) {
+                if (action === 'section' && options[i].value === 'submission') {
+                    options[i].style.display = 'none';
+                } else if (action === 'submission' && (options[i].value === 'new' || options[i].value === 'sub')) {
+                    options[i].style.display = 'none';
+                } else {
+                    options[i].style.display = 'block';
+                }
+            }
+
+            sectionTypeSelect.value = action === 'section' ? 'new' : 'submission';
+            sectionTypeSelect.dispatchEvent(new Event('change'));
+        });
     });
 </script>

@@ -9,7 +9,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.urls import reverse
-from home.models import AcademicYear, Answer, AnsweredQuestion, ChatMessage, Classroom, Comment, CustomUser, FavoriteClassroom, Participant, Question, QuizResult, Section, StudentFile, Subjects, Submission, SubmissionFile, SubsectionFile
+from home.models import AcademicYear, Answer, AnsweredQuestion, BlockedParticipant, ChatMessage, Classroom, Comment, CustomUser, FavoriteClassroom, Participant, Question, QuizResult, Section, StudentFile, Subjects, Submission, SubmissionFile, SubsectionFile
 
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.forms import SetPasswordForm
@@ -320,6 +320,9 @@ def classrooms(request, subject_id, grade):
         classrooms = Classroom.objects.filter(subject=subject, grade=grade, status=status)
     else:
         classrooms = Classroom.objects.filter(subject=subject, grade=grade)
+    
+    blocked_classrooms = BlockedParticipant.objects.filter(user=user).values_list('classroom_id', flat=True)
+    classrooms = classrooms.exclude(id__in=blocked_classrooms)
 
     participant_classrooms = Participant.objects.filter(user=user, classroom__in=classrooms).values_list('classroom_id', flat=True)
 
@@ -331,6 +334,21 @@ def classrooms(request, subject_id, grade):
         'participant_classrooms': participant_classrooms,
     }
     return render(request, 'classrooms.html', context)
+
+@login_required
+def join_classroom(request, classroom_id):
+    classroom = get_object_or_404(Classroom, id=classroom_id)
+    user = request.user
+
+    # Check if the user is already a participant
+    if Participant.objects.filter(user=user, classroom=classroom).exists():
+        return redirect('classroom_detail', id=classroom_id)
+
+    if request.method == 'POST':
+        Participant.objects.create(user=user, classroom=classroom)
+        return redirect('classroom_detail', id=classroom_id)
+
+    return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
 
 def enter_password(request, classroom_id):
 
@@ -730,10 +748,21 @@ def delete_file_submission(request, file_id):
 
 def setting_classroom(request, id):
     classroom = get_object_or_404(Classroom, id=id)
+    blocked_participants = BlockedParticipant.objects.filter(classroom=classroom)
     context = {
-        'classroom': classroom
+        'classroom': classroom,
+        'blocked_participants': blocked_participants,
     }
     return render(request, 'setting_classroom.html', context)
+
+@login_required
+def unblock_participant(request, classroom_id):
+    if request.method == 'POST':
+        participant_id = request.POST.get('participant_id')
+        participant = get_object_or_404(BlockedParticipant, id=participant_id, classroom_id=classroom_id)
+        participant.delete()
+        return redirect('setting_classroom', id=classroom_id)
+    return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
 
 def manage_classroom_detail(request, id):
     classroom = get_object_or_404(Classroom, id=id)
@@ -764,9 +793,15 @@ def create_section_submission(request):
             section_type = request.POST.get('section_type')
             parent_section_id = request.POST.get('parent_section')
             parent_section = None
-            if section_type == 'sub' and parent_section_id:
+
+            if not title or not description:
+                return JsonResponse({'status': 'error', 'message': 'Title and description are required for section.'})
+
+            if section_type == 'sub':
+                if not parent_section_id:
+                    return JsonResponse({'status': 'error', 'message': 'Parent section is required for subsection.'})
                 parent_section = get_object_or_404(Section, id=parent_section_id)
-            
+
             section = Section.objects.create(
                 classroom=classroom,
                 title=title,
@@ -775,18 +810,21 @@ def create_section_submission(request):
             )
             section.save()
             messages.success(request, 'Section/Subsection created successfully!')
-            
-            participants_to_notify = classroom.participants.filter(user__notify_sections=True)
-            print(participants_to_notify)
-            if participants_to_notify.exists():
-                notify_participants(classroom, 'section', title, participants_to_notify)
+            if classroom.participants.filter(user__notify_sections=True).exists():
+                notify_participants(classroom, 'section', title, classroom.participants.filter(user__notify_sections=True))
+            return JsonResponse({'status': 'success', 'message': 'Section/Subsection created successfully!'})
 
         elif action_type == 'submission':
             submission_type = request.POST.get('submission_type')
             open_date = request.POST.get('open_date')
             close_date = request.POST.get('close_date')
-            section = get_object_or_404(Section, id=request.POST.get('parent_section'))
-            
+            parent_section_id = request.POST.get('parent_section')
+
+            if not (parent_section_id and open_date and close_date and submission_type and title and description):
+                return JsonResponse({'status': 'error', 'message': 'All fields are required for submission.'})
+
+            section = get_object_or_404(Section, id=parent_section_id)
+
             submission = Submission.objects.create(
                 section=section,
                 title=title,
@@ -797,13 +835,11 @@ def create_section_submission(request):
             )
             submission.save()
             messages.success(request, 'Submission created successfully!')
-            
             if classroom.participants.filter(user__notify_sections=True).exists():
-                notify_participants(classroom, 'submission', title)
+                notify_participants(classroom, 'submission', title, classroom.participants.filter(user__notify_sections=True))
+            return JsonResponse({'status': 'success', 'message': 'Submission created successfully!'})
 
-        return redirect('manage_classroom_detail', id=classroom.id)
-
-    return redirect('home')
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method.'})
 
 def notify_participants(classroom, item_type, item_title, participants):
     subject = f'New {item_type} added to {classroom.name}'
@@ -848,10 +884,14 @@ def manage_classroom_list(request):
 def question_list(request, submission_id):
     submission = get_object_or_404(Submission, id=submission_id, submission_type='question_test')
     questions = submission.questions.all()
-    
+    quiz_results = submission.quiz_results.all()
+    number_of_participants = quiz_results.count()
+    total_participants = submission.section.classroom.participants.count()
     context = {
         'submission': submission,
         'questions': questions,
+        'number_of_participants': number_of_participants,
+        'total_participants': total_participants,
     }
     
     return render(request, 'question_list.html', context)
@@ -1033,6 +1073,63 @@ def delete_section(request, section_id):
         section = get_object_or_404(Section, id=section_id)
         section.delete()
         return JsonResponse({'success': True})
+    
+
+def delete_submission(request, submission_id):
+    if request.method == 'POST':
+        submission = get_object_or_404(Submission, id=submission_id)
+        submission.delete()
+        return JsonResponse({'success': True})
+
+@csrf_exempt
+def delete_member(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        member_id = data.get('member_id')
+        try:
+            participant = Participant.objects.get(id=member_id)
+            participant.delete()
+            return JsonResponse({'success': True})
+        except Participant.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Participant not found'})
+    return JsonResponse({'success': False, 'error': 'Invalid request'})
+
+@csrf_exempt
+def block_member(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        member_id = data.get('member_id')
+        reason = data.get('reason', '')  # Thêm lý do
+        try:
+            participant = Participant.objects.get(id=member_id)
+            BlockedParticipant.objects.create(user=participant.user, classroom=participant.classroom, reason=reason)
+            participant.delete()
+            return JsonResponse({'success': True})
+        except Participant.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Participant not found'})
+    return JsonResponse({'success': False, 'error': 'Invalid request'})
+
+def question_test_marking(request, submission_id):
+    submission = get_object_or_404(Submission, id=submission_id)
+    quiz_results = submission.quiz_results.all()
+    number_of_participants = quiz_results.count()
+    total_participants = submission.section.classroom.participants.count()
+    context = {
+        'submission': submission,
+        'quiz_results': quiz_results,
+        'number_of_participants': number_of_participants,
+        'total_participants': total_participants,
+    }
+    return render(request, 'question_test_marking.html', context)
+
+def view_answer_history(request, quiz_result_id):
+    quiz_result = get_object_or_404(QuizResult, id=quiz_result_id)
+    answered_questions = quiz_result.answeredquestion_set.all()
+    context = {
+        'quiz_result': quiz_result,
+        'answered_questions': answered_questions,
+    }
+    return render(request, 'view_answer_history.html', context)
 
 def adminPage(request):
     # classroom = get_object_or_404(Classroom, id=id)

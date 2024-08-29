@@ -2065,6 +2065,16 @@
         {% endfor %}
     </div>
 
+    <div id="preloader">
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+    </div>
+
+    <!-- Main JS File -->
+    <script src="{% static 'assets/js/main.js' %}"></script>
+
     <script src="https://kit.fontawesome.com/a076d05399.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.9.359/pdf.min.js"></script>
     <script>
@@ -2385,51 +2395,131 @@
             const urlParams = new URLSearchParams(window.location.search);
             const sectionId = urlParams.get('section_id');
             const parentSectionId = urlParams.get('parent_section_id');
-            
-            if (sectionId) {
+            const submissionId = urlParams.get('submission_id');
+
+            if (submissionId) {
                 // Ẩn tất cả các content-section
                 document.querySelectorAll('.content-section').forEach(section => {
+
                     section.classList.add('hidden');
                     section.classList.remove('active');
+
                 });
 
-                // Hiển thị section tương ứng
-                const targetSection = document.getElementById(`section-content-${sectionId}`);
-                if (targetSection) {
-                    targetSection.classList.remove('hidden');
-                    targetSection.classList.add('active');
+                // Hiển thị submission tương ứng
+                const targetSubmission = document.getElementById(`submission-content-${submissionId}`);
+                if (targetSubmission) {
+
+                    targetSubmission.classList.remove('hidden');
+
+                    targetSubmission.classList.add('active');
                 }
 
-                // Mở rộng sidebar để hiển thị các subsection
-                const sidebarLink = document.querySelector(`.nav-link[data-content="section-content-${sectionId}"]`);
+                // Mở rộng sidebar để hiển thị các submission
+                const sidebarLink = document.querySelector(`.nav-link[data-content="submission-content-${submissionId}"]`);
+
                 if (sidebarLink) {
                     const submenu = sidebarLink.nextElementSibling;
+
                     if (submenu) {
                         submenu.style.display = 'block';
                         const icon = sidebarLink.querySelector('i');
                         if (icon) {
-                            icon.classList.remove('fa-caret-down');
+                            icon.classList.remove('fa-caret-down'); 
+
                             icon.classList.add('fa-caret-up');
+                        }
+                    }
+
+                }
+
+                // Mở rộng sidebar theo section_id của submission
+                const sectionSidebarLink = document.querySelector(`.nav-link[data-content="section-content-${sectionId}"]`);
+                if (sectionSidebarLink) {
+                    const sectionSubmenu = sectionSidebarLink.nextElementSibling;
+
+                    if (sectionSubmenu) {
+                        sectionSubmenu.style.display = 'block';
+                        const sectionIcon = sectionSidebarLink.querySelector('i');
+                        if (sectionIcon) {
+                            sectionIcon.classList.remove('fa-caret-down');
+
+                            sectionIcon.classList.add('fa-caret-up');
                         }
                     }
                 }
 
+            } else if (sectionId) {
+
+                // Ẩn tất cả các content-section
+                document.querySelectorAll('.content-section').forEach(section => {
+                    section.classList.add('hidden');
+
+                    section.classList.remove('active');
+
+                });
+
+                // Hiển thị section tương ứng
+
+                const targetSection = document.getElementById(`section-content-${sectionId}`);
+
+                if (targetSection) {
+                    targetSection.classList.remove('hidden');
+
+                    targetSection.classList.add('active');
+                }
+
+                // Mở rộng sidebar để hiển thị các subsection
+
+                const sidebarLink = document.querySelector(`.nav-link[data-content="section-content-${sectionId}`);
+                if (sidebarLink) {
+
+                    const submenu = sidebarLink.nextElementSibling;
+                    if (submenu) {
+
+                        submenu.style.display = 'block';
+
+                        const icon = sidebarLink.querySelector('i');
+
+                        if (icon) {
+
+                            icon.classList.remove('fa-caret-down');
+
+                            icon.classList.add('fa-caret-up');
+                        }
+
+                    }
+                }
+
+
                 // Mở rộng parent section nếu có
+
                 if (parentSectionId) {
-                    const parentSectionLink = document.querySelector(`.nav-link[data-content="section-content-${parentSectionId}"]`);
+
+                    const parentSectionLink = document.querySelector(`.nav-link[data-content="section-content-${parentSectionId}`);
+
                     if (parentSectionLink) {
                         const parentSubmenu = parentSectionLink.nextElementSibling;
+
                         if (parentSubmenu) {
                             parentSubmenu.style.display = 'block';
+
                             const parentIcon = parentSectionLink.querySelector('i');
                             if (parentIcon) {
                                 parentIcon.classList.remove('fa-caret-down');
+
                                 parentIcon.classList.add('fa-caret-up');
+
                             }
+
                         }
+
                     }
+
                 }
+
             }
+
         });
     </script>
 </body>
