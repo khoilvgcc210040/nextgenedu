@@ -1,0 +1,212 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Question Test Marking</title>
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+</head>
+<style>
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    table, th, td {
+        border: 1px solid #ddd;
+        text-align: center;
+    }
+
+    th, td {
+        padding: 8px;
+    }
+
+    th {
+        background-color: var(--accent-color);
+        color: #fff;
+    }
+
+    .btn-view {
+        color: #fff;
+        background-color: var(--accent-color);
+        padding: 5px 10px;
+        border-radius: 5px;
+        margin: 0 auto;
+        font-weight: bold;
+        font-size: 12px;
+        transition: transform 0.3s ease, color 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .btn-view:hover {
+        transform: translateY(-5%);
+        cursor: pointer;
+        color: #fff;
+    }
+
+    .btn-back {
+        display: flex;
+        height: 3em;
+        align-items: center;
+        justify-content: center;
+        border-radius: 3px;
+        letter-spacing: 1px;
+        transition: all 0.2s linear;
+        cursor: pointer;
+        border: none;
+        color: #fff;
+        background: var(--accent-color);
+    }
+
+    .btn-back > svg {
+        margin-right: 5px;
+        margin-left: 5px;
+        font-size: 20px;
+        transition: all 0.4s ease-in;
+    }
+
+    .btn-back:hover > svg {
+        font-size: 1.2em;
+        transform: translateX(-5px);
+    }
+
+    .btn-back:hover {
+        transform: translateY(-2px);
+    }
+
+    .submission-title {
+        border: 1px solid #000;
+        background-color: var(--accent-color);
+        color: #fff;
+        padding: 10px 0 10px 50px;
+    }
+
+    .submission-title-content {
+        transition: transform 0.3s ease-in-out;
+    }
+
+    .submission-title-content:hover {
+        transform: translateX(-3%);
+        cursor: pointer;
+    }
+
+    .table-question {
+        padding: 0 50px;
+    }
+
+    .question-table {
+        width: 100%;
+        border-collapse: collapse;
+        padding: 0 50px;
+    }
+
+    .question-table th, .question-table td {
+        padding: 10px;
+        text-align: center;
+        vertical-align: middle;
+        border: 1px solid #dee2e6;
+    }
+
+    .question-table th {
+        background-color: var(--accent-color);
+        color: #fff;
+        text-align: center;
+    }
+
+    .add-question-btn {
+        display: flex;
+        justify-content: space-between;
+        align-items: end;
+        margin: 20px 50px 20px 50px;
+    }
+
+    .add-question-btn .as-info {
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        line-height: 30px;
+    }
+
+    .add-question-btn button {
+        background-color: #6c757d;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        padding: 10px 20px;
+        font-size: 14px;
+        cursor: pointer;
+    }
+
+    .add-question-btn button i {
+        margin-right: 5px;
+    }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<body>
+    {% include "headerMain.html" %}
+    <main>
+
+        <div class="submission-title d-flex justify-content-between align-items-center">
+            <button class="btn-back" onclick="history.back()" style="outline: none;">
+                <svg height="16" width="16" fill="currentColor" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 1024 1024">
+                    <path d="M874.690416 495.52477c0 11.2973-9.168824 20.466124-20.466124 20.466124l-604.773963 0 188.083679 188.083679c7.992021 7.992021 7.992021 20.947078 0 28.939099-4.001127 3.990894-9.240455 5.996574-14.46955 5.996574-5.239328 0-10.478655-1.995447-14.479783-5.996574l-223.00912-223.00912c-3.837398-3.837398-5.996574-9.046027-5.996574-14.46955 0-5.433756 2.159176-10.632151 5.996574-14.46955l223.019353-223.029586c7.992021-7.992021 20.957311-7.992021 28.949332 0 7.992021 8.002254 7.992021 20.957311 0 28.949332l-188.073446 188.073446 604.753497 0C865.521592 475.058646 874.690416 484.217237 874.690416 495.52477z"></path>
+                </svg>
+                <span>Back</span>
+            </button>
+            <p class="mb-0" style="font-size: 20px; font-weight: 500; margin-right: 100px">{{ submission.title }}</p>
+        </div>
+        
+        
+
+        <div class="add-question-btn">
+            <div class="info" style="color: #000;">
+                <p style="font-weight: 500;">Open time: {{ submission.open_date|date:"H:i d/m/Y" }}</p>
+                <p style="font-weight: 500;">Close time: {{ submission.close_date|date:"H:i d/m/Y" }}</p>
+                <p style="font-weight: 500; margin-bottom: 0;">Number of participants: {{ number_of_participants }} / {{ total_participants }}</p>
+            </div>
+            <div>
+                <button><i class="fas fa-chevron-down"></i> All</button>
+            </div>
+        </div>
+
+        <div class="table-question">
+            <table class="question-table">
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Correct Answers</th>
+                        <th>Score</th>
+                        <th>Time Taken</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for result in quiz_results %}
+                    <tr>
+                        <td style="font-weight: bold; color: var(--accent-color); font-size: 14px;">{{ result.student.username }}</td>
+                        <td style="font-weight: bold; color: var(--accent-color); font-size: 14px;">{{ result.correct_answers }}</td>
+                        <td style="font-weight: bold; color: var(--accent-color); font-size: 14px;">{{ result.score }}</td>
+                        <td style="font-weight: bold; color: var(--accent-color); font-size: 14px;">{{ result.time_taken }}</td>
+                        <td>
+                            <a href="{% url 'view_answer_history' result.id %}" class="btn-view">View</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <div id="preloader">
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+    </div>
+
+    <!-- Main JS File -->
+    <script src="{% static 'assets/js/main.js' %}"></script>
+</body>
+</html>

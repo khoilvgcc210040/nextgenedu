@@ -189,7 +189,7 @@
         <div class="modal-dialog">
             <div class="modal-content d-flex justify-content-center align-items-center bg-transparent border-0">
                 <button type="button" class="btn-close position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close"></button>
-                <div class="card p-4" style="width: 100%; border: 5px solid #fff;">
+                <div class="card p-4" style="width: 100%; border: 5px solid var(--accent-color);">
                     <div class="card-body">
                         <div class="add-icon d-flex justify-content-center">
                             <img src="{% static 'add.png' %}" alt="Add Icon">
@@ -294,10 +294,10 @@
                     </ul>
                 </li>
                 <li class="dropdown" style="padding: 0 40px 0 10px;"><a href="#"><img style="width: 30px; height: 30px; border-radius: 50%;" src="{% static 'account.png' %}" alt="user"><i class="bi bi-chevron-down toggle-dropdown d-xl-none"></i></a>
-                    <ul style="padding: 0;">
+                    <ul style="padding: 0; box-shadow: 0 0 10px rgba(0, 0, 0, 0.7); border-radius: 10px; border: 1px solid #e0e0e0;">
                       <li style="padding: 0;">
-                        <div style="display: flex; align-items: center; gap: 10px; padding: 10px; border-bottom: 1px solid #e0e0e0;">
-                            <img style="width: 30px; height: 30px; border-radius: 50%;" src="{% static 'account.png' %}" alt="user">
+                        <div style="border-radius: 10px 10px 0 0; display: flex; align-items: center; gap: 10px; padding: 10px; border-bottom: 1px solid #e0e0e0; background-color: var(--accent-color); color: #fff;">
+                            <img style="width: 30px; height: 30px; border-radius: 50%; background-color: #fff;" src="{% static 'account.png' %}" alt="user">
                             <div>
                                 <p style="font-weight: 700; font-size: 14px; margin: 0;">{{user.username}}</p>
                                 <p style="font-size: 12px; margin: 0;">{{user.email}}</p>
@@ -308,7 +308,7 @@
                       <li><a href="{% url "achivement" %}" style="display: flex; align-items: center; justify-content: left; gap: 10px;"><i class="fa-solid fa-trophy"></i> Achievement</a></li>
                       <li><a href="{% url "favorite" %}" style="display: flex; align-items: center; justify-content: left; gap: 10px;"><i class="fa-solid fa-star"></i> Favorite</a></li>
                       <li><a href="{% url "setting" %}" style="display: flex; align-items: center; justify-content: left; gap: 10px;"><i class="fa-solid fa-gear"></i> Setting</a></li>
-                      <li><a href="{% url "logout" %}" style="display: flex; align-items: center; justify-content: left; gap: 10px;"><i class="fa-solid fa-arrow-left"></i> Logout</a></li>
+                      <li><a href="{% url "logout" %}" style="display: flex; align-items: center; justify-content: left; gap: 10px; background-color: var(--accent-color); color: #fff; border-radius: 0 0 10px 10px; transition: transform 0.3s;"><span style="transition: transform 0.3s;" onmouseover="this.style.transform='translateX(-3px)';" onmouseout="this.style.transform='translateY(0)';"><i class="fa-solid fa-arrow-left"></i> Logout</span></a></li>
                     </ul>
                 </li>
                 {% else %}
@@ -326,7 +326,7 @@
                         </ul>
                     </li>
                     <li><a href="{% url "auth" %}?form=login" style="font-weight: 700; background-color: #a3a3a3; color: #fff; padding: 10px 15px; border-radius: 5px; transition: opacity 0.3s;" onmouseover="this.style.opacity=0.7;" onmouseout="this.style.opacity=1;">Log in</a></li>
-                    <li style="padding: 0 10px;"><a href="{% url "auth" %}?form=signup" style="font-weight: 700; background-color: #000; color: #fff; padding: 10px 15px; border-radius: 5px; transition: opacity 0.3s;" onmouseover="this.style.opacity=0.7;" onmouseout="this.style.opacity=1;">Sign up</a></li>
+                    <li style="padding: 0 10px;"><a href="{% url "auth" %}?form=signup" style="font-weight: 700; background-color: var(--accent-color); color: #fff; padding: 10px 15px; border-radius: 5px; transition: opacity 0.3s;" onmouseover="this.style.opacity=0.7;" onmouseout="this.style.opacity=1;">Sign up</a></li>
                 {% endif %}
               </ul>
               <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>

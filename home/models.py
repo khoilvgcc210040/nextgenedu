@@ -227,4 +227,13 @@ class FavoriteClassroom(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.classroom.name}"
+    
+class BlockedParticipant(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    classroom = models.ForeignKey(Classroom, on_delete=models.CASCADE)
+    blocked_at = models.DateTimeField(auto_now_add=True)
+    reason = models.TextField(null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.classroom.name}"
 

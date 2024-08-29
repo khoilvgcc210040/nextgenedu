@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,20 +10,18 @@
     <style>
         .content-wrapper {
             width: 100%;
-            padding: 100px 0 0 0;
         }
 
         .add-question-btn {
             display: flex;
             justify-content: space-between;
             align-items: end;
-            margin: 20px 50px 20px 0;
+            margin: 20px 50px 20px 50px;
         }
 
         .add-question-btn .as-info {
             border: none;
             border-radius: 5px;
-            padding: 0 50px;
             font-size: 16px;
             line-height: 30px;
         }
@@ -49,13 +48,15 @@
 
         .question-table th, .question-table td {
             padding: 10px;
-            text-align: left;
+            text-align: center;
             vertical-align: middle;
             border: 1px solid #dee2e6;
         }
 
         .question-table th {
-            background-color: #f1f1f1;
+            background-color: var(--accent-color);
+            color: #fff;
+            text-align: center;
         }
 
         .question-actions {
@@ -74,7 +75,9 @@
 
         .submission-title {
             border: 1px solid #000;
-            padding: 20px 0 20px 50px;
+            background-color: var(--accent-color);
+            color: #fff;
+            padding: 10px 0 10px 50px;
         }
 
         .submission-title-content {
@@ -87,25 +90,69 @@
         }
 
         .btn-marking {
+            color: #fff;
+            background-color: var(--accent-color);
+            padding: 5px 10px;
             border-radius: 5px;
+            margin: 0 auto;
+            font-weight: bold;
+            font-size: 12px;
+            transition: transform 0.3s ease, color 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
         }
+    
+        .btn-marking:hover {
+            transform: translateY(-5%);
+            cursor: pointer;
+        }    
 
         .card-body input[type="text"] {
             padding: 5px;
             width: 100%;
             border-radius: 5px;
         }
+
+        .btn-back {
+            display: flex;
+            height: 3em;
+            align-items: center;
+            justify-content: center;
+            border-radius: 3px;
+            letter-spacing: 1px;
+            transition: all 0.2s linear;
+            cursor: pointer;
+            border: none;
+            color: #fff;
+            background: var(--accent-color);
+        }
+    
+        .btn-back > svg {
+            margin-right: 5px;
+            margin-left: 5px;
+            font-size: 20px;
+            transition: all 0.4s ease-in;
+        }
+    
+        .btn-back:hover > svg {
+            font-size: 1.2em;
+            transform: translateX(-5px);
+        }
+    
+        .btn-back:hover {
+            transform: translateY(-2px);
+        }
     </style>
 </head>
 <body>
 
-    {% include "header.html" %}
+    {% include "headerMain.html" %}
 
     <div class="modal fade {% if show_modal %}show{% endif %}" id="markingModal" tabindex="-1" aria-labelledby="markingModalLabel" aria-hidden="true" style="{% if show_modal %}display: block;{% endif %}">
         <div class="modal-dialog">
             <div class="modal-content d-flex justify-content-center align-items-center bg-transparent border-0">
                 <button type="button" class="btn-close position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close"></button>
-                <div class="card p-4" style="max-width: 400px; width: 100%; border: 5px solid {{ assignment.section.classroom.subject.bg_color }}">
+                <div class="card p-4" style="max-width: 400px; width: 100%; border: 5px solid var(--accent-color)">
                     <div class="card-body">
                         <h5 class="card-title text-center mb-4 font-weight-bold">Marking</h5>
                         <form method="POST" action="{% url 'marking' assignment.id %}" id="markingForm">
@@ -114,10 +161,10 @@
                             <input type="text" name="score" class="modal-input mb-3" placeholder="Enter points..." value="">
                             {% if messages %}
                                 {% for message in messages %}
-                                    <div class="alert alert-danger">{{ message }}</div>
+                                    <div class="alert" style="font-size: 14px; border-radius: 3px; padding: 5px; background-color: #fff; color: red; border: 2px solid red;">{{ message }}</div>
                                 {% endfor %}
                             {% endif %}
-                            <button type="submit" class="submit-modal btn btn-dark w-100 border-0" style="background-color: {{ assignment.section.classroom.subject.bg_color }}; overflow: hidden; transition: all 0.3s ease;">
+                            <button type="submit" class="submit-modal btn btn-dark w-100 border-0" style="background-color: var(--accent-color); overflow: hidden; transition: all 0.3s ease;">
                                 <span class="btn-text">Submit</span>
                             </button>
                         </form>                    
@@ -129,10 +176,12 @@
 
     <div class="content-wrapper">
         <div class="submission-title d-flex justify-content-between align-items-center">
-            <div class="submission-title-content d-flex align-items-center" onclick="window.location.href='{% url "manage_classroom_detail" assignment.section.classroom.id %}'">
-                <i class="fas fa-backward fa-lg mr-2"></i>
-                <p class="m-0" style="font-weight: 500;">Back</p>
-            </div>
+            <button class="btn-back" onclick="history.back()" style="outline: none;">
+                <svg height="16" width="16" fill="currentColor" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 1024 1024">
+                    <path d="M874.690416 495.52477c0 11.2973-9.168824 20.466124-20.466124 20.466124l-604.773963 0 188.083679 188.083679c7.992021 7.992021 7.992021 20.947078 0 28.939099-4.001127 3.990894-9.240455 5.996574-14.46955 5.996574-5.239328 0-10.478655-1.995447-14.479783-5.996574l-223.00912-223.00912c-3.837398-3.837398-5.996574-9.046027-5.996574-14.46955 0-5.433756 2.159176-10.632151 5.996574-14.46955l223.019353-223.029586c7.992021-7.992021 20.957311-7.992021 28.949332 0 7.992021 8.002254 7.992021 20.957311 0 28.949332l-188.073446 188.073446 604.753497 0C865.521592 475.058646 874.690416 484.217237 874.690416 495.52477z"></path>
+                </svg>
+                <span>Back</span>
+            </button>
             <p class="mb-0" style="font-size: 20px; font-weight: 500; margin-right: 100px">{{ assignment.title }}</p>
         </div>
 
@@ -162,16 +211,18 @@
                     {% for student_file in student_files %}
                     <tr>
                         <td>
-                            <div>{{ student_file.student.username }}</div>
+                            <div style="font-weight: bold; color: var(--accent-color); font-size: 14px;">{{ student_file.student.username }}</div>
                         </td>
                         <td>
-                            <div>{{ student_file.file.name }}</div>
+                            <div style="font-weight: bold; color: var(--accent-color); font-size: 14px;">
+                                <a href="{{ student_file.file.url }}" download>{{ student_file.file.name|cut:"student_files/"|slice:":30" }}...</a>
+                            </div>
                         </td>
                         <td>
-                            <div>{{ student_file.date_submitted|date:"H:i d/m/Y" }}</div>
+                            <div style="font-weight: bold; color: var(--accent-color); font-size: 14px;">{{ student_file.date_submitted|date:"H:i d/m/Y" }}</div>
                         </td>
                         <td>
-                            <div class="text-center">{% if student_file.score  %} {{ student_file.score }} {% else %} - {% endif %}</div>
+                            <div style="font-weight: bold; color: var(--accent-color); font-size: 14px;">{% if student_file.score  %} {{ student_file.score }} {% else %} - {% endif %}</div>
                         </td>
                         <td>
                             <div class="d-flex justify-content-center">
@@ -186,6 +237,16 @@
             </table>
         </div>
     </div>
+
+    <div id="preloader">
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+    </div>
+
+    <!-- Main JS File -->
+    <script src="{% static 'assets/js/main.js' %}"></script>
 
 </body>
 </html>
