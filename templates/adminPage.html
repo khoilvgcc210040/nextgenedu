@@ -4,13 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Classroom Detail</title>
+    <title>Admin Page</title>
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.min.js"></script>
     <style>
         .sidebar {
-            background-color: {{ classroom.subject.bg_color }};
+            background-color: var(--accent-color);
             padding: 36px 20px 100px 20px;
             min-height: 100%;
             position: fixed;
@@ -23,7 +23,7 @@
             overflow-y: scroll;
             scrollbar-width: none;
             -ms-overflow-style: none;
-            border-radius: 0 15px 5px 0;
+            border-radius: 0 5px 5px 0;
         }
 
         .sidebar::-webkit-scrollbar {
@@ -85,8 +85,8 @@
         }
 
         .nav-item .nav-link{
-            border-bottom: 2px solid #000;
-            color: #000;
+            border-bottom: 2px solid #fff;
+            color: #fff;
             font-weight: 700;
             padding: 0.7rem 0.3rem;
         }
@@ -94,17 +94,17 @@
         .nav-item .nav-link-back{
             text-decoration: none;
             display: block;
-            color: #000;
+            color: #fff;
             font-weight: 700;
             padding: 2rem 0;
         }
 
         .navbar .navbar-brand span{
-            color: {{ classroom.subject.bg_color }} !important;
+            color: var(--accent-color) !important;
         }
     
         .navbar .navbar-nav .header-nav-link {
-            color: {{ classroom.subject.bg_color }} !important;
+            color: var(--accent-color) !important;
         }
         
         .btn-edit:hover{
@@ -113,14 +113,14 @@
         }
 
         .btn-delete {
-            background-color: {{ classroom.subject.bg_color }};
+            background-color: var(--accent-color);
             padding: 7px 14px;
             border-radius: 10px;
             transition: background-color 0.1s ease-in-out;
         }
 
         .btn-delete:hover {
-            background-color: #fecaca;
+            background-color: #b91c1c;
         }
 
         .toggle-switch {
@@ -182,7 +182,7 @@
             box-shadow: inset 0 0 0 2px #04b360;
         }
 
-        .toggle-switch input[type="checkbox"]:checked + .toggle-switch:before {
+        .toggle-switch input[type="checkbox"]:checked + .toggle-switch::before {
             content: "On";
             color: #05c46b;
             right: -15px;
@@ -199,48 +199,571 @@
         .btn-back:hover {
             transform: translateX(-5%);
         }
+
+        .btn-unblock {
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .btn-unblock:hover {
+            transform: translateY(-5%);
+        }   
     </style>
 </head>
-<body style="padding: 80px 0;">
-    {% include "header.html" %}
+<body>
+    {% include "headerMain.html" %}
     
     <div class="sidebar">
         <ul class="nav flex-column">
             <li class="nav-item">
-                <a id="welcome-link" class="nav-link active" href="#">Statistical Analysis</a>
+                <a id="statistical-link" class="nav-link active" href="#">Statistical Analysis</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link toggle-link" data-content="account-content" href="#">Account</a>
+                <a id="account-link" class="nav-link" href="#">Account</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link toggle-link" data-content="subject-content" href="#">Subject</a>
+                <a id="subject-link" class="nav-link" href="#">Subject</a>
             </li>
             <li class="nav-item">
-                <a class="btn-back nav-link-back toggle-link" href="#" onclick="history.back()"><i class="fa-solid fa-backward"></i>&nbsp;Back</a>
+                <a id="subsectionfile-link" class="nav-link" href="#">SubsectionFile</a>
+            </li>
+            <li class="nav-item">
+                <a id="submissionfile-link" class="nav-link" href="#">SubmissionFile</a>
             </li>
         </ul>
     </div>
     
-
     <div class="content-area">
-        <div id="welcome-content" class="content-section active pb-lg-5">
+        <div id="statistical-content" class="content-section active pb-lg-5">
             <div class="text-center">
                 <h1 style="font-weight: 700;" class="text-truncate ">STATISTICAL ANALYSIS</h1>
             </div>
-        </div> 
+            <hr style="border: 1px solid #000;">
+            <!-- Table for Statistical Analysis -->
+            <table class="table text-center">
+                <thead>
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for data in statistical_data %}
+                    <tr>
+                        <td>{{ data.id }}</td>
+                        <td>{{ data.name }}</td>
+                        <td>
+                            <button class="btn btn-edit" data-bs-toggle="modal" data-bs-target="#editStatisticalModal" data-bs-id="{{ data.id }}">Edit</button>
+                            <button class="btn btn-delete" onclick="deleteStatistical({{ data.id }})">Delete</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addStatisticalModal">Add New</button>
+        </div>
 
         <div id="account-content" class="content-section pb-lg-5">
             <div class="text-center">
                 <h1 style="font-weight: 700;" class="text-truncate ">ACCOUNT</h1>
             </div>
+            <hr style="border: 1px solid #000;">
+            <!-- Table for Account -->
+            <table class="table text-center">
+                <thead>
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Username</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Role</th>
+                        <th scope="col">Subject/Grade</th>
+                        <th scope="col">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for account in accounts %}
+                    <tr>
+                        <td>{{ account.id }}</td>
+                        <td>{{ account.username }}</td>
+                        <td>{{ account.email }}</td>
+                        <td>{{ account.role }}</td>
+                        <td>
+                            {% if account.role == 'teacher' %}
+                                {{ account.subject.name }}
+                            {% elif account.role == 'student' %}
+                                {{ account.grade }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button class="btn btn-edit" data-bs-toggle="modal" data-bs-target="#editAccountModal" data-bs-username="{{ account.username }}" data-bs-email="{{ account.email }}" data-bs-role="{{ account.role }}" data-bs-subject="{{ account.subject.name }}" data-bs-grade="{{ account.grade }}" data-bs-id="{{ account.id }}">Edit</button>
+                            <button class="btn btn-delete" onclick="deleteAccount({{ account.id }})">Delete</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAccountModal">Add New</button>
         </div>
+
+        <!-- Modal for Editing Account -->
+        <div class="modal fade" id="editAccountModal" tabindex="-1" aria-labelledby="editAccountModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editAccountModalLabel">Edit Account</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editAccountForm" method="post" action="{% url 'update_account' %}">
+                            {% csrf_token %}
+                            <input type="hidden" id="editAccountId" name="id" value="{{ user.id }}">
+                            
+                            <div class="mb-3">
+                                <label for="editUsername" class="form-label">Username</label>
+                                <input type="text" class="form-control" id="editUsername" name="username" value="{{ user.username }}">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="editEmail" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="editEmail" name="email" value="{{ user.email }}">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="editRole" class="form-label">Role</label>
+                                <select class="form-control" id="editRole" name="role">
+                                    <option value="teacher" {% if user.role == 'teacher' %}selected{% endif %}>Teacher</option>
+                                    <option value="student" {% if user.role == 'student' %}selected{% endif %}>Student</option>
+                                    <option value="admin" {% if user.role == 'admin' %}selected{% endif %}>Admin</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3" id="subjectField" style="display: {% if user.role == 'teacher' %}block{% else %}none{% endif %};">
+                                <label for="editSubject" class="form-label">Subject</label>
+                                <select class="form-control" id="editSubject" name="subject">
+                                    {% for subject in subjects %}
+                                        <option value="{{ subject.id }}" {% if user.subject and user.subject.id == subject.id %}selected{% endif %}>{{ subject.name }} - Grade {{ subject.grade }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3" id="gradeField" style="display: {% if user.role == 'student' %}block{% else %}none{% endif %};">
+                                <label for="editGrade" class="form-label">Grade</label>
+                                <select class="form-control" id="editGrade" name="grade">
+                                    {% if user.grade %}
+                                        <option value="{{ user.grade }}" selected>{{ user.grade }}</option>
+                                    {% else %}
+                                        <option value="10" selected>10</option>
+                                        <option value="11">11</option>
+                                        <option value="12">12</option>
+                                    {% endif %}
+                                </select>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary">Save changes</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const roleField = document.getElementById('editRole');
+                const subjectField = document.getElementById('subjectField');
+                const gradeField = document.getElementById('gradeField');
+    
+                function updateFields(role) {
+                    if (role === 'teacher') {
+                        gradeField.style.display = 'none';
+                        subjectField.style.display = 'block';
+                    } else if (role === 'student') {
+                        subjectField.style.display = 'none';
+                        gradeField.style.display = 'block';
+                    } else {
+                        subjectField.style.display = 'none';
+                        gradeField.style.display = 'none';
+                    }
+                }
+
+                roleField.addEventListener('change', function() {
+                    updateFields(this.value);
+                });
+    
+                // Gọi hàm updateFields khi modal được mở
+                const editAccountModal = document.getElementById('editAccountModal');
+                editAccountModal.addEventListener('show.bs.modal', function (event) {
+                    const button = event.relatedTarget;
+                    const role = button.getAttribute('data-bs-role');
+                    updateFields(role);
+                });
+
+                // Modal for editing Account
+                editAccountModal.addEventListener('show.bs.modal', function (event) {
+                    const button = event.relatedTarget;
+                    const id = button.getAttribute('data-bs-id');
+
+                    // Lấy các giá trị từ phần tử trong modal
+                    const usernameInput = editAccountModal.querySelector('#editUsername');
+                    const emailInput = editAccountModal.querySelector('#editEmail');
+                    const roleInput = editAccountModal.querySelector('#editRole');
+                    const subjectInput = editAccountModal.querySelector('#editSubject');
+                    const gradeInput = editAccountModal.querySelector('#editGrade');
+                    const accountIdInput = editAccountModal.querySelector('#editAccountId');
+
+                    // Gán giá trị đã được render từ view vào các trường trong modal
+                    accountIdInput.value = id;  // ID đã được gán vào trường ẩn
+                    usernameInput.value = button.getAttribute('data-bs-username');
+                    emailInput.value = button.getAttribute('data-bs-email');
+                    roleInput.value = button.getAttribute('data-bs-role');
+                    gradeInput.value = button.getAttribute('data-bs-grade');
+
+                    // Gán giá trị cho select option của subject
+                    const subjectValue = button.getAttribute('data-bs-subject');
+                    const subjectOptions = subjectInput.options;
+                    for (let i = 0; i < subjectOptions.length; i++) {
+                        if (subjectOptions[i].text === subjectValue) {
+                            subjectOptions[i].selected = true;
+                            break;
+                        }
+                    }
+                });
+
+                // Xử lý submit form với JSONResponse
+                const editAccountForm = document.getElementById('editAccountForm');
+                editAccountForm.addEventListener('submit', function(event) {
+                    event.preventDefault();
+
+                    const formData = new FormData(editAccountForm);
+
+                    fetch('/update-account/', {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-CSRFToken': '{{ csrf_token }}',
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            location.reload();
+                        } else {
+                            alert('Failed to update account.');
+                        }
+                    });
+                });
+            });
+        </script>
 
         <div id="subject-content" class="content-section pb-lg-5">
             <div class="text-center">
                 <h1 style="font-weight: 700;" class="text-truncate ">SUBJECT</h1>
             </div>
+            <hr style="border: 1px solid #000;">
+            <!-- Table for Subject -->
+            <table class="table text-center">
+                <thead>
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Grade</th>
+                        <th scope="col">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for subject in subjects %}
+                    <tr>
+                        <td>{{ subject.id }}</td>
+                        <td>{{ subject.name }}</td>
+                        <td>{{ subject.grade }}</td>
+                        <td>
+                            <button class="btn btn-edit" data-bs-toggle="modal" data-bs-target="#editSubjectModal" data-bs-id="{{ subject.id }}">Edit</button>
+                            <button class="btn btn-delete" onclick="deleteSubject({{ subject.id }})">Delete</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addSubjectModal">Add New</button>
+        </div>
+
+        <div id="subsectionfile-content" class="content-section pb-lg-5">
+            <div class="text-center">
+                <h1 style="font-weight: 700;" class="text-truncate ">SUBSECTIONFILE</h1>
+            </div>
+            <hr style="border: 1px solid #000;">
+            <!-- Table for SubsectionFile -->
+            <table class="table text-center">
+                <thead>
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Subsection</th>
+                        <th scope="col">File</th>
+                        <th scope="col">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for file in subsection_files %}
+                    <tr>
+                        <td>{{ file.id }}</td>
+                        <td>{{ file.subsection.title }}</td>
+                        <td>{{ file.file.name }}</td>
+                        <td>
+                                <button class="btn btn-edit" data-bs-toggle="modal" data-bs-target="#editSubsectionFileModal" data-bs-id="{{ file.id }}">Edit</button>
+                                <button class="btn btn-delete" onclick="deleteSubsectionFile({{ file.id }})">Delete</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addSubsectionFileModal">Add New</button>
+        </div>
+
+        <div id="submissionfile-content" class="content-section pb-lg-5">
+            <div class="text-center">
+                <h1 style="font-weight: 700;" class="text-truncate ">SUBMISSIONFILE</h1>
+            </div>
+            <hr style="border: 1px solid #000;">
+            <!-- Table for SubmissionFile -->
+            <table class="table text-center">
+                <thead>
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Submission</th>
+                        <th scope="col">File</th>
+                        <th scope="col">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for file in submission_files %}
+                    <tr>
+                        <td>{{ file.id }}</td>
+                        <td>{{ file.submission.title }}</td>
+                        <td>{{ file.file.name }}</td>
+                        <td>
+                            <button class="btn btn-edit" data-bs-toggle="modal" data-bs-target="#editSubmissionFileModal" data-bs-id="{{ file.id }}">Edit</button>
+                            <button class="btn btn-delete" onclick="deleteSubmissionFile({{ file.id }})">Delete</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addSubmissionFileModal">Add New</button>
         </div>
     </div>
+
+    <!-- Modal for editing Statistical Analysis -->
+    <div class="modal fade" id="editStatisticalModal" tabindex="-1" aria-labelledby="editStatisticalModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content" style="border: 5px solid var(--accent-color); border-radius: 15px;">
+                <div class="modal-header d-flex justify-content-between align-items-center" style="background-color: var(--accent-color);">
+                    <h5 class="modal-title" id="editStatisticalModalLabel" style="color: #fff;">Edit Statistical Analysis</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" style="background-color: #fff; border: none;" aria-label="Close"></button>
+                </div>  
+                <form id="editStatisticalForm" method="POST" action="#">
+                    {% csrf_token %}
+                    <div class="modal-body" style="border-bottom: 2px solid var(--accent-color);">
+                        <!-- Form fields here -->
+                    </div>
+                    <div class="modal-footer d-flex justify-content-end">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn" style="background-color: var(--accent-color); color: #fff;">Save changes</button> 
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>  
+
+    
+    
+    
+
+    <!-- Modal for editing SubsectionFile -->
+    <div class="modal fade" id="editSubsectionFileModal" tabindex="-1" aria-labelledby="editSubsectionFileModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content" style="border: 5px solid var(--accent-color); border-radius: 15px;">
+                <div class="modal-header d-flex justify-content-between align-items-center" style="background-color: var(--accent-color);">
+                    <h5 class="modal-title" id="editSubsectionFileModalLabel" style="color: #fff;">Edit SubsectionFile</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" style="background-color: #fff; border: none;" aria-label="Close"></button>
+                </div>  
+                <form id="editSubsectionFileForm" method="POST" action="#">
+                    {% csrf_token %}    
+                    <div class="modal-body" style="border-bottom: 2px solid var(--accent-color);">
+                        <!-- Form fields here -->
+                    </div>
+                    <div class="modal-footer d-flex justify-content-end">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn" style="background-color: var(--accent-color); color: #fff;">Save changes</button> 
+                    </div>
+                </form> 
+            </div>  
+        </div>
+    </div>  
+
+    <!-- Modal for editing SubmissionFile -->
+    <div class="modal fade" id="editSubmissionFileModal" tabindex="-1" aria-labelledby="editSubmissionFileModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content" style="border: 5px solid var(--accent-color); border-radius: 15px;">
+                <div class="modal-header d-flex justify-content-between align-items-center" style="background-color: var(--accent-color);">
+                    <h5 class="modal-title" id="editSubmissionFileModalLabel" style="color: #fff;">Edit SubmissionFile</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" style="background-color: #fff; border: none;" aria-label="Close"></button>
+                </div>  
+                <form id="editSubmissionFileForm" method="POST" action="#"> 
+                    {% csrf_token %}    
+                    <div class="modal-body" style="border-bottom: 2px solid var(--accent-color);">
+                        <!-- Form fields here -->
+                    </div>
+                    <div class="modal-footer d-flex justify-content-end">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn" style="background-color: var(--accent-color); color: #fff;">Save changes</button> 
+                    </div>
+                </form> 
+            </div>  
+        </div>
+    </div>
+
+    <!-- Modal for editing Subject -->
+    <div class="modal fade" id="editSubjectModal" tabindex="-1" aria-labelledby="editSubjectModalLabel" aria-hidden="true"> 
+        <div class="modal-dialog">
+            <div class="modal-content" style="border: 5px solid var(--accent-color); border-radius: 15px;">
+                <div class="modal-header d-flex justify-content-between align-items-center" style="background-color: var(--accent-color);">
+                    <h5 class="modal-title" id="editSubjectModalLabel" style="color: #fff;">Edit Subject</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" style="background-color: #fff; border: none;" aria-label="Close"></button>
+                </div>  
+                <form id="editSubjectForm" method="POST" action="#">
+                    {% csrf_token %}    
+                    <div class="modal-body" style="border-bottom: 2px solid var(--accent-color);">
+                        <!-- Form fields here -->
+                    </div>
+                    <div class="modal-footer d-flex justify-content-end">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn" style="background-color: var(--accent-color); color: #fff;">Save changes</button> 
+                    </div>
+                </form>
+            </div>  
+        </div>
+    </div>
+
+    <!-- Modal for adding new Statistical Analysis -->
+    <div class="modal fade" id="addStatisticalModal" tabindex="-1" aria-labelledby="addStatisticalModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content" style="border: 5px solid var(--accent-color); border-radius: 15px;">
+                <div class="modal-header d-flex justify-content-between align-items-center" style="background-color: var(--accent-color);">
+                    <h5 class="modal-title" id="addStatisticalModalLabel" style="color: #fff;">Add New Statistical Analysis</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" style="background-color: #fff; border: none;" aria-label="Close"></button>
+                </div>
+                <form id="addStatisticalForm" method="POST" action="#">
+                    {% csrf_token %}
+                    <div class="modal-body" style="border-bottom: 2px solid var(--accent-color);">
+                        <!-- Form fields here -->
+                    </div>
+                    <div class="modal-footer d-flex justify-content-end">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn" style="background-color: var(--accent-color); color: #fff;">Save changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for adding new Account -->
+    <div class="modal fade" id="addAccountModal" tabindex="-1" aria-labelledby="addAccountModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content" style="border: 5px solid var(--accent-color); border-radius: 15px;">
+                <div class="modal-header d-flex justify-content-between align-items-center" style="background-color: var(--accent-color);">
+                    <h5 class="modal-title" id="addAccountModalLabel" style="color: #fff;">Add New Account</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" style="background-color: #fff; border: none;" aria-label="Close"></button>
+                </div>
+                <form id="addAccountForm" method="POST" action="#">
+                    {% csrf_token %}
+                    <div class="modal-body" style="border-bottom: 2px solid var(--accent-color);">
+                        <!-- Form fields here -->
+                    </div>
+                    <div class="modal-footer d-flex justify-content-end">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn" style="background-color: var(--accent-color); color: #fff;">Save changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for adding new Subject -->
+    <div class="modal fade" id="addSubjectModal" tabindex="-1" aria-labelledby="addSubjectModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content" style="border: 5px solid var(--accent-color); border-radius: 15px;">
+                <div class="modal-header d-flex justify-content-between align-items-center" style="background-color: var(--accent-color);">
+                    <h5 class="modal-title" id="addSubjectModalLabel" style="color: #fff;">Add New Subject</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" style="background-color: #fff; border: none;" aria-label="Close"></button>
+                </div>
+                <form id="addSubjectForm" method="POST" action="#">
+                    {% csrf_token %}
+                    <div class="modal-body" style="border-bottom: 2px solid var(--accent-color);">
+                        <!-- Form fields here -->
+                    </div>
+                    <div class="modal-footer d-flex justify-content-end">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn" style="background-color: var(--accent-color); color: #fff;">Save changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for adding new SubsectionFile -->
+    <div class="modal fade" id="addSubsectionFileModal" tabindex="-1" aria-labelledby="addSubsectionFileModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content" style="border: 5px solid var(--accent-color); border-radius: 15px;">
+                <div class="modal-header d-flex justify-content-between align-items-center" style="background-color: var(--accent-color);">
+                    <h5 class="modal-title" id="addSubsectionFileModalLabel" style="color: #fff;">Add New SubsectionFile</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" style="background-color: #fff; border: none;" aria-label="Close"></button>
+                </div>
+                <form id="addSubsectionFileForm" method="POST" action="#">
+                    {% csrf_token %}
+                    <div class="modal-body" style="border-bottom: 2px solid var(--accent-color);">
+                        <!-- Form fields here -->
+                    </div>
+                    <div class="modal-footer d-flex justify-content-end">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn" style="background-color: var(--accent-color); color: #fff;">Save changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for adding new SubmissionFile -->
+    <div class="modal fade" id="addSubmissionFileModal" tabindex="-1" aria-labelledby="addSubmissionFileModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content" style="border: 5px solid var(--accent-color); border-radius: 15px;">
+                <div class="modal-header d-flex justify-content-between align-items-center" style="background-color: var(--accent-color);">
+                    <h5 class="modal-title" id="addSubmissionFileModalLabel" style="color: #fff;">Add New SubmissionFile</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" style="background-color: #fff; border: none;" aria-label="Close"></button>
+                </div>
+                <form id="addSubmissionFileForm" method="POST" action="#">
+                    {% csrf_token %}
+                    <div class="modal-body" style="border-bottom: 2px solid var(--accent-color);">
+                        <!-- Form fields here -->
+                    </div>
+                    <div class="modal-footer d-flex justify-content-end">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn" style="background-color: var(--accent-color); color: #fff;">Save changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="preloader">
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+    </div>
+
+    <!-- Main JS File -->
+    <script src="{% static 'assets/js/main.js' %}"></script>
 
     <!-- FontAwesome Icons -->
     <script src="https://kit.fontawesome.com/a076d05399.js"></script>
@@ -255,10 +778,118 @@
                     document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
 
                     this.classList.add('active');
-                    const contentId = this.dataset.content || this.id.replace('-link', '-content');
+                    const contentId = this.id.replace('-link', '-content');
                     document.getElementById(contentId).classList.add('active');
                 });
             });
+
+            const addForms = document.querySelectorAll('form');
+            addForms.forEach(form => {
+                form.addEventListener('submit', function(event) {
+                    event.preventDefault();
+                    const formData = new FormData(this);
+                    const url = this.action;
+
+                    fetch(url, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            alert(data.message);
+                            location.reload();
+                        } else {
+                            alert('Failed to save changes');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+                });
+            });
+
+            // Modal for editing Statistical Analysis
+            const editStatisticalModal = document.getElementById('editStatisticalModal');
+            editStatisticalModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                const id = button.getAttribute('data-bs-id');
+                const modalBody = editStatisticalModal.querySelector('.modal-body');
+                modalBody.innerHTML = '<p>Loading...</p>';
+                
+            });
+
+
+
+            // Modal for editing SubsectionFile
+            const editSubsectionFileModal = document.getElementById('editSubsectionFileModal');
+            editSubsectionFileModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                const id = button.getAttribute('data-bs-id');
+                const modalBody = editSubsectionFileModal.querySelector('.modal-body');
+                modalBody.innerHTML = '<p>Loading...</p>';
+            }); 
+
+            // Modal for editing SubmissionFile
+            const editSubmissionFileModal = document.getElementById('editSubmissionFileModal');
+            editSubmissionFileModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                const id = button.getAttribute('data-bs-id');
+                const modalBody = editSubmissionFileModal.querySelector('.modal-body');
+                modalBody.innerHTML = '<p>Loading...</p>';
+            }); 
+            
+            // Modal for editing Subject
+            const editSubjectModal = document.getElementById('editSubjectModal');
+            editSubjectModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                const id = button.getAttribute('data-bs-id');
+                const modalBody = editSubjectModal.querySelector('.modal-body');
+                modalBody.innerHTML = '<p>Loading...</p>';
+            });  
+
+            // Modal for adding new Statistical Analysis
+            const addStatisticalModal = document.getElementById('addStatisticalModal');
+            addStatisticalModal.addEventListener('show.bs.modal', function (event) {
+                const modalBody = addStatisticalModal.querySelector('.modal-body');
+                modalBody.innerHTML = '<p>Loading...</p>';
+            }); 
+
+            // Modal for adding new Account
+            const addAccountModal = document.getElementById('addAccountModal');
+            addAccountModal.addEventListener('show.bs.modal', function (event) {
+                const modalBody = addAccountModal.querySelector('.modal-body');
+                modalBody.innerHTML = '<p>Loading...</p>';
+            });  
+
+            // Modal for adding new Subject
+            const addSubjectModal = document.getElementById('addSubjectModal');
+            addSubjectModal.addEventListener('show.bs.modal', function (event) {
+                const modalBody = addSubjectModal.querySelector('.modal-body');
+                modalBody.innerHTML = '<p>Loading...</p>';
+            });  
+
+            // Modal for adding new SubsectionFile
+            const addSubsectionFileModal = document.getElementById('addSubsectionFileModal');
+            addSubsectionFileModal.addEventListener('show.bs.modal', function (event) {
+                const modalBody = addSubsectionFileModal.querySelector('.modal-body');
+                modalBody.innerHTML = '<p>Loading...</p>';
+            });  
+
+            // Modal for adding new SubmissionFile
+            const addSubmissionFileModal = document.getElementById('addSubmissionFileModal');
+            addSubmissionFileModal.addEventListener('show.bs.modal', function (event) {
+                const modalBody = addSubmissionFileModal.querySelector('.modal-body');
+                modalBody.innerHTML = '<p>Loading...</p>';
+            }); 
+
+            
+            
+            
+            
         });
     </script>
 </body>

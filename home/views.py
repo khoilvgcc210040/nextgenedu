@@ -166,6 +166,7 @@ def subjects(request):
 
 import logging
 logger = logging.getLogger(__name__)
+from django.core.mail import EmailMessage
 
 def forgot_password(request):
     if request.method == 'POST':
@@ -176,18 +177,24 @@ def forgot_password(request):
                 subject = "Password Reset Requested"
                 email_template_name = "password_reset_email.html"
                 uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
-                logger.debug(f'Generated uidb64: {uidb64}') 
                 c = {
                     "email": user.email,
-                    'domain': 'localhost:8000', 
-                    'site_name': 'Website',
-                    "uidb64": uidb64,  
+                    'domain': 'localhost:8000',
+                    'site_name': 'NextGenEdu',
+                    "uidb64": uidb64,
                     "user": user,
                     'token': default_token_generator.make_token(user),
                     'protocol': 'http',
                 }
-                email = render_to_string(email_template_name, c)
-                send_mail(subject, email, 'NextGenEdu <nextgenedu03.info@gmail.com>', [user.email], fail_silently=False)
+                email_body = render_to_string(email_template_name, c)
+                email = EmailMessage(
+                    subject,
+                    email_body,
+                    'NextGenEdu <nextgenedu03.info@gmail.com>',
+                    [user.email],
+                )
+                email.content_subtype = "html"  # This is the key line that allows HTML rendering
+                email.send()
             return render(request, 'check_your_email.html')
         else:
             messages.error(request, 'This email does not exist in our system.')
@@ -212,7 +219,7 @@ def reset_password(request, uidb64=None, token=None):
                     user.set_password(new_password)
                     user.save()
                     messages.success(request, 'Your password has been successfully changed.')
-                    return redirect('reset_password')
+                    return redirect('/auth/?form=login')
                 else:
                     messages.error(request, 'Passwords do not match. Please try again.')
                     return redirect(request.path)
@@ -896,6 +903,27 @@ def question_list(request, submission_id):
     
     return render(request, 'question_list.html', context)
 
+from django.utils.dateparse import parse_datetime
+
+@csrf_exempt
+def edit_submission_time(request):
+    if request.method == 'POST':
+        submission_id = request.POST.get('submission_id')
+        time_type = request.POST.get('time_type')
+        new_time = request.POST.get('new_time')
+        
+        try:
+            submission = Submission.objects.get(id=submission_id)
+            if time_type == 'open':
+                submission.open_date = parse_datetime(new_time)
+            elif time_type == 'close':
+                submission.close_date = parse_datetime(new_time)
+            submission.save()
+            return JsonResponse({'success': True})
+        except Submission.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Submission not found'})
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
+
 def create_question(request, submission_id):
     submission = get_object_or_404(Submission, id=submission_id, submission_type='question_test')
 
@@ -1132,11 +1160,47 @@ def view_answer_history(request, quiz_result_id):
     return render(request, 'view_answer_history.html', context)
 
 def adminPage(request):
-    # classroom = get_object_or_404(Classroom, id=id)
-    # context = {
-    #     'classroom': classroom
-    # }
-    return render(request, 'adminPage.html')
+    statistical_data = []  # Thêm dữ liệu thống kê nếu có
+    accounts = CustomUser.objects.all()
+    subjects = Subjects.objects.all()
+    subsection_files = SubsectionFile.objects.all()
+    submission_files = SubmissionFile.objects.all()
+    subjects = Subjects.objects.all()   
+
+    context = {
+        'statistical_data': statistical_data,
+        'accounts': accounts,
+        'subjects': subjects,
+        'subsection_files': subsection_files,
+        'submission_files': submission_files,
+        'subjects': subjects,
+    }
+    return render(request, 'adminPage.html', context)
+
+def update_account(request):
+    if request.method == 'POST':
+        account_id = request.POST.get('id')
+        account = get_object_or_404(CustomUser, id=account_id)
+        
+        account.username = request.POST.get('username')
+        account.email = request.POST.get('email')
+        account.role = request.POST.get('role')
+        
+        if account.role == 'teacher':
+            subject_id = request.POST.get('subject')
+            account.subject = Subjects.objects.get(id=subject_id) if subject_id else None
+            account.grade = None
+        elif account.role == 'student':
+            account.grade = request.POST.get('grade')
+            account.subject = None
+        else:
+            account.subject = None
+            account.grade = None
+        
+        account.save()
+        
+        return JsonResponse({'status': 'success'})
+    return JsonResponse({'status': 'failed'})
 
 from django.db.models import Sum, Max, Avg
 from django.contrib.auth.decorators import login_required
@@ -1219,11 +1283,16 @@ def searchPage(request):
     query = request.GET.get('q', '')
     public_classrooms = Classroom.objects.filter(status=False, name__icontains=query) | Classroom.objects.filter(status=False, teacher__username__icontains=query)
     private_classrooms = Classroom.objects.filter(status=True, name__icontains=query) | Classroom.objects.filter(status=True, teacher__username__icontains=query)
+    participant_classrooms = Participant.objects.filter(user=request.user).values_list('classroom_id', flat=True)
     return render(request, 'searchPage.html', {
         'public_classrooms': public_classrooms,
         'private_classrooms': private_classrooms,
-        'query': query
+        'query': query,
+        'participant_classrooms': participant_classrooms,
     })
+
+
+
 
 
 

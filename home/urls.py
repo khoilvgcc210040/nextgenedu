@@ -54,4 +54,6 @@ urlpatterns = [
     path('search/', views.searchPage, name='searchPage'),
     path('question_test_marking/<int:submission_id>/', views.question_test_marking, name='question_test_marking'),
     path('view_answer_history/<int:quiz_result_id>/', views.view_answer_history, name='view_answer_history'),
+    path('edit_submission_time/', views.edit_submission_time, name='edit_submission_time'),
+    path('update-account/', views.update_account, name='update_account'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

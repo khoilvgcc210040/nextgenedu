@@ -294,9 +294,9 @@
                     </ul>
                 </li>
                 <li class="dropdown" style="padding: 0 40px 0 10px;"><a href="#"><img style="width: 30px; height: 30px; border-radius: 50%;" src="{% static 'account.png' %}" alt="user"><i class="bi bi-chevron-down toggle-dropdown d-xl-none"></i></a>
-                    <ul style="padding: 0; box-shadow: 0 0 10px rgba(0, 0, 0, 0.7); border-radius: 10px; border: 1px solid #e0e0e0;">
+                    <ul style="padding: 0; box-shadow: 0 0 10px rgba(0, 0, 0, 0.7); border-radius: 5px; border: 1px solid #e0e0e0;">
                       <li style="padding: 0;">
-                        <div style="border-radius: 10px 10px 0 0; display: flex; align-items: center; gap: 10px; padding: 10px; border-bottom: 1px solid #e0e0e0; background-color: var(--accent-color); color: #fff;">
+                        <div style="border-radius: 5px 5px 0 0; display: flex; align-items: center; gap: 10px; padding: 10px; border-bottom: 1px solid #e0e0e0; background-color: var(--accent-color); color: #fff;">
                             <img style="width: 30px; height: 30px; border-radius: 50%; background-color: #fff;" src="{% static 'account.png' %}" alt="user">
                             <div>
                                 <p style="font-weight: 700; font-size: 14px; margin: 0;">{{user.username}}</p>
@@ -308,7 +308,10 @@
                       <li><a href="{% url "achivement" %}" style="display: flex; align-items: center; justify-content: left; gap: 10px;"><i class="fa-solid fa-trophy"></i> Achievement</a></li>
                       <li><a href="{% url "favorite" %}" style="display: flex; align-items: center; justify-content: left; gap: 10px;"><i class="fa-solid fa-star"></i> Favorite</a></li>
                       <li><a href="{% url "setting" %}" style="display: flex; align-items: center; justify-content: left; gap: 10px;"><i class="fa-solid fa-gear"></i> Setting</a></li>
-                      <li><a href="{% url "logout" %}" style="display: flex; align-items: center; justify-content: left; gap: 10px; background-color: var(--accent-color); color: #fff; border-radius: 0 0 10px 10px; transition: transform 0.3s;"><span style="transition: transform 0.3s;" onmouseover="this.style.transform='translateX(-3px)';" onmouseout="this.style.transform='translateY(0)';"><i class="fa-solid fa-arrow-left"></i> Logout</span></a></li>
+                      {% if user.role == 'admin' %}
+                      <li><a href="{% url "adminPage" %}" style="display: flex; align-items: center; justify-content: left; gap: 10px; background-color: #f97316; color: #fff; transition: transform 0.3s;"><span style="transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-1px)';" onmouseout="this.style.transform='translateY(0)';"><i class="fa-solid fa-user-tie"></i> Admin</span></a></li>
+                      {% endif %}
+                      <li><a href="{% url "logout" %}" style="display: flex; align-items: center; justify-content: left; gap: 10px; background-color: var(--accent-color); color: #fff; border-radius: 0 0 5px 5px; transition: transform 0.3s;"><span style="transition: transform 0.3s;" onmouseover="this.style.transform='translateX(-3px)';" onmouseout="this.style.transform='translateY(0)';"><i class="fa-solid fa-arrow-left"></i> Logout</span></a></li>
                     </ul>
                 </li>
                 {% else %}
