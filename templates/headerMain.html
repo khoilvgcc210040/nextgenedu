@@ -330,6 +330,14 @@
                     </li>
                     <li><a href="{% url "auth" %}?form=login" style="font-weight: 700; background-color: #a3a3a3; color: #fff; padding: 10px 15px; border-radius: 5px; transition: opacity 0.3s;" onmouseover="this.style.opacity=0.7;" onmouseout="this.style.opacity=1;">Log in</a></li>
                     <li style="padding: 0 10px;"><a href="{% url "auth" %}?form=signup" style="font-weight: 700; background-color: var(--accent-color); color: #fff; padding: 10px 15px; border-radius: 5px; transition: opacity 0.3s;" onmouseover="this.style.opacity=0.7;" onmouseout="this.style.opacity=1;">Sign up</a></li>
+                    {% if request.session.user_data %}
+                    <div>
+                        <p>Hi {{ request.session.user_data.given_name }} 🙂</p>
+                        <p>Your email is {{ request.session.user_data.email }}</p>
+                        <img src="{{ request.session.user_data.picture }}" alt="User picture">
+                        <p>Click here to <a href="{% url "logout" %}">Sign out</a></p>
+                    </div>
+                    {% endif %}
                 {% endif %}
               </ul>
               <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>

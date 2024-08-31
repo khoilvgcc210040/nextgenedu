@@ -23,7 +23,7 @@ class CustomUser(AbstractUser):
     role = models.CharField(max_length=10, null=True, blank=True)
     grade = models.CharField(max_length=10, null=True, blank=True)
     subject = models.ForeignKey(Subjects, on_delete=models.CASCADE, null=True, blank=True)
-    notify_sections = models.BooleanField(default=False)
+    notify_sections = models.BooleanField(default=True)
     terms_accepted = models.BooleanField(default=False)
 
     def __str__(self):
@@ -236,4 +236,34 @@ class BlockedParticipant(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.classroom.name}"
+    
+class ForumPost(models.Model):
+    POST_TYPE_CHOICES = [
+        ('question', 'Question'),
+        ('discussion', 'Discussion'),
+    ]
+
+    title = models.CharField(max_length=200)
+    content = models.TextField()
+    post_type = models.CharField(max_length=10, choices=POST_TYPE_CHOICES)
+    classroom = models.ForeignKey(Classroom, on_delete=models.CASCADE, related_name='forum_posts')
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(default=timezone.now)
+    is_approved = models.BooleanField(default=False)
+    is_rejected = models.BooleanField(default=False)
+    likes = models.IntegerField(default=0)
+    views = models.IntegerField(default=0)
+    reason = models.TextField(null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.title} by {self.user.username}"
+    
+class ForumComment(models.Model):
+    post = models.ForeignKey(ForumPost, on_delete=models.CASCADE, related_name='forum_comments')
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    text = models.TextField()
+    created_at = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f"Comment by {self.user.username} on {self.post.title}"
 

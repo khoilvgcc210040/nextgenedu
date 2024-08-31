@@ -56,4 +56,17 @@ urlpatterns = [
     path('view_answer_history/<int:quiz_result_id>/', views.view_answer_history, name='view_answer_history'),
     path('edit_submission_time/', views.edit_submission_time, name='edit_submission_time'),
     path('update-account/', views.update_account, name='update_account'),
+    path('auth-receiver', views.auth_receiver, name='auth_receiver'),
+    path('complete-profile/', views.complete_profile, name='complete_profile'),
+
+    path('forum/<int:classroom_id>/', views.forum, name='forum'),
+    path('forum/<int:post_id>/detail/', views.forum_detail, name='forum_detail'),
+    path('forum/<int:classroom_id>/create/', views.create_post, name='create_post'),
+    path('forum/<int:classroom_id>/manage/', views.manage_posts, name='manage_posts'),
+    path('forum/post/<int:post_id>/edit/', views.edit_post, name='edit_post'),
+    path('forum/post/<int:post_id>/delete/', views.delete_post, name='delete_post'),
+    path('forum/<int:classroom_id>/manage_approve/', views.manage_approve_posts, name='manage_approve_posts'),
+    path('forum/post/<int:post_id>/approve/', views.approve_post, name='approve_post'),
+    path('forum/post/<int:post_id>/reject/', views.reject_post, name='reject_post'),
+    path('forum/post/<int:post_id>/comment/', views.add_comment, name='add_comment'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
