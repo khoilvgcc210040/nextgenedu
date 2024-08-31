@@ -1,0 +1,12 @@
+<h2>{{ classroom.name }} Forum</h2>
+<div class="forum-posts">
+    {% for post in posts %}
+        {% if post.is_approved %}
+            <div class="post">
+                <h4><a href="{% url 'forum_detail' post.id %}">{{ post.title }}</a></h4>
+                <p>{{ post.content|truncatewords:20 }}</p>
+                <p><small>Posted by {{ post.user.username }} on {{ post.created_at }}</small></p>
+            </div>
+        {% endif %}
+    {% endfor %}
+</div>

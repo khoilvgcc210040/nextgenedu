@@ -975,6 +975,21 @@
         .btn-setting:hover .fa-gear {
             transform: rotate(90deg);
         }
+
+        .btn-forum {
+            outline: none;
+            padding: 10px 20px;
+            background-color: var(--accent-color);
+            color: #fff;
+            border-radius: 8px;
+            transition: transform 0.3s ease-in-out;
+            margin-left: 15px;
+        }
+
+        .btn-forum:hover {
+            transform: translateY(-5%);
+            color: #fff;
+        }
     </style>
 </head>
 <body>
@@ -1627,11 +1642,16 @@
                 </a>
             </div>
             <hr style="border: 1px solid #000;">
+            <h1 style="font-weight: 700;" class="text-truncate">Forum</h1>
+                <div class="d-flex justify-content-start mt-3 ml-5">
+                    <a href="{% url 'forum' classroom.id %}" class="btn-forum">Go to Forum <i class="fa-regular fa-circle-question"></i></a>
+                </div>
+            <hr style="border: 1px solid #000;">
             <h1 style="font-weight: 700;" class="text-truncate">Comments ({{ classroom.average_rating|floatformat:1 }}/5.0)</h1>
             <p>There are {{ comments.count }} comments on {{ classroom.name }}</p>
             {% if not existing_comment %}
             <div class="d-flex pb-3">
-                <div class="user-icon mr-3">
+                <div class="user-icon mr-3" style="margin-right: 10px;">
                     <img src="{% static "account.png" %}" alt="User Icon">
                 </div>
                 <div class="comment-box">

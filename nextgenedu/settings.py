@@ -12,6 +12,22 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 import os
 from pathlib import Path
+from dotenv import load_dotenv
+
+
+load_dotenv()
+
+
+GOOGLE_OAUTH_CLIENT_ID = os.environ.get('GOOGLE_OAUTH_CLIENT_ID')
+if not GOOGLE_OAUTH_CLIENT_ID:
+    raise ValueError(
+        'GOOGLE_OAUTH_CLIENT_ID is missing.' 
+        'Have you put it in a file at core/.env ?'
+    )
+
+# We need these lines below to allow the Google sign in popup to work.
+SECURE_REFERRER_POLICY = 'no-referrer-when-downgrade'
+SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin-allow-popups"
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -48,6 +64,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'home.apps.HomeConfig',
     'channels',
+    'rest_framework',
 ]
 
 ASGI_APPLICATION = 'nextgenedu.asgi.application'  # Replace with your project name
