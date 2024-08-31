@@ -6,7 +6,7 @@ from urllib.parse import urlencode
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, get_backends
 from django.contrib import messages
 from django.urls import reverse
 from home.models import AcademicYear, Answer, AnsweredQuestion, BlockedParticipant, ChatMessage, Classroom, Comment, CustomUser, FavoriteClassroom, Participant, Question, QuizResult, Section, StudentFile, Subjects, Submission, SubmissionFile, SubsectionFile
@@ -152,6 +152,91 @@ def authPage(request):
             'login_email': request.session.get('login_email') if request.session.get('login_email') else "",
         }
         return render(request, 'auth.html', context)
+
+from google.oauth2 import id_token
+from google.auth.transport import requests
+import os
+
+def generate_unique_username(base_username):
+    username = base_username
+    counter = 1
+    while User.objects.filter(username=username).exists():
+        username = f"{base_username}{counter}"
+        counter += 1
+    return username
+
+@csrf_exempt
+def auth_receiver(request):
+    token = request.POST['credential']
+
+    try:
+        user_data = id_token.verify_oauth2_token(
+            token, requests.Request(), os.environ['GOOGLE_OAUTH_CLIENT_ID']
+        )
+    except ValueError:
+        return HttpResponse(status=403)
+
+    email = user_data.get('email')
+    base_username = user_data.get('name')
+
+    # Kiểm tra xem người dùng đã tồn tại trong database chưa
+    try:
+        user = CustomUser.objects.get(email=email)
+        # Nếu người dùng đã tồn tại, đăng nhập ngay lập tức
+        login(request, user, backend='home.backends.EmailBackend')
+        return redirect('home')
+    except CustomUser.DoesNotExist:
+        # Nếu người dùng chưa tồn tại, kiểm tra xem username của gg account này có tồn tại trong database hay không
+        if User.objects.filter(username=base_username).exists():
+            # Nếu có trùng nhau thì mới tạo username duy nhất
+            username = generate_unique_username(base_username)
+        else:
+            # Nếu không thì vẫn lưu username gg account đến session google_user_data
+            username = base_username
+        # Lưu thông tin vào session và chuyển hướng đến trang hoàn thành hồ sơ
+        request.session['google_user_data'] = {
+            'email': email,
+            'username': username,
+        }
+        return redirect('complete_profile')
+    
+def complete_profile(request):
+    if request.method == 'POST':
+        google_user_data = request.session.get('google_user_data')
+        if not google_user_data:
+            return redirect('/auth/?form=login')  # Trường hợp không có dữ liệu trong session, quay lại trang đăng nhập
+
+        email = google_user_data['email']
+        username = google_user_data['username']
+        
+        role = request.POST.get('role')
+        grade = request.POST.get('grade')
+        subject_id = request.POST.get('subject')
+        
+        day = int(request.POST.get('day'))
+        month = int(request.POST.get('month'))
+        year = int(request.POST.get('year'))
+
+        # Tạo người dùng mới với thông tin đầy đủ
+        user = CustomUser.objects.create_user(
+            username=username,
+            email=email,
+            date_of_birth=date(year, month, day),
+            terms_accepted=True,
+            role=role,
+            grade=grade if role == 'student' else None,
+            subject=Subjects.objects.get(id=subject_id) if role == 'teacher' else None
+        )
+        user.save()
+
+        # Đăng nhập người dùng sau khi hoàn tất hồ sơ
+        login(request, user, backend='home.backends.EmailBackend')
+        return redirect('home')
+    else:
+        subjects = Subjects.objects.all()
+        context = {'subjects': subjects}
+        return render(request, 'complete_profile.html', context)
+
     
 def logoutPage(request):
     logout(request)
@@ -1291,6 +1376,83 @@ def searchPage(request):
         'participant_classrooms': participant_classrooms,
     })
 
+from .models import ForumComment, ForumPost
+
+def forum(request, classroom_id):
+    classroom = get_object_or_404(Classroom, id=classroom_id)
+    posts = ForumPost.objects.filter(classroom=classroom)
+    return render(request, 'forum.html', {'classroom': classroom, 'posts': posts})
+
+def forum_detail(request, post_id):
+    post = get_object_or_404(ForumPost, id=post_id)
+    comments = post.forum_comments.all()
+    return render(request, 'forum_detail.html', {'post': post, 'comments': comments})
+
+
+def add_comment(request, post_id):
+    if request.method == 'POST':
+        post = get_object_or_404(ForumPost, id=post_id)
+        comment_text = request.POST.get('comment_text')
+        ForumComment.objects.create(user=request.user, post=post, text=comment_text)
+        return redirect('forum_detail', post_id=post_id)
+    
+def create_post(request, classroom_id):
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        content = request.POST.get('content')
+        post_type = request.POST.get('post_type')  # 'question' hoặc 'discussion'
+        classroom = get_object_or_404(Classroom, id=classroom_id)
+        
+        ForumPost.objects.create(
+            title=title,
+            content=content,
+            post_type=post_type,
+            classroom=classroom,
+            user=request.user
+        )
+        return redirect('forum', classroom_id=classroom_id)
+    
+    return render(request, 'create_post.html', {'classroom_id': classroom_id})
+
+def manage_posts(request, classroom_id):
+    classroom = get_object_or_404(Classroom, id=classroom_id)
+    posts = ForumPost.objects.filter(classroom=classroom, user=request.user)
+    return render(request, 'manage_posts.html', {'posts': posts, 'classroom_id': classroom_id})
+
+def edit_post(request, post_id):
+    post = get_object_or_404(ForumPost, id=post_id, user=request.user)
+    if request.method == 'POST':
+        post.title = request.POST.get('title')
+        post.content = request.POST.get('content')
+        post.save()
+        return redirect('manage_posts', classroom_id=post.classroom.id)
+
+def delete_post(request, post_id):
+    post = get_object_or_404(ForumPost, id=post_id, user=request.user)
+    if request.method == 'POST':
+        post.delete()
+        return redirect('manage_posts', classroom_id=post.classroom.id)
+    
+def manage_approve_posts(request, classroom_id):
+    classroom = get_object_or_404(Classroom, id=classroom_id)
+    posts = ForumPost.objects.filter(classroom=classroom, is_approved=False)
+    return render(request, 'approve_posts.html', {'posts': posts, 'classroom_id': classroom_id})
+
+def approve_post(request, post_id):
+    post = get_object_or_404(ForumPost, id=post_id)
+    if request.method == 'POST':
+        post.is_approved = True
+        post.save()
+        return redirect('manage_approve_posts', classroom_id=post.classroom.id)
+    
+def reject_post(request, post_id):
+    post = get_object_or_404(ForumPost, id=post_id)
+    if request.method == 'POST':
+        reason = request.POST.get('reason')
+        post.reason = reason
+        post.is_rejected = True
+        post.save()
+        return redirect('manage_approve_posts', classroom_id=post.classroom.id)
 
 
 

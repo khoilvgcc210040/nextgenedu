@@ -1,0 +1,56 @@
+<h2>Manage Your Posts</h2>
+<div class="forum-posts">
+    {% for post in posts %}
+        <div class="post">
+            <h4>{{ post.title }}</h4>
+            <p>{{ post.content|truncatewords:20 }}</p>
+            <button data-toggle="modal" data-target="#editModal{{ post.id }}">Edit</button>
+            <button data-toggle="modal" data-target="#deleteModal{{ post.id }}">Delete</button>
+        </div>
+
+        <!-- Edit Modal -->
+        <div class="modal fade" id="editModal{{ post.id }}" tabindex="-1" role="dialog" aria-labelledby="editModalLabel{{ post.id }}" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editModalLabel{{ post.id }}">Edit Post</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="post" action="{% url 'edit_post' post.id %}">
+                            {% csrf_token %}
+                            <label for="title{{ post.id }}">Title:</label>
+                            <input type="text" id="title{{ post.id }}" name="title" value="{{ post.title }}" required>
+                            <label for="content{{ post.id }}">Content:</label>
+                            <textarea id="content{{ post.id }}" name="content" required>{{ post.content }}</textarea>
+                            <button type="submit" class="btn btn-primary">Save changes</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delete Modal -->
+        <div class="modal fade" id="deleteModal{{ post.id }}" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel{{ post.id }}" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteModalLabel{{ post.id }}">Delete Post</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure you want to delete this post?</p>
+                        <form method="post" action="{% url 'delete_post' post.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>

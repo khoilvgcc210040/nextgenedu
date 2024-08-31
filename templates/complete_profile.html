@@ -1,0 +1,102 @@
+<form method="post">
+    {% csrf_token %}
+    
+    <!-- Phần chọn vai trò (role) -->
+    <div>
+        <label for="role">Who are you?</label>
+        <select id="role" name="role" required>
+            <option value="student">Student</option>
+            <option value="teacher">Teacher</option>
+        </select>
+    </div>
+    
+    <!-- Phần nhập ngày sinh -->
+    <div>
+        <label for="date_of_birth">Date of Birth</label>
+        <div style="display: flex; gap: 10px; margin-top: 5px;">
+            <select id="day" name="day" required>
+                <!-- Các tùy chọn sẽ được điền bởi JavaScript -->
+            </select>
+            <select id="month" name="month" required>
+                <!-- Các tùy chọn sẽ được điền bởi JavaScript -->
+            </select>
+            <select id="year" name="year" required>
+                <!-- Các tùy chọn sẽ được điền bởi JavaScript -->
+            </select>
+        </div>
+    </div>
+    
+    <!-- Phần chọn lớp hoặc môn học tùy theo vai trò -->
+    <div id="grade-container">
+        <label for="grade">What grade are you in?</label>
+        <select id="grade" name="grade">
+            <option value="10">10</option>
+            <option value="11">11</option>
+            <option value="12">12</option>
+        </select>
+    </div>
+    <div id="subject-container" style="display: none;">
+        <label for="subject">Which subject do you teach?</label>
+        <select id="subject" name="subject">
+            {% for subject in subjects %}
+                <option value="{{ subject.id }}">{{ subject.name }} - Grade {{ subject.grade }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="form-check d-flex align-items-center" style="margin-bottom: 35px;">
+        <input type="checkbox" class="form-check-input" id="terms" name="terms" required>
+        <label class="form-check-label ms-2 mt-1" for="terms">I accept the <a href="" class="text-dark fw-bold">Terms of Service</a> and <a href="" class="text-dark fw-bold">Privacy Policy</a></label>
+    </div>
+    
+    <button type="submit">Complete Profile</button>
+</form>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const daySelect = document.getElementById('day');
+    for (let i = 1; i <= 31; i++) {
+        const option = document.createElement('option');
+        option.value = i;
+        option.textContent = i;
+        daySelect.appendChild(option);
+    }
+
+    const monthSelect = document.getElementById('month');
+    const monthNames = ["January", "February", "March", "April", "May", "June", 
+                    "July", "August", "September", "October", "November", "December"];
+    for (let i = 0; i < monthNames.length; i++) {
+        const option = document.createElement('option');
+        option.value = i + 1;
+        option.textContent = monthNames[i];
+        monthSelect.appendChild(option);
+    }
+
+    const yearSelect = document.getElementById('year');
+    const currentYear = new Date().getFullYear();
+    for (let i = currentYear; i >= 1900; i--) {
+        const option = document.createElement('option');
+        option.value = i;
+        option.textContent = i;
+        yearSelect.appendChild(option);
+    }
+    
+    toggleFields();
+});
+
+function toggleFields() {
+    var roleSelect = document.getElementById('role');
+    var gradeContainer = document.getElementById('grade-container');
+    var subjectContainer = document.getElementById('subject-container');
+    
+    if (roleSelect.value === 'teacher') {
+        gradeContainer.style.display = 'none';
+        subjectContainer.style.display = 'block';
+    } else {
+        gradeContainer.style.display = 'block';
+        subjectContainer.style.display = 'none';
+    }
+}
+
+document.getElementById('role').addEventListener('change', toggleFields);
+</script>
