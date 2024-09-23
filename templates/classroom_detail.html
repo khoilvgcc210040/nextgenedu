@@ -9,6 +9,8 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
+    <script src="https://mozilla.github.io/pdf.js/build/pdf.js"></script>
     <style>
         .sidebar {
             background-color: var(--accent-color);
@@ -38,7 +40,8 @@
         .content-area {
             height: 100%;
             margin-left: 250px;
-            padding: 20px 40px;
+            padding: 20px 50px;
+            margin-right: 20px;
             transition: margin-left 0.3s ease-in-out;
         }
 
@@ -110,219 +113,6 @@
         .header-classroom{
             border-bottom: 2px solid #000;
         }
-
-        .cd-popup {
-            --cd-burger-line-width: 1.125em;
-            --cd-burger-line-height: 0.125em;
-            --cd-burger-offset: 0.625em;
-            --cd-burger-bg: rgba(0, 0, 0, .15);
-            --cd-burger-color: #333;
-            --cd-burger-line-border-radius: 0.1875em;
-            --cd-burger-diameter: 2.125em;
-            --cd-burger-btn-border-radius: calc(var(--cd-burger-diameter) / 2);
-            --cd-burger-line-transition: .3s;
-            --cd-burger-transition: all .1s ease-in-out;
-            --cd-burger-hover-scale: 1.1;
-            --cd-burger-active-scale: .95;
-            --cd-burger-enable-outline-color: var(--cd-burger-bg);
-            --cd-burger-enable-outline-width: 0.125em;
-            --cd-burger-enable-outline-offset: var(--cd-burger-enable-outline-width);
-            /* nav */
-            --cd-nav-padding-x: 0.25em;
-            --cd-nav-padding-y: 0.625em;
-            --cd-nav-border-radius: 0.375em;
-            --cd-nav-border-color: #ccc;
-            --cd-nav-border-width: 0.0625em;
-            --cd-nav-shadow-color: rgba(0, 0, 0, .2);
-            --cd-nav-shadow-width: 0 1px 5px;
-            --cd-nav-bg: #eee;
-            --cd-nav-font-family: "Montserrat", sans-serif;
-            --cd-nav-default-scale: .8;
-            --cd-nav-active-scale: 1;
-            --cd-nav-position-left: 0;
-            --cd-nav-position-right: unset;
-            /* if you want to change sides just switch one property */
-            /* from properties to "unset" and the other to 0 */
-            /* title */
-            --cd-nav-title-size: 0.625em;
-            --cd-nav-title-color: #777;
-            --cd-nav-title-padding-x: 1rem;
-            --cd-nav-title-padding-y: 0.25em;
-            /* nav button */
-            --cd-nav-button-padding-x: 1rem;
-            --cd-nav-button-padding-y: 0.375em;
-            --cd-nav-button-border-radius: 0.375em;
-            --cd-nav-button-font-size: 12px;
-            --cd-nav-button-hover-bg: #6495ed;
-            --cd-nav-button-hover-text-color: #fff;
-            --cd-nav-button-distance: 0.875em;
-            /* underline */
-            --cd-underline-border-width: 0.0625em;
-            --cd-underline-border-color: #ccc;
-            --cd-underline-margin-y: 0.3125em;
-          }
-          
-          /* cd-popup settings 👆 */
-          
-          .cd-popup {
-            display: inline-block;
-            text-rendering: optimizeLegibility;
-            position: relative;
-          }
-          
-          .cd-popup input {
-            display: none;
-          }
-          
-          .cd-burger {
-            display: flex;
-            position: relative;
-            align-items: center;
-            justify-content: center;
-            background: var(--cd-burger-bg);
-            width: var(--cd-burger-diameter);
-            height: var(--cd-burger-diameter);
-            border-radius: var(--cd-burger-btn-border-radius);
-            border: none;
-            cursor: pointer;
-            overflow: hidden;
-            transition: var(--cd-burger-transition);
-            outline: var(--cd-burger-enable-outline-width) solid transparent;
-            outline-offset: 0;
-          }
-          
-          .cd-burger span {
-            height: var(--cd-burger-line-height);
-            width: var(--cd-burger-line-width);
-            background: var(--cd-burger-color);
-            border-radius: var(--cd-burger-line-border-radius);
-            position: absolute;
-            transition: var(--cd-burger-line-transition);
-          }
-          
-          .cd-burger span:nth-child(1) {
-            top: var(--cd-burger-offset);
-          }
-          
-          .cd-burger span:nth-child(2) {
-            bottom: var(--cd-burger-offset);
-          }
-          
-          .cd-burger span:nth-child(3) {
-            top: 50%;
-            transform: translateY(-50%);
-          }
-          
-          .cd-popup-window {
-            transform: scale(var(--cd-nav-default-scale));
-            visibility: hidden;
-            opacity: 0;
-            position: absolute;
-            padding: var(--cd-nav-padding-y) var(--cd-nav-padding-x);
-            background: var(--cd-nav-bg);
-            font-family: var(--cd-nav-font-family);
-            color: var(--cd-nav-text-color);
-            border-radius: var(--cd-nav-border-radius);
-            box-shadow: var(--cd-nav-shadow-width) var(--cd-nav-shadow-color);
-            border: var(--cd-nav-border-width) solid var(--cd-nav-border-color);
-            top: calc(var(--cd-burger-diameter) + var(--cd-burger-enable-outline-width) + var(--cd-burger-enable-outline-offset));
-            left: var(--cd-nav-position-left);
-            right: var(--cd-nav-position-right);
-            transition: var(--cd-burger-transition);
-          }
-
-          .cd-popup-window legend {
-            padding: var(--cd-nav-title-padding-y) var(--cd-nav-title-padding-x);
-            margin: 0;
-            color: var(--cd-nav-title-color);
-            font-size: var(--cd-nav-title-size);
-            text-transform: uppercase;
-          }
-          
-          .cd-popup-window ul {
-            margin: 0;
-            padding: 0;
-            list-style-type: none;
-          }
-          
-          .cd-popup-window ul button {
-            outline: none;
-            width: 100%;
-            border: none;
-            background: none;
-            display: flex;
-            align-items: center;
-            color: var(--cd-burger-color);
-            font-size: var(--cd-nav-button-font-size);
-            padding: var(--cd-nav-button-padding-y) var(--cd-nav-button-padding-x);
-            white-space: nowrap;
-            border-radius: var(--cd-nav-button-border-radius);
-            cursor: pointer;
-            column-gap: var(--cd-nav-button-distance);
-          }
-          
-          .cd-popup-window ul li:nth-child(1) svg,
-          .cd-popup-window ul li:nth-child(2) svg {
-            color: cornflowerblue;
-          }
-          
-          .cd-popup-window ul li:nth-child(4) svg,
-          .cd-popup-window ul li:nth-child(5) svg {
-            color: rgb(153, 153, 153);
-          }
-          
-          .cd-popup-window ul li:nth-child(7) svg {
-            color: red;
-          }
-          
-          .cd-popup-window hr {
-            margin: var(--cd-underline-margin-y) 0;
-            border: none;
-            border-bottom: var(--cd-underline-border-width) solid var(--cd-underline-border-color);
-          }
-          
-          /* actions */
-          
-          .cd-popup-window ul button:hover,
-          .cd-popup-window ul button:focus-visible,
-          .cd-popup-window ul button:hover svg,
-          .cd-popup-window ul button:focus-visible svg {
-            color: var(--cd-nav-button-hover-text-color);
-            background: var(--cd-nav-button-hover-bg);
-          }
-          
-          .cd-burger:hover {
-            transform: scale(var(--cd-burger-hover-scale));
-          }
-          
-          .cd-burger:active {
-            transform: scale(var(--cd-burger-active-scale));
-          }
-          
-          .cd-burger:focus:not(:hover) {
-            outline-color: var(--cd-burger-enable-outline-color);
-            outline-offset: var(--cd-burger-enable-outline-offset);
-          }
-          
-          .cd-popup input:checked+.cd-burger span:nth-child(1) {
-            top: 50%;
-            transform: translateY(-50%) rotate(45deg);
-          }
-          
-          .cd-popup input:checked+.cd-burger span:nth-child(2) {
-            bottom: 50%;
-            transform: translateY(50%) rotate(-45deg);
-          }
-          
-          .cd-popup input:checked+.cd-burger span:nth-child(3) {
-            transform: translateX(calc(var(--cd-burger-diameter) * -1 - var(--cd-burger-line-width)));
-          }
-          
-          .cd-popup input:checked~nav {
-            transform: scale(var(--cd-nav-active-scale));
-            visibility: visible;
-            opacity: 1;
-          }
 
         .navbar .navbar-brand span{
             color: var(--accent-color) !important;
@@ -469,7 +259,7 @@
         .tooltip {
             position: absolute;
             left: 300px;
-            top: 60%;
+            top: 65%;
             transform: translateX(-50%);
             visibility: hidden;
             opacity: 0;
@@ -483,6 +273,7 @@
         
         .tooltip-text {
             white-space: nowrap;
+            font-size: 12px;
         }
         
         .rating:hover .tooltip {
@@ -686,8 +477,7 @@
         
         table th, table td {
             padding: 10px;
-            text-align: left;
-            border-bottom: 1px solid #000;
+            text-align: center;
         }
         
         .delete-btn {
@@ -972,10 +762,6 @@
             transform: translateX(-5%);
         }
 
-        .btn-setting:hover .fa-gear {
-            transform: rotate(90deg);
-        }
-
         .btn-forum {
             outline: none;
             padding: 10px 20px;
@@ -990,10 +776,83 @@
             transform: translateY(-5%);
             color: #fff;
         }
+
+        .dropdown-section {
+            background-color: transparent !important; 
+            border: 1px solid #fff; 
+            outline: none; 
+            z-index: 1000; 
+            cursor: pointer; 
+            color: #fff; 
+            font-size: 20px;
+        }
+    
+        .dropdown-menu {
+            background-color: var(--accent-color) !important;
+            border: 3px solid #f97316 !important;
+            border-radius: 3px !important;
+            color: #000 !important;
+            box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
+            margin-top: 10px !important;
+        }
+    
+        .dropdown-item {
+            color: #fff !important;
+        }
+    
+        .dropdown-item:hover {
+            background-color: #f97316 !important;
+            color: #fff !important;
+        }
+
+        .dropdown-toggle[aria-expanded="true"] .fa-gear {
+            transform: rotate(90deg);
+        }
     </style>
 </head>
 <body>
     {% include "headerMain.html" %}
+
+    <!-- Modal -->
+    <div class="modal fade" id="confirmLeaveModal" tabindex="-1" aria-labelledby="confirmLeaveModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: var(--accent-color);">
+                    <h5 class="modal-title" id="confirmLeaveModalLabel" style="color: white;">Confirm Leave</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="background-color: #fff; border: none;"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to leave the classroom?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <a href="{% url "leave_classroom" classroom.id %}" class="btn btn-danger">Leave</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="pdfModal" tabindex="-1" aria-labelledby="pdfModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" style="max-width: 80%;">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: var(--accent-color);">
+                    <h5 class="modal-title" id="pdfModalLabel" style="color: white;"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="background-color: #fff; border: none;"></button>
+                </div>
+                <div class="modal-body" style="overflow-y: scroll; max-height: 80vh; position: relative; scrollbar-width: none; -ms-overflow-style: none;">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <button id="prevPage" class="btn" style="background-color: var(--accent-color); color: white; position: fixed; left: 10.5%; top: 50%; transform: translateY(-50%);"><i class="fas fa-chevron-left"></i></button>
+                        <span style="font-weight: 500; color: var(--accent-color);">Page: <span id="pageNum">1</span> / <span id="pageCount">1</span></span>
+                        <div class="d-flex justify-content-end">
+                            <button id="downloadPDF" class="btn" style="background-color: var(--accent-color); color: white;"><i class="fas fa-download"></i> Download</button>
+                        </div>
+                        <button id="nextPage" class="btn" style="background-color: var(--accent-color); color: white; position: fixed; right: 10.5%; top: 50%; transform: translateY(-50%);"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                    <canvas id="pdfViewer" style="width: 100%;"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Modal for editing submission -->
     <div class="modal fade" id="editSubmissionModal" tabindex="-1" aria-labelledby="editSubmissionModalLabel" aria-hidden="true">
@@ -1008,11 +867,12 @@
                 </div>
 
                 <div class="modal-body" style="border-bottom: 2px solid var(--accent-color);">
-                    <form id="editSubmissionForm" method="post" enctype="multipart/form-data" action="{% url 'update_submission' classroom.id 0 %}">
+                    <form id="editSubmissionForm" method="post" enctype="multipart/form-data" action="{% url 'update_submission' classroom.id 0 %}" onsubmit="return validateFormSubmission()">
                         {% csrf_token %}
                         <!-- Edit Description -->
                         <div class="mb-3">
                             <label for="submissionDescription" class="form-label" style="color: var(--accent-color); font-weight: 700;">Description</label>
+                            <div id="descriptionErrorSubmission" class="text-danger" style="display: none; margin-bottom: 8px;">Description cannot be empty.</div>
                             <textarea id="submissionDescription" name="description" class="form-control" rows="5" style="border: 2px solid var(--accent-color); text-align: justify;"></textarea>
                         </div>
 
@@ -1039,6 +899,29 @@
 
                         </div>
                     </form>
+
+                    <script>
+                        function validateFormSubmission() {
+                            var description = document.getElementById('submissionDescription').value;
+                            var descriptionError = document.getElementById('descriptionErrorSubmission');
+
+                            if (description.trim() === "") {
+                                descriptionError.style.display = 'block';
+                                return false;
+                            } else {
+                                descriptionError.style.display = 'none';
+
+                                // Save the current state before submitting
+                                const rightSidebarExpanded = document.querySelector('.right-sidebar').classList.contains('expanded');
+                                const activeSectionId = document.querySelector('.content-section.active')?.id;
+                                const activeLeftSidebarId = document.querySelector('.nav-link.active')?.dataset.content;
+                                localStorage.setItem('rightSidebarExpanded', rightSidebarExpanded);
+                                localStorage.setItem('activeSectionId', activeSectionId);
+                                localStorage.setItem('activeLeftSidebarId', activeLeftSidebarId);
+                                return true;
+                            }
+                        }
+                    </script>
                 </div>
 
             </div>
@@ -1057,13 +940,13 @@
 
                     <button type="button" class="btn-close" data-bs-dismiss="modal" style="background-color: #fff; border: none;" aria-label="Close"></button>
                 </div>
-                <form id="editClassroomDescriptionForm" method="POST" action="{% url 'update_classroom_description' classroom.id %}">
+                <form id="editClassroomDescriptionForm" method="POST" action="{% url 'update_classroom_description' classroom.id %}" onsubmit="return validateFormClassroom()">
                     {% csrf_token %}
                     <div class="modal-body" style="border-bottom: 2px solid var(--accent-color);">
 
                         <div class="mb-3">
                             <label for="classroomDescription" class="form-label" style="color: var(--accent-color); font-weight: 700;">Description</label>
-
+                            <div id="descriptionErrorClassroom" class="text-danger" style="display: none; margin-bottom: 8px;">Description cannot be empty.</div>
                             <textarea id="classroomDescription" name="description" rows="5" class="form-control" style="border: 2px solid var(--accent-color); text-align: justify;">{{ classroom.description }}</textarea>
 
                         </div>
@@ -1076,6 +959,28 @@
                     </div>
                 </form>
 
+                <script>
+                    function validateFormClassroom() {
+                        var description = document.getElementById('classroomDescription').value;
+                        var descriptionError = document.getElementById('descriptionErrorClassroom');
+
+                        if (description.trim() === "") {
+                            descriptionError.style.display = 'block';
+                            return false;
+                        } else {
+                            descriptionError.style.display = 'none';
+
+                            // Save the current state before submitting
+                            const rightSidebarExpanded = document.querySelector('.right-sidebar').classList.contains('expanded');
+                            const activeSectionId = document.querySelector('.content-section.active')?.id;
+                            const activeLeftSidebarId = document.querySelector('.nav-link.active')?.dataset.content;
+                            localStorage.setItem('rightSidebarExpanded', rightSidebarExpanded);
+                            localStorage.setItem('activeSectionId', activeSectionId);
+                            localStorage.setItem('activeLeftSidebarId', activeLeftSidebarId);
+                            return true;
+                        }
+                    }
+                </script>
             </div>
 
         </div>
@@ -1094,12 +999,13 @@
                 </div>
 
                 <div class="modal-body" style="border-bottom: 2px solid var(--accent-color);">
-                    <form id="editDescriptionForm" method="post" action="{% url 'update_section' classroom.id 0 %}">
+                    <form id="editDescriptionForm" method="post" action="{% url 'update_section' classroom.id 0 %}" onsubmit="return validateFormDescription()">
 
                         {% csrf_token %}
                         <input type="hidden" id="editSectionId" name="section_id" value="">
                         <div class="mb-3">
                             <label for="description" class="form-label" style="color: var(--accent-color); font-weight: 700;">Description</label>
+                            <div id="descriptionError" class="text-danger" style="display: none; margin-bottom: 8px;">Description cannot be empty.</div>
                             <textarea id="description" name="description" class="form-control" rows="5" style="border: 2px solid var(--accent-color); text-align: justify;"></textarea>
 
                         </div>
@@ -1109,6 +1015,28 @@
                         </div>
 
                     </form>
+
+                    <script>
+                        function validateFormDescription() {
+                            var description = document.getElementById('description').value;
+                            var descriptionError = document.getElementById('descriptionError');
+
+                            if (description.trim() === "") {
+                                descriptionError.style.display = 'block';
+                                return false;
+                            } else {
+                                descriptionError.style.display = 'none';
+                                // Save the current state before submitting
+                                const rightSidebarExpanded = document.querySelector('.right-sidebar').classList.contains('expanded');
+                                const activeSectionId = document.querySelector('.content-section.active')?.id;
+                                const activeLeftSidebarId = document.querySelector('.nav-link.active')?.dataset.content;
+                                localStorage.setItem('rightSidebarExpanded', rightSidebarExpanded);
+                                localStorage.setItem('activeSectionId', activeSectionId);
+                                localStorage.setItem('activeLeftSidebarId', activeLeftSidebarId);
+                                return true;
+                            }   
+                        }
+                    </script>
                 </div>
 
             </div>
@@ -1127,20 +1055,21 @@
                 </div>
                 <div class="modal-body" style="border-bottom: 2px solid var(--accent-color);">
 
-                    <form id="editFilesForm" method="post" enctype="multipart/form-data" action="{% url 'update_section' classroom.id 0 %}">
+                    <form id="editFilesForm" method="post" enctype="multipart/form-data" action="{% url 'update_section' classroom.id 0 %}" onsubmit="return validateFormFiles()">
                         {% csrf_token %}
                         <input type="hidden" id="editFilesSectionId" name="section_id" value="">
 
                         <!-- Upload file -->
                         <div class="mb-3">
                             <label for="uploadFile" class="form-label" style="color: var(--accent-color); font-weight: 700;">Upload File</label>
-                            <input type="file" id="uploadFile" name="uploadFile" class="form-control" style="border: 2px solid var(--accent-color);">
+                            <div id="uploadFileError" class="text-danger" style="display: none; margin-bottom: 8px;">Please select a file to upload.</div>
+                            <input type="file" id="uploadFile" name="uploadFile" class="form-control" style="border: 2px solid var(--accent-color);" onchange="checkFile()">
                         </div>
 
                         <!-- Delete file -->
                         <div class="mb-3">
                             <label for="deleteFile" class="form-label" style="color: var(--accent-color); font-weight: 700;">Delete File</label>
-
+                            <div id="deleteFileError" class="text-danger" style="display: none; margin-bottom: 8px;">Please select a file to delete.</div>
                             <select id="deleteFile" name="deleteFile" class="form-select" style="border: 2px solid var(--accent-color);">
                                 <option value="">Select a file to delete</option>
                             </select>
@@ -1151,6 +1080,36 @@
                             <button type="submit" class="btn" style="background-color: var(--accent-color); color: #fff;">Save changes</button>
                         </div>
                     </form>
+
+                    <script>
+                        let fileChecked = false;
+
+                        function checkFile() {
+                            fileChecked = true;
+                            return true;
+                        }
+
+                        function validateFormFiles() {
+                            const deleteFile = document.getElementById('deleteFile').value;
+
+                            if (!fileChecked && deleteFile === "") {
+                                var uploadFileError = document.getElementById('uploadFileError');
+                                var deleteFileError = document.getElementById('deleteFileError');
+                                uploadFileError.style.display = 'block';
+                                deleteFileError.style.display = 'block';
+                                return false;
+                            }
+
+                            // Save the current state before submitting
+                            const rightSidebarExpanded = document.querySelector('.right-sidebar').classList.contains('expanded');
+                            const activeSectionId = document.querySelector('.content-section.active')?.id;
+                            const activeLeftSidebarId = document.querySelector('.nav-link.active')?.dataset.content;
+                            localStorage.setItem('rightSidebarExpanded', rightSidebarExpanded);
+                            localStorage.setItem('activeSectionId', activeSectionId);
+                            localStorage.setItem('activeLeftSidebarId', activeLeftSidebarId);
+                            return true;
+                        }
+                    </script>
                 </div>
             </div>
         </div>
@@ -1200,7 +1159,9 @@
                     <tr>
                         <th>Username</th>
                         <th>Roles</th>
-                        <th>Action</th>
+                        {% if request.user.role == 'teacher' %}
+                            <th>Action</th>
+                        {% endif %}
                     </tr>
                 </thead>
                 <tbody>
@@ -1208,7 +1169,9 @@
                     <tr>
                         <td>{{ participant.user.username }}</td>
                         <td>{{ participant.user.role }}</td>
-                        <td><button class="delete-btn">🗑️</button></td>
+                        {% if request.user.role == 'teacher' %}
+                            <td><button class="delete-btn" onclick="deleteMember({{ participant.id }})">🗑️</button></td>
+                        {% endif %}
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -1229,7 +1192,14 @@
                 <tbody>
                     {% for score in scores_data %}
                     <tr>
-                        <td>{{ forloop.counter }}</td> 
+                        <td>
+                            <div style="position: relative; display: inline-block;">
+                                <img src="{% static 'account.png' %}" alt="User Icon" style="width: 40px; height: 40px; background-color: white; border-radius: 50%;">
+                                <span style="position: absolute; bottom: -7px; right: -10px; background-color: white; color: black; border: 2px solid black; border-radius: 50%; padding: 2px 8px; font-size: 12px; font-weight: bold;">
+                                    {{ forloop.counter }}
+                                </span>
+                            </div>
+                        </td>
                         <td>{{ score.user.username }}</td>
                         <td>{{ score.num_tests }}</td>
                         <td>{{ score.total_time }}</td>
@@ -1536,7 +1506,7 @@
                         <input type="file" id="fileInput" accept=".pdf,.doc,.docx" style="display:none;"> 
 
                         
-                        <input type="text" id="chatMessageInput" placeholder="Please input your message in here..." required class="form-control">
+                        <input type="text" id="chatMessageInput" placeholder="Please input your message in here..." required class="form-control ms-3">
                         
                         <button id="sendButton" class="btn"><i class="fa-solid fa-paper-plane"></i></button>
                     </div>
@@ -1617,15 +1587,43 @@
         <div id="section-content-{{ section.id }}" class="content-section active">
             <div class="header-classroom">
                 <div class="back-icon">
-                    <a href="{% url 'classrooms' classroom.subject.id classroom.grade %}">
+                    <a href="#" id="back-link">
                         <i class="fa-solid fa-circle-chevron-left" style="font-size: 25px; color: var(--accent-color);"></i>
                     </a>
                 </div>
-                <h1 style="font-weight: 700;" class="text-truncate">Welcome to {{classroom.name}}</h1>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function () {
+                        const backLink = document.getElementById('back-link');
+                        backLink.addEventListener('click', function(event) {
+                            event.preventDefault();
+                            const referrer = document.referrer;
+                            window.location.href = referrer;
+                        });
+                    });
+                </script>
+                <h1 style="font-weight: 700; margin: 0 50px;" class="text-truncate">Welcome to {{classroom.name}}</h1>
                 <div class="d-flex justify-content-between align-items-center">
-                    <button onclick="window.location.href='{% url 'setting_classroom' classroom.id %}'" class="btn-setting mr-4" style="outline: none; border: none; background-color: transparent;">
-                        <i class="fa-solid fa-gear fa-xl" style="transition: transform 0.3s;"></i>
-                    </button> 
+                    {% if user.id == classroom.teacher.id %}
+                    <div class="dropdown">
+                        <button class="btn-setting mr-4 dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false" style="outline: none; border: none; background-color: transparent;">
+                            <i class="fa-solid fa-gear fa-xl" style="transition: transform 0.3s;"></i>
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <li><a class="dropdown-item" href="{% url 'manage_classroom_detail' classroom.id %}">Classroom Management</a></li>
+                            <li><a class="dropdown-item" href="{% url 'setting_classroom' classroom.id %}">Classroom Setting</a></li>
+                        </ul>
+                    </div>
+                    {% endif %}
+                    {% if user.id != classroom.teacher.id %}
+                    <div class="dropdown">
+                        <button class="btn-setting mr-4 dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false" style="outline: none; border: none; background-color: transparent;">
+                            <i class="fa-solid fa-gear fa-xl" style="transition: transform 0.3s;"></i>
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#confirmLeaveModal">Leave the classroom</a></li>
+                        </ul>
+                    </div>
+                    {% endif %}
                     <button class="btn-favorite mr-4" style="outline: none;">
                         <i class="fa-regular fa-star fa-xl {% if is_favorite %}favorite{% endif %}"></i>
                     </button>
@@ -1637,18 +1635,36 @@
                 </p>
             </div>            
             <div class="edit-description-classroom d-flex justify-content-end">
+                {% if user.id == classroom.teacher.id %}
                 <a href="#" class="edit-icon">
                     <i class="fas fa-edit fa-lg"></i>
                 </a>
+                {% endif %}
             </div>
             <hr style="border: 1px solid #000;">
-            <h1 style="font-weight: 700;" class="text-truncate">Forum</h1>
-                <div class="d-flex justify-content-start mt-3 ml-5">
-                    <a href="{% url 'forum' classroom.id %}" class="btn-forum">Go to Forum <i class="fa-regular fa-circle-question"></i></a>
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 style="font-weight: 700;" class="text-truncate">Forum</h1>
+                    <div class="d-flex justify-content-start mt-3 ml-5">
+                        <a href="{% url 'forum' classroom.id %}" class="btn-forum">Go to Forum <i class="fa-regular fa-circle-question" style="color: #10b981;"></i></a>
+                    </div>
                 </div>
+                <div>
+                    <h1 style="font-weight: 700;" class="text-truncate">Participants</h1>
+                    <div class="d-flex justify-content-start mt-3 ml-5">
+                        <button id="participants-btn-welcome" class="btn-forum">Go to Participants <i class="fa-solid fa-users" style="color: #f59e0b;"></i></button>
+                    </div>
+                </div>
+                <div>
+                    <h1 style="font-weight: 700;" class="text-truncate">Scores</h1>
+                    <div class="d-flex justify-content-start mt-3 ml-5">
+                        <button id="scores-btn-welcome" class="btn-forum">Go to Scores 💯</button>
+                    </div>
+                </div>
+            </div>
             <hr style="border: 1px solid #000;">
             <h1 style="font-weight: 700;" class="text-truncate">Comments ({{ classroom.average_rating|floatformat:1 }}/5.0)</h1>
-            <p>There are {{ comments.count }} comments on {{ classroom.name }}</p>
+            <p class="text-truncate" style="width: auto; margin-right: 50px;">There are {{ comments.count }} comments on {{ classroom.name }}</p>
             {% if not existing_comment %}
             <div class="d-flex pb-3">
                 <div class="user-icon mr-3" style="margin-right: 10px;">
@@ -1657,50 +1673,33 @@
                 <div class="comment-box">
 
                     <form id="commentForm" method="post" action="{% url 'classroom_detail' classroom.id %}">
-
                         {% csrf_token %}
-
                         <div class="comment-content">
-                            <textarea name="comment" placeholder="Please share your thoughts about the classroom after you've completed it. So that you know, you can only leave a comment once..."></textarea>
+                            <textarea id="comment" name="comment" placeholder="Please share your thoughts about the classroom. So that you know, you can only leave a comment once..." oninput="clearErrorMessage()"></textarea>
+                            <div id="error-message" class="error-message" style="color: red; padding: 5px; font-size: 14px;"></div>
                         </div>
                         <div class="send-button d-flex justify-content-between align-items-center">
-
                             <div class="rating">
-                                    <input type="radio" id="star-1" name="rating" value="5"><label for="star-1">
-
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path pathLength="360" d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"></path></svg>
-
-                                    </label>
-
-                                    <input type="radio" id="star-2" name="rating" value="4"><label for="star-2">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path pathLength="360" d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"></path></svg>
-
-                                    </label>
-
-                                    <input type="radio" id="star-3" name="rating" value="3"><label for="star-3">
-
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path pathLength="360" d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"></path></svg>
-
-                                    </label>
-                                    <input type="radio" id="star-4" name="rating" value="2"><label for="star-4">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path pathLength="360" d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"></path></svg>
-
-                                    </label>
-
-                                    <input type="radio" id="star-5" name="rating" value="1"><label for="star-5">
-
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path pathLength="360" d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"></path></svg>
-                                    </label>
-                                    <div class="tooltip" style="font-family: Montserrat, sans-serif !important;">
-
-                                        <span class="tooltip-text">Note: you can only rate once</span>
-
-                                    </div>
-
+                                <input type="radio" id="star-1" name="rating" value="5"><label for="star-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path pathLength="360" d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"></path></svg>
+                                </label>
+                                <input type="radio" id="star-2" name="rating" value="4"><label for="star-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path pathLength="360" d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"></path></svg>
+                                </label>
+                                <input type="radio" id="star-3" name="rating" value="3"><label for="star-3">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path pathLength="360" d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"></path></svg>
+                                </label>
+                                <input type="radio" id="star-4" name="rating" value="2"><label for="star-4">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path pathLength="360" d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"></path></svg>
+                                </label>
+                                <input type="radio" id="star-5" name="rating" value="1"><label for="star-5">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path pathLength="360" d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"></path></svg>
+                                </label>
+                                <div class="tooltip" style="font-family: Montserrat, sans-serif !important;">
+                                    <span class="tooltip-text">Note: you can only rate once</span>
+                                </div>
                             </div>
-
                             <img src="{% static "rocket.png" %}" alt="Send Icon" onclick="submitCommentForm();">
-
                         </div>
                     </form>
                 </div>  
@@ -1712,10 +1711,10 @@
 
                         <div class="modal-content">
 
-                            <div class="modal-header">
+                            <div class="modal-header" style="background-color: var(--accent-color);">
 
-                                <h5 class="modal-title" id="confirmModalLabel">Confirm Comment</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                <h5 class="modal-title" id="confirmModalLabel" style="color: white;">Confirm Comment</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="background-color: #fff; border: none;"></button>
                             </div>
                             <div class="modal-body">
                                 Are you sure you want to comment without a rating?
@@ -1724,7 +1723,7 @@
 
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
 
-                                <button type="button" class="btn btn-primary" onclick="submitFormWithoutRating()">Confirm</button>
+                                <button type="button" class="btn" style="background-color: var(--accent-color); color: white;" onclick="submitFormWithoutRating()">Confirm</button>
 
                             </div>
 
@@ -1737,22 +1736,29 @@
                 <script>
 
                     function submitCommentForm() {
+                        const comment = document.getElementById('comment').value;
                         const rating = document.querySelector('input[name="rating"]:checked');
-
-                        if (!rating) {
-
-                            const confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
-                            confirmModal.show();
+                        const errorMessage = document.getElementById('error-message');
+                
+                        if (!comment) {
+                            errorMessage.textContent = "Please provide a comment.";
                         } else {
-                            document.getElementById('commentForm').submit();
-
+                            if (!rating) {
+                                const confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+                                confirmModal.show();
+                            } else {
+                                document.getElementById('commentForm').submit();
+                            }
                         }
-
+                    }
+                
+                    function submitFormWithoutRating() {
+                        document.getElementById('commentForm').submit();
                     }
 
-                    function submitFormWithoutRating() {
-
-                        document.getElementById('commentForm').submit();
+                    function clearErrorMessage() {
+                        const errorMessage = document.getElementById('error-message');
+                        errorMessage.textContent = '';
                     }
 
                 </script>
@@ -1785,9 +1791,27 @@
             <div class="header-classroom">
                 <h1 style="font-weight: 700;" class="text-truncate">{{section.title}}</h1>
                 <div class="d-flex justify-content-between align-items-center">
-                    <button onclick="window.location.href='{% url 'setting_classroom' classroom.id %}'" class="btn-setting mr-4" style="outline: none; border: none; background-color: transparent;">
-                        <i class="fa-solid fa-gear fa-xl" style="transition: transform 0.3s;"></i>
-                    </button>                      
+                    {% if user.id == classroom.teacher.id %}
+                    <div class="dropdown">
+                        <button class="btn-setting mr-4 dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false" style="outline: none; border: none; background-color: transparent;">
+                            <i class="fa-solid fa-gear fa-xl" style="transition: transform 0.3s;"></i>
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <li><a class="dropdown-item" href="{% url 'manage_classroom_detail' classroom.id %}">Classroom Management</a></li>
+                            <li><a class="dropdown-item" href="{% url 'setting_classroom' classroom.id %}">Classroom Setting</a></li>
+                        </ul>
+                    </div>    
+                    {% endif %}
+                    {% if user.id != classroom.teacher.id %}
+                    <div class="dropdown">
+                        <button class="btn-setting mr-4 dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false" style="outline: none; border: none; background-color: transparent;">
+                            <i class="fa-solid fa-gear fa-xl" style="transition: transform 0.3s;"></i>
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#confirmLeaveModal">Leave the classroom</a></li>
+                        </ul>
+                    </div>
+                    {% endif %}
                     <button class="btn-favorite mr-4" style="outline: none;"><i class="fa-regular fa-star fa-xl {% if is_favorite %}favorite{% endif %}"></i></button>
                 </div>
             </div>
@@ -1797,32 +1821,39 @@
                 </p>
             </div>
             <div class="edit-description d-flex justify-content-end">
+                {% if user.id == classroom.teacher.id %}
                 <a href="#" class="edit-icon">
                     <i class="fas fa-edit fa-lg"></i>
                 </a>
+                {% endif %}
             </div>
             <hr style="border: 1px solid #000;">
             <h1 style="font-weight: 700;" class="text-truncate">Documents</h1>
             <p>There are {{ section.files.count }} documents on {{ section.title }}</p>
+            
             {% for file in section.files.all %}
             <div class="d-flex justify-content-between align-items-center pt-3 pb-3" style="padding-right: 400px;">
                 <div class="doc-icon mr-3">
-                    <img src="{% static 'google-docs.png' %}" alt="Document Icon">
+                    <a href="{{ file.file.url }}" download>
+                        <img src="{% static 'google-docs.png' %}" alt="Document Icon">
+                    </a>
                 </div>
                 <div class="file-name-container" style="flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500;">
                     <p class="m-0">{{ file.file.name|filename }}</p>
                 </div>
-                <button class="btn-doc" style="outline: none; margin-left: 15px;" onclick="openPDFModal('{{ file.file.url }}')">Open</button>
+                <button class="btn-doc" style="outline: none; margin-left: 15px;" onclick="openPDFModal('{{ file.file.url }}', '{{ file.file.name|filename }}')">Open</button>
                 <span style="margin-left: 10px;">|</span>
                 <button class="btn-doc" style="outline: none; margin-left: 10px;">
-                    <a href="{{ file.file.url }}" download style="text-decoration: none;">Download</a>
+                    <a href="{{ file.file.url }}" download style="text-decoration: none; color: white;" onmouseover="this.style.color='white'" onmouseout="this.style.color='white'">Download</a>
                 </button>
-            </div>            
+            </div>              
             {% endfor %}
             <div class="edit-files d-flex justify-content-end">
+                {% if user.id == classroom.teacher.id %}
                 <a href="#" class="edit-icon">
                     <i class="fas fa-edit fa-lg"></i>
                 </a>
+                {% endif %}
             </div>
         </div>
         {% endif %}
@@ -1831,9 +1862,27 @@
             <div class="header-classroom">
                 <h1 style="font-weight: 700;" class="text-truncate">{{subsection.title}}</h1>
                 <div class="d-flex justify-content-between align-items-center">
-                    <button onclick="window.location.href='{% url 'setting_classroom' classroom.id %}'" class="btn-setting mr-4" style="outline: none; border: none; background-color: transparent;">
-                        <i class="fa-solid fa-gear fa-xl" style="transition: transform 0.3s;"></i>
-                    </button>                          
+                    {% if user.id == classroom.teacher.id %}
+                    <div class="dropdown">
+                        <button class="btn-setting mr-4 dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false" style="outline: none; border: none; background-color: transparent;">
+                            <i class="fa-solid fa-gear fa-xl" style="transition: transform 0.3s;"></i>
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <li><a class="dropdown-item" href="{% url 'manage_classroom_detail' classroom.id %}">Classroom Management</a></li>
+                            <li><a class="dropdown-item" href="{% url 'setting_classroom' classroom.id %}">Classroom Setting</a></li>
+                        </ul>
+                    </div> 
+                    {% endif %}
+                    {% if user.id != classroom.teacher.id %}
+                    <div class="dropdown">
+                        <button class="btn-setting mr-4 dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false" style="outline: none; border: none; background-color: transparent;">
+                            <i class="fa-solid fa-gear fa-xl" style="transition: transform 0.3s;"></i>
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#confirmLeaveModal">Leave the classroom</a></li>
+                        </ul>
+                    </div>
+                    {% endif %}
                     <button class="btn-favorite mr-4" style="outline: none;"><i class="fa-regular fa-star fa-xl {% if is_favorite %}favorite{% endif %}"></i></button>
                 </div>
             </div>
@@ -1843,9 +1892,11 @@
                 </p>
             </div>
             <div class="edit-description d-flex justify-content-end">
+                {% if user.id == classroom.teacher.id %}
                 <a href="#" class="edit-icon">
                     <i class="fas fa-edit fa-lg"></i>
                 </a>
+                {% endif %}
             </div>
             <hr style="border: 1px solid #000;">
             <h1 style="font-weight: 700;" class="text-truncate">Documents</h1>                     
@@ -1853,22 +1904,26 @@
             {% for file in subsection.files.all %}
             <div class="d-flex justify-content-between align-items-center pt-3 pb-3" style="padding-right: 400px;">
                 <div class="doc-icon mr-3">
-                    <img src="{% static 'google-docs.png' %}" alt="Document Icon">
+                    <a href="{{ file.file.url }}" download>
+                        <img src="{% static 'google-docs.png' %}" alt="Document Icon">
+                    </a>
                 </div>
                 <div class="file-name-container" style="flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500;">
                     <p class="m-0">{{ file.file.name|filename }}</p>
                 </div>
-                <button class="btn-doc" style="outline: none; margin-left: 15px;" onclick="openPDFModal('{{ file.file.url }}')">Open</button>
+                <button class="btn-doc" style="outline: none; margin-left: 15px;" onclick="openPDFModal('{{ file.file.url }}', '{{ file.file.name|filename }}')">Open</button>
                 <span style="margin-left: 10px;">|</span>
                 <button class="btn-doc" style="outline: none; margin-left: 10px;">
-                    <a href="{{ file.file.url }}" download style="text-decoration: none;">Download</a>
+                    <a href="{{ file.file.url }}" download style="text-decoration: none; color: white;" onmouseover="this.style.color='white'" onmouseout="this.style.color='white'">Download</a>
                 </button>
-            </div>  
+            </div>     
             {% endfor %}
             <div class="edit-files d-flex justify-content-end">
+                {% if user.id == classroom.teacher.id %}
                 <a href="#" class="edit-icon">
                     <i class="fas fa-edit fa-lg"></i>
                 </a>
+                {% endif %}
             </div>
         </div>
         {% endfor %}
@@ -1878,9 +1933,27 @@
                 <div class="header-classroom">
                     <h1 style="font-weight: 700;" class="text-truncate">{{submission.title}}</h1>
                     <div class="d-flex justify-content-between align-items-center">
-                        <button onclick="window.location.href='{% url 'setting_classroom' classroom.id %}'" class="btn-setting mr-4" style="outline: none; border: none; background-color: transparent;">
-                            <i class="fa-solid fa-gear fa-xl" style="transition: transform 0.3s;"></i>
-                        </button>                         
+                        {% if user.id == classroom.teacher.id %}
+                        <div class="dropdown">
+                            <button class="btn-setting mr-4 dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false" style="outline: none; border: none; background-color: transparent;">
+                                <i class="fa-solid fa-gear fa-xl" style="transition: transform 0.3s;"></i>
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <li><a class="dropdown-item" href="{% url 'manage_classroom_detail' classroom.id %}">Classroom Management</a></li>
+                                <li><a class="dropdown-item" href="{% url 'setting_classroom' classroom.id %}">Classroom Setting</a></li>
+                            </ul>
+                        </div>   
+                        {% endif %}
+                        {% if user.id != classroom.teacher.id %}
+                        <div class="dropdown">
+                            <button class="btn-setting mr-4 dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false" style="outline: none; border: none; background-color: transparent;">
+                                <i class="fa-solid fa-gear fa-xl" style="transition: transform 0.3s;"></i>
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#confirmLeaveModal">Leave the classroom</a></li>
+                            </ul>
+                        </div>
+                        {% endif %}
                         <button class="btn-favorite mr-4" style="outline: none;"><i class="fa-regular fa-star fa-xl {% if is_favorite %}favorite{% endif %}"></i></button>
                     </div>
                 </div>
@@ -1894,7 +1967,7 @@
                     {% for file in submission.files.all %}
                         <div class="d-flex align-items-center pt-2 pb-2">
                             <div class="doc-icon mr-3">
-                                <a href="{{ file.file.url }}" download data-file-id="{{ file.id }}">
+                                <a href="{{ file.file.url }}" download data-file-id="{{ file.id }}" onclick="openPDFModal('{{ file.file.url }}', '{{ file.file.name|filename }}'); return false;">
                                     <img src="{% static 'google-docs.png' %}" alt="{{ file.file.name|filename }}">
                                 </a>
                             </div>
@@ -1908,9 +1981,11 @@
                 </div>                
                 
                 <div class="edit-submission d-flex justify-content-end">
+                    {% if user.id == classroom.teacher.id %}
                     <a href="#" class="edit-icon">
                         <i class="fas fa-edit fa-lg"></i>
                     </a>
+                    {% endif %}
                 </div>
                 
                 <hr style="border: 1px solid #000;">
@@ -1939,15 +2014,88 @@
                         </div>
                         <div class="d-flex justify-content-start align-items-center">
                             {% if submission.is_open %}
-                                <form action="{% url 'update_file_submission' student_file.id %}" method="post" enctype="multipart/form-data" style="margin-right: 10px;">
+                                <form action="{% url 'update_file_submission' student_file.id %}" method="post" enctype="multipart/form-data" style="margin-right: 10px;" onsubmit="return validateFileSubmissionUpdate()">
                                     {% csrf_token %}
-                                    <input type="file" name="file" class="btn-doc text-white" style="outline: none; padding: 3px 6px; font-size: 12px; background-color: var(--accent-color);" required>
+                                    <div id="fileErrorUpdate" class="text-danger" style="display: none; margin-bottom: 1rem;">Please choose a file to update.</div>
+                                    <input type="file" name="file" class="btn-doc text-white" style="outline: none; padding: 3px 6px; font-size: 12px; background-color: var(--accent-color);" onchange="checkFileSubmissionUpdate()">
                                     <button type="submit" class="btn-doc mr-3" style="outline: none; padding: 5px 10px; background-color: var(--accent-color);">Update</button> 
                                 </form>
-                                <form action="{% url 'delete_file_submission' student_file.id %}" method="post">
+                                <script>
+                                    let fileCheckedUpdate = false;
+
+                                    function checkFileSubmissionUpdate() {
+                                        fileCheckedUpdate = true;
+                                        var fileErrorUpdate = document.getElementById('fileErrorUpdate');
+                                        fileErrorUpdate.style.display = 'none';
+                                        var deleteButton = document.querySelector('form[action="{% url 'delete_file_submission' student_file.id %}"] button');
+                                        deleteButton.style.marginTop = '0px';
+                                        return true;
+                                    }
+
+                                    function validateFileSubmissionUpdate() {
+                                        if (!fileCheckedUpdate) {
+                                            var fileErrorUpdate = document.getElementById('fileErrorUpdate');
+                                            fileErrorUpdate.style.display = 'block';
+                                            var deleteButton = document.querySelector('form[action="{% url 'delete_file_submission' student_file.id %}"] button');
+                                            deleteButton.style.marginTop = '40px';
+                                            return false;
+                                        }
+
+                                        // Save the current state before submitting
+                                        const rightSidebarExpanded = document.querySelector('.right-sidebar').classList.contains('expanded');
+                                        const activeSectionId = document.querySelector('.content-section.active')?.id;
+                                        const activeLeftSidebarId = document.querySelector('.nav-link.active')?.dataset.content;
+                                        localStorage.setItem('rightSidebarExpanded', rightSidebarExpanded);
+                                        localStorage.setItem('activeSectionId', activeSectionId);
+                                        localStorage.setItem('activeLeftSidebarId', activeLeftSidebarId);
+                                        return true;
+                                    }
+                                </script>
+                                
+                                <form action="{% url 'delete_file_submission' student_file.id %}" method="post" onsubmit="return confirmDeleteFileSubmission(event)">
                                     {% csrf_token %}
                                     <button type="submit" class="btn-doc" style="outline: none; padding: 5px 10px;">Delete</button> 
                                 </form>
+                                <script>
+                                    function confirmDeleteFileSubmission(event) {
+                                        event.preventDefault();
+                                        const deleteModal = new bootstrap.Modal(document.getElementById('confirmDeleteFileModal'));
+                                        deleteModal.show();
+                                        document.getElementById('confirmDeleteFileBtn').onclick = function() {
+                                            event.target.submit();
+                                        };
+
+                                        const rightSidebarExpanded = document.querySelector('.right-sidebar').classList.contains('expanded');
+                                        const activeSectionId = document.querySelector('.content-section.active')?.id;
+                                        const activeLeftSidebarId = document.querySelector('.nav-link.active')?.dataset.content;
+                                        localStorage.setItem('rightSidebarExpanded', rightSidebarExpanded);
+                                        localStorage.setItem('activeSectionId', activeSectionId);
+                                        localStorage.setItem('activeLeftSidebarId', activeLeftSidebarId);
+                                    }
+                                </script>
+                                <div class="modal fade" id="confirmDeleteFileModal" tabindex="-1" aria-labelledby="confirmDeleteFileModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog">
+
+                                        <div class="modal-content">
+                                            <div class="modal-header" style="background-color: var(--accent-color);">
+
+                                                <h5 class="modal-title" id="confirmDeleteFileModalLabel" style="color: white;">Confirm Deletion</h5>
+
+                                                <button type="button" class="btn-close" style="color: white; background-color: white;" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+
+                                            <div class="modal-body">
+
+                                                Are you sure you want to delete this file?
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                <button type="button" class="btn btn-danger" style="background-color: var(--accent-color); border: none;" id="confirmDeleteFileBtn">Delete</button>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
                             {% else %}
                                 <p class="text-muted">Submission period has ended. You cannot update or delete your submission.</p>
                             {% endif %}
@@ -1959,18 +2107,48 @@
                     {% if submission.is_open %}
                         <h1 style="font-weight: 700;" class="text-truncate">Submit assignment</h1>
                         <p>Deadline time: {{submission.open_date}} - {{submission.close_date}}</p>
-                        <form action="{% url 'submit_assignment' submission.id %}" method="post" enctype="multipart/form-data">
+                        <form action="{% url 'submit_assignment' submission.id %}" method="post" enctype="multipart/form-data" onsubmit="return validateFileSubmission()">
                             {% csrf_token %}
+                            <div id="fileError" class="text-danger" style="display: none;">Please choose a file to submit.</div>
                             <div class="d-flex align-items-end pt-3 pb-3">
                                 <div class="doc-icon mr-3">
                                     <img src="{% static "google-docs.png" %}" alt="Document Icon">
                                 </div>
-                                <input type="file" class="btn-doc text-white" style="outline: none; padding: 3px 6px; font-size: 12px; background-color: var(--accent-color);" name="file" required>
+                                <input type="file" id="fileInput" class="btn-doc text-white" style="outline: none; padding: 3px 6px; font-size: 12px; background-color: var(--accent-color);" name="file" onchange="checkFileSubmission()">
                             </div>
                             <div class="d-flex justify-content-start">
                                 <button type="submit" class="btn-doc" style="outline: none; padding: 5px 10px;">Submit</button> 
                             </div>
                         </form>
+
+                        <script>
+                            let fileCheckedSubmision = false;
+
+                            function checkFileSubmission() {
+                                fileCheckedSubmision = true;
+                                var fileError = document.getElementById('fileError');
+                                fileError.style.display = 'none';
+                                return true;
+                            }
+
+                            function validateFileSubmission() {
+
+                                if (!fileCheckedSubmision) {
+                                    var fileError = document.getElementById('fileError');
+                                    fileError.style.display = 'block';
+                                    return false;
+                                }
+
+                                // Save the current state before submitting
+                                const rightSidebarExpanded = document.querySelector('.right-sidebar').classList.contains('expanded');
+                                const activeSectionId = document.querySelector('.content-section.active')?.id;
+                                const activeLeftSidebarId = document.querySelector('.nav-link.active')?.dataset.content;
+                                localStorage.setItem('rightSidebarExpanded', rightSidebarExpanded);
+                                localStorage.setItem('activeSectionId', activeSectionId);
+                                localStorage.setItem('activeLeftSidebarId', activeLeftSidebarId);
+                                return true;
+                            }
+                        </script>
                     {% elif submission.not_open_yet %}
                         <h1 style="font-weight: 700;" class="text-truncate">Submit assignment</h1>
                         <p>Deadline time: {{submission.open_date}} - {{submission.close_date}}</p>
@@ -1985,16 +2163,29 @@
             {% elif submission.submission_type == 'question_test' %}
             <div id="submission-content-{{ submission.id }}" class="content-section hidden">
                 <div class="header-classroom">
-                    <h1 style="font-weight: 700;" class="text-truncate">Welcome to {{classroom.name}}</h1>
+                    <h1 style="font-weight: 700;" class="text-truncate">{{submission.title}}</h1>
                     <div class="d-flex justify-content-between align-items-center">
-                        <button onclick="window.location.href='{% url 'setting_classroom' classroom.id %}'" class="btn-setting mr-4" style="outline: none; border: none; background-color: transparent;">
-                            <i class="fa-solid fa-gear fa-xl" style="transition: transform 0.3s;"></i>
-                        </button>            
-                        <style>
-                            .btn-setting:hover .fa-gear {
-                                transform: rotate(90deg);
-                            }
-                        </style>                    
+                        {% if user.id == classroom.teacher.id %}
+                        <div class="dropdown">
+                            <button class="btn-setting mr-4 dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false" style="outline: none; border: none; background-color: transparent;">
+                                <i class="fa-solid fa-gear fa-xl" style="transition: transform 0.3s;"></i>
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <li><a class="dropdown-item" href="{% url 'manage_classroom_detail' classroom.id %}">Classroom Management</a></li>
+                                <li><a class="dropdown-item" href="{% url 'setting_classroom' classroom.id %}">Classroom Setting</a></li>
+                            </ul>
+                        </div>   
+                        {% endif %}
+                        {% if user.id != classroom.teacher.id %}
+                        <div class="dropdown">
+                            <button class="btn-setting mr-4 dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false" style="outline: none; border: none; background-color: transparent;">
+                                <i class="fa-solid fa-gear fa-xl" style="transition: transform 0.3s;"></i>
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#confirmLeaveModal">Leave the classroom</a></li>
+                            </ul>
+                        </div>
+                        {% endif %}
                         <button class="btn-favorite mr-4" style="outline: none;"><i class="fa-regular fa-star fa-xl {% if is_favorite %}favorite{% endif %}"></i></button>
                     </div>
                 </div>
@@ -2008,7 +2199,7 @@
                     {% for file in submission.files.all %}
                         <div class="d-flex align-items-center pt-2 pb-2">
                             <div class="doc-icon mr-3">
-                                <a href="{{ file.file.url }}" download data-file-id="{{ file.id }}">
+                                <a href="{{ file.file.url }}" download data-file-id="{{ file.id }}" onclick="openPDFModal('{{ file.file.url }}', '{{ file.file.name|filename }}'); return false;">
                                     <img src="{% static 'google-docs.png' %}" alt="{{ file.file.name|filename }}">
                                 </a>
                             </div>
@@ -2022,9 +2213,11 @@
                 </div>                              
                 
                 <div class="edit-submission d-flex justify-content-end">
+                    {% if user.id == classroom.teacher.id %}
                     <a href="#" class="edit-icon">
                         <i class="fas fa-edit fa-lg"></i>
                     </a>
+                    {% endif %}
                 </div>
                 <hr style="border: 1px solid #000;">
                 
@@ -2085,6 +2278,24 @@
         {% endfor %}
     </div>
 
+    <div class="modal fade" id="deleteMemberModal" style="z-index: 9999;" tabindex="-1" aria-labelledby="deleteMemberModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: var(--accent-color);">
+                    <h5 class="modal-title" id="deleteMemberModalLabel" style="color: white;">Confirm Deletion</h5>
+                    <button type="button" class="btn-close" style="color: white; background-color: white;" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete this member?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" style="background-color: var(--accent-color); border: none;" id="confirmDeleteMemberBtn">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="preloader">
         <div></div>
         <div></div>
@@ -2098,6 +2309,182 @@
     <script src="https://kit.fontawesome.com/a076d05399.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.9.359/pdf.min.js"></script>
     <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const rightSidebarExpanded = localStorage.getItem('rightSidebarExpanded') === 'true';
+            const activeSectionId = localStorage.getItem('activeSectionId');
+            const activeLeftSidebarId = localStorage.getItem('activeLeftSidebarId');
+
+            if (rightSidebarExpanded) {
+                document.querySelector('.right-sidebar').classList.add('expanded');
+                const toggleIcon = document.querySelector('.btn-toggle-right-sidebar i');
+                toggleIcon.classList.remove('fa-chevron-left');
+                toggleIcon.classList.add('fa-chevron-right');
+            }
+
+            if (activeSectionId) {
+                document.querySelectorAll('.content-section').forEach(section => {
+                    section.classList.add('hidden');
+                    section.classList.remove('active');
+                });
+                const targetSection = document.getElementById(activeSectionId);
+                if (targetSection) {
+                    targetSection.classList.remove('hidden');
+                    targetSection.classList.add('active');
+                }
+            }
+
+            if (activeLeftSidebarId) {
+                document.querySelectorAll('.nav-link').forEach(link => {
+                    link.classList.remove('active');
+                });
+                let targetLink = document.querySelector(`.nav-link[data-content="${activeLeftSidebarId}"]`);
+                if (targetLink) {
+                    targetLink.classList.add('active');
+                    const submenu = targetLink.nextElementSibling;
+                    if (submenu) {
+                        submenu.style.display = 'block';
+                        const icon = targetLink.querySelector('i');
+                        if (icon) {
+                            icon.classList.remove('fa-caret-down');
+                            icon.classList.add('fa-caret-up');
+                        }
+                    } else {
+                        if (targetLink.dataset.content.includes('submission-content') || targetLink.dataset.content.includes('subsection-content')) {
+                            const subsectionId = targetLink.dataset.content.split('-')[2];
+                            const sectionId = document.querySelector(`.nav-link[data-content="subsection-content-${subsectionId}"], .nav-link[data-content="submission-content-${subsectionId}"]`).closest('.submenu').previousElementSibling.dataset.content;
+                            if (sectionId) {
+                                const sectionLink = document.querySelector(`.nav-link[data-content="${sectionId}"]`);
+                                if (sectionLink) {
+                                    sectionLink.classList.add('active');
+                                    const sectionSubmenu = sectionLink.nextElementSibling;
+                                    if (sectionSubmenu) {
+                                        sectionSubmenu.style.display = 'block';
+                                        const sectionIcon = sectionLink.querySelector('i');
+                                        if (sectionIcon) {
+                                            sectionIcon.classList.remove('fa-caret-down');
+                                            sectionIcon.classList.add('fa-caret-up');
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            localStorage.removeItem('rightSidebarExpanded');
+            localStorage.removeItem('activeSectionId');
+            localStorage.removeItem('activeLeftSidebarId');
+        });
+
+        document.getElementById('confirmDeleteMemberBtn').addEventListener('click', function() {
+            if (memberIdToDelete !== null) {
+                // Lưu trữ trạng thái của right-sidebar và section hiện tại
+                const rightSidebarExpanded = document.querySelector('.right-sidebar').classList.contains('expanded');
+                const activeSectionId = document.querySelector('.content-section.active')?.id;
+                const activeLeftSidebarId = document.querySelector('.nav-link.active')?.dataset.content;
+                localStorage.setItem('rightSidebarExpanded', rightSidebarExpanded);
+                localStorage.setItem('activeSectionId', activeSectionId);
+                localStorage.setItem('activeLeftSidebarId', activeLeftSidebarId);
+    
+                fetch(`{% url 'delete_member' %}`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ member_id: memberIdToDelete })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('Failed to delete member.');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // Khôi phục trạng thái của right-sidebar, left-sidebar và section hiện tại
+            const rightSidebarExpanded = localStorage.getItem('rightSidebarExpanded') === 'true';
+            const activeSectionId = localStorage.getItem('activeSectionId');
+            const activeLeftSidebarId = localStorage.getItem('activeLeftSidebarId');
+
+            if (rightSidebarExpanded) {
+                document.querySelector('.right-sidebar').classList.add('expanded');
+                const toggleIcon = document.querySelector('.btn-toggle-right-sidebar i');
+                toggleIcon.classList.remove('fa-chevron-left');
+                toggleIcon.classList.add('fa-chevron-right');
+            }
+
+            if (activeSectionId) {
+                document.querySelectorAll('.content-section').forEach(section => {
+                    section.classList.add('hidden');
+                    section.classList.remove('active');
+                });
+                const targetSection = document.getElementById(activeSectionId);
+                if (targetSection) {
+                    targetSection.classList.remove('hidden');
+                    targetSection.classList.add('active');
+                }
+            }
+
+            if (activeLeftSidebarId) {
+                document.querySelectorAll('.nav-link').forEach(link => {
+                    link.classList.remove('active');
+                });
+                let targetLink = document.querySelector(`.nav-link[data-content="${activeLeftSidebarId}"]`);
+                console.log(targetLink);
+                
+                if (targetLink) {
+                    targetLink.classList.add('active');
+                    const submenu = targetLink.nextElementSibling;
+                    if (submenu) {
+                        submenu.style.display = 'block';
+                        const icon = targetLink.querySelector('i');
+                        if (icon) {
+                            icon.classList.remove('fa-caret-down');
+                            icon.classList.add('fa-caret-up');
+                        }
+                    } else {
+                        // Kiểm tra nếu targetLink là submission hoặc subsection
+                        if (targetLink.dataset.content.includes('submission-content') || targetLink.dataset.content.includes('subsection-content')) {
+                            // Suy ra section id từ submission hoặc subsection
+                            const subsectionId = targetLink.dataset.content.split('-')[2];
+                            const sectionId = document.querySelector(`.nav-link[data-content="subsection-content-${subsectionId}"], .nav-link[data-content="submission-content-${subsectionId}"]`).closest('.submenu').previousElementSibling.dataset.content;
+                            console.log(sectionId);
+                            if (sectionId) {
+                                const sectionLink = document.querySelector(`.nav-link[data-content="${sectionId}"]`);
+                                if (sectionLink) {
+                                    sectionLink.classList.add('active');
+                                    const sectionSubmenu = sectionLink.nextElementSibling;
+                                    if (sectionSubmenu) {
+                                        sectionSubmenu.style.display = 'block';
+                                        const sectionIcon = sectionLink.querySelector('i');
+                                        if (sectionIcon) {
+                                            sectionIcon.classList.remove('fa-caret-down');
+                                            sectionIcon.classList.add('fa-caret-up');
+                                        }
+                                    }
+                                }
+                            }
+                        }else{
+                            console.log('targetLink is not a submission or subsection');
+                        }
+
+                    }
+                }
+            }
+
+            // Xóa trạng thái khỏi localStorage sau khi khôi phục
+            localStorage.removeItem('rightSidebarExpanded');
+            localStorage.removeItem('activeSectionId');
+            localStorage.removeItem('activeLeftSidebarId');
+        });
+
         document.addEventListener('DOMContentLoaded', function () {
             const sidebar = document.querySelector('.sidebar');
             const rightSidebar = document.querySelector('.right-sidebar');
@@ -2156,7 +2543,9 @@
             });
 
             const participantsBtn = document.getElementById("participants-btn");
+            const participantsBtnWelcome = document.getElementById("participants-btn-welcome");
             const scoresBtn = document.getElementById("scores-btn");
+            const scoresBtnWelcome = document.getElementById("scores-btn-welcome");
             const participantsContent = document.getElementById("participants");
             const scoresContent = document.getElementById("scores");
 
@@ -2167,7 +2556,40 @@
                 scoresContent.classList.remove("active");
             });
 
+            participantsBtnWelcome.addEventListener("click", function() {
+                rightSidebar.classList.toggle('expanded');
+
+                if (rightSidebar.classList.contains('expanded')) {
+                    toggleIcon.classList.remove('fa-chevron-left');
+                    toggleIcon.classList.add('fa-chevron-right');
+                } else {
+                    toggleIcon.classList.remove('fa-chevron-right');
+                    toggleIcon.classList.add('fa-chevron-left');
+                }
+                participantsBtn.classList.add("active");
+                scoresBtn.classList.remove("active");
+                participantsContent.classList.add("active");
+                scoresContent.classList.remove("active");
+            });
+
             scoresBtn.addEventListener("click", function() {
+                scoresBtn.classList.add("active");
+                participantsBtn.classList.remove("active");
+                scoresContent.classList.add("active");
+                participantsContent.classList.remove("active");
+            });
+
+            scoresBtnWelcome.addEventListener("click", function() {
+                rightSidebar.classList.toggle('expanded');
+
+                if (rightSidebar.classList.contains('expanded')) {
+                    toggleIcon.classList.remove('fa-chevron-left');
+                    toggleIcon.classList.add('fa-chevron-right');
+                } else {
+                    toggleIcon.classList.remove('fa-chevron-right');
+                    toggleIcon.classList.add('fa-chevron-left');
+                }
+
                 scoresBtn.classList.add("active");
                 participantsBtn.classList.remove("active");
                 scoresContent.classList.add("active");
@@ -2312,39 +2734,131 @@
             // Mở folderModal
             var folderModal = new bootstrap.Modal(document.getElementById('chatModal'));
             folderModal.show();
-        }  
+        }
+
+        function deleteMember(memberId) {
+            memberIdToDelete = memberId;
+            const deleteModal = new bootstrap.Modal(document.getElementById('deleteMemberModal'));
+            deleteModal.show();
+        }
+    </script>
+    <script>
+        let pdfDoc = null,
+            pageNum = 1,
+            pageRendering = false,
+            pageNumPending = null,
+            scale = 1.5,
+            canvas = document.getElementById('pdfViewer'),
+            ctx = canvas.getContext('2d');
+    
+        function renderPage(num) {
+            pageRendering = true;
+            pdfDoc.getPage(num).then(function(page) {
+                const viewport = page.getViewport({ scale: scale });
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+    
+                const renderContext = {
+                    canvasContext: ctx,
+                    viewport: viewport
+                };
+                const renderTask = page.render(renderContext);
+    
+                renderTask.promise.then(function() {
+                    pageRendering = false;
+                    if (pageNumPending !== null) {
+                        renderPage(pageNumPending);
+                        pageNumPending = null;
+                    }
+                });
+            });
+    
+            document.getElementById('pageNum').textContent = num;
+        }
+    
+        function queueRenderPage(num) {
+            if (pageRendering) {
+                pageNumPending = num;
+            } else {
+                renderPage(num);
+            }
+        }
+    
+        function onPrevPage() {
+            if (pageNum <= 1) {
+                return;
+            }
+            pageNum--;
+            queueRenderPage(pageNum);
+        }
+    
+        function onNextPage() {
+            if (pageNum >= pdfDoc.numPages) {
+                return;
+            }
+            pageNum++;
+            queueRenderPage(pageNum);
+        }
+    
+        document.getElementById('prevPage').addEventListener('click', onPrevPage);
+        document.getElementById('nextPage').addEventListener('click', onNextPage);
+    
+        function openPDFModal(pdfUrl, fileName) {
+            const pdfModal = new bootstrap.Modal(document.getElementById('pdfModal'));
+            document.getElementById('pdfModalLabel').textContent = fileName;
+            pdfModal.show();
+    
+            pdfjsLib.getDocument(pdfUrl).promise.then(function(pdfDoc_) {
+                pdfDoc = pdfDoc_;
+                document.getElementById('pageCount').textContent = pdfDoc.numPages;
+                renderPage(pageNum);
+            });
+    
+            document.getElementById('downloadPDF').onclick = function() {
+                const link = document.createElement('a');
+                link.href = pdfUrl;
+                link.download = fileName;
+                link.click();
+            };
+        }
     </script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const favoriteButtons = document.querySelectorAll('.btn-favorite');
-            
-            favoriteButtons.forEach(button => {
-                button.addEventListener('click', function () {
-                    const classroomId = {{ classroom.id }};
-                    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-    
-                    fetch(`/favorite_classroom/${classroomId}/`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRFToken': csrfToken
-                        },
-                        body: JSON.stringify({ classroom_id: classroomId })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        favoriteButtons.forEach(btn => {
-                            const icon = btn.querySelector('i');
-                            if (data.is_favorite) {
-                                icon.classList.add('favorite');
-                            } else {
-                                icon.classList.remove('favorite');
-                            }
-                        });
+        const favoriteButtons = document.querySelectorAll('.btn-favorite');
+        
+        favoriteButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const classroomId = {{ classroom.id }};
+                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+                fetch(`/favorite_classroom/${classroomId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: JSON.stringify({ classroom_id: classroomId })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    favoriteButtons.forEach(btn => {
+                        const icon = btn.querySelector('i');
+                        if (data.is_favorite) {
+                            icon.classList.add('favorite');
+                            // Hiển thị hiệu ứng tung pháo
+                            confetti({
+                                particleCount: 200,
+                                spread: 140,
+                                origin: { y: 0.8 }
+                            });
+                        } else {
+                            icon.classList.remove('favorite');
+                        }
                     });
                 });
             });
         });
+    });
 
         document.addEventListener('DOMContentLoaded', function() {
 
@@ -2542,5 +3056,7 @@
 
         });
     </script>
+
+    
 </body>
 </html>
