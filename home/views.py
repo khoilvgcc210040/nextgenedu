@@ -1,6 +1,7 @@
 from datetime import date, timedelta, timezone
 import json
 import math
+from django.conf import settings
 from django.db.models import Avg
 from urllib.parse import urlencode
 from django.db import IntegrityError
@@ -22,7 +23,58 @@ from django.contrib.auth.decorators import login_required
 from django.utils.timezone import now
 from django.views.decorators.csrf import csrf_exempt
 
+import os
+import joblib
+from dotenv import load_dotenv
+import openai
+from openai.error import RateLimitError
+
+load_dotenv()
+openai.api_key = os.getenv('OPENAI_API_KEY')
+
+
+model = joblib.load(os.path.join(settings.BASE_DIR, 'education_classification_model.pkl'))
+vectorizer = joblib.load(os.path.join(settings.BASE_DIR, 'vectorizer.pkl'))
+label_encoder = joblib.load(os.path.join(settings.BASE_DIR, 'label_encoder.pkl'))
 User = get_user_model()
+
+def get_chatgpt_response(question):
+    try:
+        openai.api_key = os.getenv('OPENAI_API_KEY')
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": question},
+            ]
+        )
+        return response['choices'][0]['message']['content']
+    except RateLimitError:
+        return "Sorry, we're experiencing high traffic right now. Please try again later."
+
+
+def classify(request):
+    if request.method == 'POST':
+        import json
+        data = json.loads(request.body)
+        user_message = data.get('message')
+
+        X_new = vectorizer.transform([user_message])
+
+        predicted_label = model.predict(X_new)[0]
+        label_text = label_encoder.inverse_transform([predicted_label])[0]
+
+        if label_text == "education":
+            response_message = get_chatgpt_response(user_message)
+        else:
+            response_message = "Sorry, I can only help with educational questions."
+
+        return JsonResponse({'response': response_message})
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=400)
+    
+def chatbot(request):
+    return render(request, 'chatbot.html')
 
 def home(request):
     if 'login_email' in request.session:
@@ -107,6 +159,9 @@ def authPage(request):
 
                 user = authenticate(request, email=email, password=password)   
                 login(request, user)
+                next_url = request.session.pop('next', None)
+                if next_url:
+                    return redirect(next_url)
                 return redirect('home')
 
         elif form_type == 'login':
@@ -117,6 +172,9 @@ def authPage(request):
 
             if user is not None:
                 login(request, user)
+                next_url = request.session.pop('next', None)
+                if next_url:
+                    return redirect(next_url)
                 return redirect('home')
             else:
                 messages.info(request, 'Oops. Something went wrong 😅. Please try again.', extra_tags='login')
@@ -184,6 +242,9 @@ def auth_receiver(request):
         user = CustomUser.objects.get(email=email)
         # Nếu người dùng đã tồn tại, đăng nhập ngay lập tức
         login(request, user, backend='home.backends.EmailBackend')
+        next_url = request.session.pop('next', None)
+        if next_url:
+            return redirect(next_url)
         return redirect('home')
     except CustomUser.DoesNotExist:
         # Nếu người dùng chưa tồn tại, kiểm tra xem username của gg account này có tồn tại trong database hay không
@@ -231,6 +292,9 @@ def complete_profile(request):
 
         # Đăng nhập người dùng sau khi hoàn tất hồ sơ
         login(request, user, backend='home.backends.EmailBackend')
+        next_url = request.session.pop('next', None)
+        if next_url:
+            return redirect(next_url)
         return redirect('home')
     else:
         subjects = Subjects.objects.all()
@@ -381,6 +445,48 @@ def create_classroom(request):
 
     return redirect('home')
 
+def access_join_classroom(request, link):
+    classroom = get_object_or_404(Classroom, link=link)
+    user = request.user
+
+    # Kiểm tra nếu người dùng đã tham gia classroom
+    if user.is_authenticated and Participant.objects.filter(user=user, classroom=classroom).exists():
+        return redirect('classroom_detail', id=classroom.id)
+
+    # Nếu classroom là private, yêu cầu password
+    if classroom.status:  # status == True tức là private
+        if not user.is_authenticated:
+            # Người dùng chưa đăng nhập
+            request.session['next'] = request.get_full_path()
+            return redirect('/auth/?form=login')  # Điều hướng đến trang đăng nhập
+
+        if request.method == 'POST':
+            password = request.POST.get('password')
+            if password == classroom.password:
+                Participant.objects.create(user=user, classroom=classroom)
+                return redirect('classroom_detail', id=classroom.id)
+            else:
+                messages.error(request, 'Incorrect password. Please try again.')
+    
+        return render(request, 'access_join_classroom.html', {
+            'classroom': classroom,
+            'requires_password': True
+        })
+
+    # Nếu classroom là public
+    if not user.is_authenticated:
+        request.session['next'] = request.get_full_path()
+        return redirect('/auth/?form=login')  # Điều hướng đến trang đăng nhập
+
+    if request.method == 'POST' and user.is_authenticated:
+        Participant.objects.create(user=user, classroom=classroom)
+        return redirect('classroom_detail', id=classroom.id)
+
+    return render(request, 'access_join_classroom.html', {
+        'classroom': classroom,
+        'requires_password': False
+    })
+
 
 def upload_subsection_file(request, subsection_id):
     subsection = get_object_or_404(Section, id=subsection_id)
@@ -401,6 +507,16 @@ def upload_subsection_file(request, subsection_id):
             return render(request, 'upload_template.html', {'errors': ['No file uploaded']})
 
     return render(request, 'classroom_detail.html')
+
+@csrf_exempt
+def leave_classroom(request, classroom_id):
+    user = request.user
+    try:
+        participant = Participant.objects.get(user=user, classroom_id=classroom_id)
+        participant.delete()
+        return redirect('classrooms', participant.classroom.subject.id, participant.classroom.grade)
+    except Participant.DoesNotExist:
+        return redirect('classroom_detail', id=classroom_id)
 
 
 def classrooms(request, subject_id, grade):
@@ -442,24 +558,30 @@ def join_classroom(request, classroom_id):
 
     return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
 
-def enter_password(request, classroom_id):
+import bleach
 
+def enter_password(request, classroom_id):
     classroom = get_object_or_404(Classroom, id=classroom_id)
     
     if request.method == 'POST':
         entered_password = request.POST.get('password')
+        
+        # Kiểm tra input rỗng
+        if not entered_password:
+            return JsonResponse({'status': 'error', 'message': '❌ Password cannot be empty'})
+        
+        # Làm sạch dữ liệu đầu vào để ngăn chặn XSS
+        entered_password = bleach.clean(entered_password)
+        
         if entered_password == classroom.password:
             participant_exists = Participant.objects.filter(user=request.user, classroom=classroom).exists()
-
             
             if not participant_exists:
                 Participant.objects.create(user=request.user, classroom=classroom)
                 
             return JsonResponse({'status': 'success', 'redirect_url': reverse('classroom_detail', args=[classroom.id])})
         else:
-
-            return JsonResponse({'status': 'error', 'message': 'Incorrect password'})
-
+            return JsonResponse({'status': 'error', 'message': '❌ Incorrect password'})
 
     return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=400)
 
@@ -476,18 +598,13 @@ def update_classroom(request, classroom_id):
                 classroom.name = name
             if status:
                 classroom.status = True if status == 'Private' else False
-                classroom.password = password
-                try:
-                    classroom.clean()
-                except ValidationError as e:
-                    return JsonResponse({'status': 'error', 'message': e.message_dict})
+                if classroom.status:
+                    classroom.password = password
+                else:
+                    classroom.password = ''
 
-            try:
-                classroom.full_clean()
-                classroom.save()
-                return JsonResponse({'status': 'success', 'message': 'Classroom updated successfully.'})
-            except ValidationError as e:
-                return JsonResponse({'status': 'error', 'message': e.message_dict})
+            classroom.save()
+            return JsonResponse({'status': 'success', 'message': 'Classroom updated successfully.'})
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': str(e)})
     return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=400)
@@ -502,7 +619,12 @@ def update_allow_chat(request, classroom_id):
             allow_chat = data.get('allow_chat')
             classroom.allow_chat = allow_chat
             classroom.save()
-            return JsonResponse({'status': 'success'})
+
+            if allow_chat:
+                return JsonResponse({'status': 'success', 'message': 'Allow chat enabled!'})
+            else:
+                return JsonResponse({'status': 'success', 'message': 'Allow chat disabled!'})
+            
         except json.JSONDecodeError:
             return JsonResponse({'status': 'failed', 'message': 'Invalid JSON'}, status=400)
     return JsonResponse({'status': 'failed', 'message': 'Invalid request method'}, status=400)
@@ -513,7 +635,7 @@ def delete_classroom(request, classroom_id):
         try:
             classroom = get_object_or_404(Classroom, id=classroom_id)
             classroom.delete()
-            return JsonResponse({'status': 'success', 'redirect_url': reverse('classrooms', args=[classroom.subject.id, classroom.grade])})
+            return redirect('classrooms', classroom.subject.id, classroom.grade)
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': str(e)})
     return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=400)
@@ -853,7 +975,7 @@ def unblock_participant(request, classroom_id):
         participant_id = request.POST.get('participant_id')
         participant = get_object_or_404(BlockedParticipant, id=participant_id, classroom_id=classroom_id)
         participant.delete()
-        return redirect('setting_classroom', id=classroom_id)
+        return JsonResponse({'status': 'success', 'message': 'Participant unblocked successfully!'})
     return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
 
 def manage_classroom_detail(request, id):
@@ -1453,6 +1575,11 @@ def reject_post(request, post_id):
         post.is_rejected = True
         post.save()
         return redirect('manage_approve_posts', classroom_id=post.classroom.id)
+
+def notification(request):
+    return render(request, 'notification.html')
+    
+
 
 
 

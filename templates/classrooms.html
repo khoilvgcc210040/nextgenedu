@@ -120,7 +120,6 @@
         </header>
 
         <section>
-            <!-- Bootstrap Nav Tabs -->
             <ul class="nav nav-tabs justify-content-center mb-4" id="classroomTab" role="tablist" style="border-bottom: 2px solid var(--accent-color);">
                 <li class="nav-item" role="presentation">
                     <button style="outline: none;" class="classroom-nav-link {% if status == None or status == '0' %}active{% endif %}" id="public-tab" data-bs-toggle="tab" data-bs-target="#public-tab-pane" type="button" role="tab" aria-controls="public-tab-pane" aria-selected="true">Public</button>
@@ -130,61 +129,160 @@
                 </li>
             </ul>
 
+            <div class="search-bar mb-4 d-flex justify-content-end">
+                <input type="text" id="searchInput" class="form-control" style="width: 300px;" placeholder="Search for classrooms..." onkeyup="searchClassrooms()">
+            </div>
+            <script>
+                function searchClassrooms() {
+                    var input, filter, ul, li, a, i, txtValue;
+                    input = document.getElementById('searchInput');
+                    filter = input.value.toUpperCase();
+                    
+                    ul = document.querySelector('#public-tab-pane .list-unstyled');
+                    li = ul.getElementsByTagName('li');
+                    for (i = 0; i < li.length; i++) {
+                        a = li[i].getElementsByTagName("a")[0];
+                        txtValue = a.textContent || a.innerText;
+                        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                            li[i].style.display = "";
+                        } else {
+                            li[i].style.display = "none";
+                        }
+                    }
+            
+                    ul = document.querySelector('#private-tab-pane .list-unstyled');
+                    li = ul.getElementsByTagName('li');
+                    for (i = 0; i < li.length; i++) {
+                        a = li[i].getElementsByTagName("a")[0];
+                        txtValue = a.textContent || a.innerText;
+                        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                            li[i].style.display = "";
+                        } else {
+                            li[i].style.display = "none";
+                        }
+                    }
+                }
+            </script>
+            
+            
+
             <!-- Tab Content -->
             <div class="tab-content" id="classroomTabContent">
                 <!-- Public Classrooms -->
                 <div class="tab-pane fade {% if status == None or status == '0' %}show active{% endif %}" id="public-tab-pane" role="tabpanel" aria-labelledby="public-tab" tabindex="0">
                     <ul class="list-unstyled">
+                        <!-- Classrooms that user has joined -->
                         {% for classroom in classrooms %}
                             {% if not classroom.status %}
-                                <li class="card-classroom mb-4">
-                                    <div class="card-body">
-                                        <div class="classroom-info">
-                                            <div class="card-title d-flex jutify-content-center align-items-center">
-                                                <h4>🌐 &nbsp;</h4>
-                                                {% if classroom.id in participant_classrooms %}
+                                {% if classroom.id in participant_classrooms or user.id == classroom.teacher.id %}
+                                    <li class="card-classroom mb-4">
+
+                                        <div class="card-body">
+                                            <div class="classroom-info">
+                                                <div class="card-title d-flex jutify-content-center align-items-center">
+                                                    <h4>🌐 &nbsp;</h4>
                                                     <a href="{% url 'classroom_detail' classroom.id %}">{{ classroom.name }}</a>
-                                                {% else %}
-                                                    <a href="#" data-bs-toggle="modal" data-bs-target="#joinModal" data-classroom-id="{{ classroom.id }}">{{ classroom.name }}</a>
-                                                {% endif %}
-                                            </div>
-                                            <p class="card-text truncate mt-2" style="width: 900px;">&nbsp;📝{{ classroom.description }}</p>
-                                            <div class="classroom-meta text-muted d-flex align-items-center">
-                                                <div>
-                                                    <span class="me-3 mr-3">&nbsp;<i class="fas fa-user" style="color: var(--accent-color)"></i> {{ classroom.teacher.username }}</span>
-                                                    <span class="me-3 mr-3"><i class="fas fa-school" style="color: var(--accent-color)"></i> {{ classroom.school }}</span>
-                                                    <span class="me-3 mr-3"><i class="fas fa-book" style="color: var(--accent-color)"></i> {{ classroom.subject.name }}</span>
-                                                    <span><i class="fas fa-calendar-alt" style="color: var(--accent-color)"></i> {{ classroom.academic_year.open_year }} - {{ classroom.academic_year.close_year }}</span>
+                                                </div>
+                                                <p class="card-text truncate mt-2" style="width: 900px;">&nbsp;📝{{ classroom.description }}</p>
+                                                <div class="classroom-meta text-muted d-flex align-items-center">
+                                                    <div>
+                                                        <span class="me-3 mr-3">&nbsp;<i class="fas fa-user" style="color: var(--accent-color)"></i> {{ classroom.teacher.username }}</span>
+                                                        <span class="me-3 mr-3"><i class="fas fa-school" style="color: var(--accent-color)"></i> {{ classroom.school }}</span>
+                                                        <span class="me-3 mr-3"><i class="fas fa-book" style="color: var(--accent-color)"></i> {{ classroom.subject.name }}</span>
+                                                        <span><i class="fas fa-calendar-alt" style="color: var(--accent-color)"></i> {{ classroom.academic_year.open_year }} - {{ classroom.academic_year.close_year }}</span>
+                                                    </div>
+                                                </div>
+                                                <div class="text-end text-muted d-flex justify-content-end align-items-center">
+                                                    <span class="mr-3" style="border: 2px solid var(--accent-color); padding: 7px;"><i class="fa-solid fa-user" style="color: var(--accent-color)"></i>&nbsp; {{ classroom.participants.count }} Participants</span>
+                                                    <span class="mr-3" style="border: 2px solid var(--accent-color); padding: 7px;"><i class="fas fa-thumbs-up" style="color: var(--accent-color)"></i>&nbsp; {{ classroom.likes }} Likes</span>
                                                 </div>
                                             </div>
-                                            <div class="text-end text-muted d-flex justify-content-end align-items-center">
-                                                <span class="mr-3" style="border: 2px solid var(--accent-color); padding: 7px;"><i class="fa-solid fa-user" style="color: var(--accent-color)"></i>&nbsp; {{ classroom.participants.count }} Participants</span>
-                                                <span class="mr-3" style="border: 2px solid var(--accent-color); padding: 7px;"><i class="fas fa-thumbs-up" style="color: var(--accent-color)"></i>&nbsp; {{ classroom.likes }} Likes</span>
+                                        </div>
+                                    </li>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                        <!-- Classrooms that user has not joined -->
+                        {% for classroom in classrooms %}
+                            {% if not classroom.status %}
+                                {% if not classroom.id in participant_classrooms and user.id != classroom.teacher.id %}
+                                    <li class="card-classroom mb-4">
+
+                                        <div class="card-body">
+                                            <div class="classroom-info">
+                                                <div class="card-title d-flex jutify-content-center align-items-center">
+                                                    <h4>🌐 &nbsp;</h4>
+                                                    <a href="#" data-bs-toggle="modal" data-bs-target="#joinModal" data-classroom-id="{{ classroom.id }}">{{ classroom.name }}</a>
+                                                </div>
+                                                <p class="card-text truncate mt-2" style="width: 900px;">&nbsp;📝{{ classroom.description }}</p>
+                                                <div class="classroom-meta text-muted d-flex align-items-center">
+                                                    <div>
+                                                        <span class="me-3 mr-3">&nbsp;<i class="fas fa-user" style="color: var(--accent-color)"></i> {{ classroom.teacher.username }}</span>
+                                                        <span class="me-3 mr-3"><i class="fas fa-school" style="color: var(--accent-color)"></i> {{ classroom.school }}</span>
+                                                        <span class="me-3 mr-3"><i class="fas fa-book" style="color: var(--accent-color)"></i> {{ classroom.subject.name }}</span>
+                                                        <span><i class="fas fa-calendar-alt" style="color: var(--accent-color)"></i> {{ classroom.academic_year.open_year }} - {{ classroom.academic_year.close_year }}</span>
+                                                    </div>
+                                                </div>
+                                                <div class="text-end text-muted d-flex justify-content-end align-items-center">
+                                                    <span class="mr-3" style="border: 2px solid var(--accent-color); padding: 7px;"><i class="fa-solid fa-user" style="color: var(--accent-color)"></i>&nbsp; {{ classroom.participants.count }} Participants</span>
+                                                    <span class="mr-3" style="border: 2px solid var(--accent-color); padding: 7px;"><i class="fas fa-thumbs-up" style="color: var(--accent-color)"></i>&nbsp; {{ classroom.likes }} Likes</span>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </li>
+                                    </li>
+                                {% endif %} 
                             {% endif %}
                         {% endfor %}
                     </ul>
+
                 </div>
 
                 <!-- Private Classrooms -->
                 <div class="tab-pane fade {% if status == '1' %}show active{% endif %}" id="private-tab-pane" role="tabpanel" aria-labelledby="private-tab" tabindex="0">
                     <ul class="list-unstyled">
+                        <!-- Classrooms that user has joined -->
                         {% for classroom in classrooms %}
                             {% if classroom.status %}
-                                <li class="card-classroom mb-4">
-                                    <div class="card-body">
-                                        <div class="classroom-info">
-                                            <div class="card-title d-flex jutify-content-center align-items-center">
-                                                {% if classroom.id in participant_classrooms %}
+                                {% if classroom.id in participant_classrooms or user.id == classroom.teacher.id %}
+                                    <li class="card-classroom mb-4">
+                                        <div class="card-body">
+
+                                            <div class="classroom-info">
+                                                <div class="card-title d-flex jutify-content-center align-items-center">
                                                     <h4>🔓 &nbsp;</h4>
                                                     <a href="{% url 'classroom_detail' classroom.id %}">{{ classroom.name }}</a>
-                                                {% else %}
-                                                    <h4>🔒 &nbsp;</h4>
-                                                    <a href="" data-bs-toggle="modal" data-bs-target="#passwordModal" data-classroom-id="{{ classroom.id }}">{{ classroom.name }}</a>
-                                                {% endif %}
+                                                </div>
+                                                <p class="card-text truncate mt-2" style="width: 900px;">&nbsp;📝{{ classroom.description }}</p>
+                                                <div class="classroom-meta text-muted d-flex align-items-center">
+                                                    <div>
+                                                        <span class="me-3 mr-3">&nbsp;<i class="fas fa-user" style="color: var(--accent-color)"></i> {{ classroom.teacher.username }}</span>
+                                                        <span class="me-3 mr-3"><i class="fas fa-school" style="color: var(--accent-color)"></i> {{ classroom.school }}</span>
+                                                        <span class="me-3 mr-3"><i class="fas fa-book" style="color: var(--accent-color)"></i> {{ classroom.subject.name }}</span>
+                                                        <span><i class="fas fa-calendar-alt" style="color: var(--accent-color)"></i> {{ classroom.academic_year.open_year }} - {{ classroom.academic_year.close_year }}</span>
+                                                    </div>
+                                                </div>
+                                                <div class="text-end text-muted d-flex justify-content-end align-items-center">
+                                                    <span class="mr-3" style="border: 2px solid var(--accent-color); padding: 7px;"><i class="fa-solid fa-user" style="color: var(--accent-color)"></i>&nbsp; {{ classroom.participants.count }} Participants</span>
+                                                    <span class="mr-3" style="border: 2px solid var(--accent-color); padding: 7px;"><i class="fas fa-thumbs-up" style="color: var(--accent-color)"></i>&nbsp; {{ classroom.likes }} Likes</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+
+                        <!-- Classrooms that user has not joined -->
+                        {% for classroom in classrooms %}
+                            {% if classroom.status %}
+                                {% if not classroom.id in participant_classrooms and user.id != classroom.teacher.id %}
+                                    <li class="card-classroom mb-4">
+                                        <div class="card-body">
+
+                                        <div class="classroom-info">
+                                            <div class="card-title d-flex jutify-content-center align-items-center">
+                                                <h4>🔒 &nbsp;</h4>
+                                                <a href="" data-bs-toggle="modal" data-bs-target="#passwordModal" data-classroom-id="{{ classroom.id }}">{{ classroom.name }}</a>
                                             </div>
                                             <p class="card-text truncate mt-2" style="width: 900px;">&nbsp;📝{{ classroom.description }}</p>
                                             <div class="classroom-meta text-muted d-flex align-items-center">
@@ -200,10 +298,13 @@
                                                 <span class="mr-3" style="border: 2px solid var(--accent-color); padding: 7px;"><i class="fas fa-thumbs-up" style="color: var(--accent-color)"></i>&nbsp; {{ classroom.likes }} Likes</span>
                                             </div>
                                         </div>
-                                    </div>
-                                </li>
+                                        </div>
+                                    </li>
+                                {% endif %}
                             {% endif %}
                         {% endfor %}
+
+
                     </ul>
                 </div>
         </section>
@@ -222,13 +323,13 @@
                         <input type="hidden" id="classroomId" name="classroom_id">
                         <div class="mb-3">
                             <label for="password" class="form-label">Password</label>
-                            <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" required>
+                            <input type="password" class="form-control" id="password" name="password" placeholder="Enter password">
                         </div>
-                        <div id="passwordError" class="text-danger mb-3 text-center" style="display: none; border: 1px solid #dc3545; padding: 2px 4px;">Incorrect password</div>
+                        <div id="passwordError" class="text-danger mb-3 text-center" style="display: none; border: 1px solid #dc3545; padding: 2px 4px;"></div>
                         <button type="submit" class="submit-modal btn btn-dark w-100 border-0" style="background-color: var(--accent-color); overflow: hidden; transition: all 0.3s ease;">
                             <span class="btn-text">Join now ➜</span>
                         </button>
-                    </form>                    
+                    </form>                   
                     </div>
                 </div>                
             </div>
@@ -262,8 +363,10 @@
         <div></div>
     </div>
 
-    <!-- Main JS File -->
     <script src="{% static 'assets/js/main.js' %}"></script>
+
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.9.359/pdf.min.js"></script>
 </body>
 </html>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
@@ -272,24 +375,20 @@
         event.preventDefault();
 
         var form = event.target;
-
         var formData = new FormData(form);
         var classroomId = document.getElementById('classroomId').value;
 
         fetch(form.action, {
             method: 'POST',
             body: formData,
-
             headers: {
                 'X-CSRFToken': formData.get('csrfmiddlewaretoken')
             }
-
         })
         .then(response => response.json())
         .then(data => {
             if (data.status === 'success') {
                 window.location.href = data.redirect_url;
-
             } else {
                 document.getElementById('passwordError').innerText = data.message;
                 document.getElementById('passwordError').style.display = 'block';
@@ -303,7 +402,6 @@
                     document.getElementById('passwordError').style.display = 'none';
                 });
             }
-
         })
         .catch(error => console.error('Error:', error));
     });
@@ -315,14 +413,14 @@
         var classroomId = button.getAttribute('data-classroom-id'); 
 
         var form = document.getElementById('passwordForm');
-
         form.action = form.action.replace('/0/', '/' + classroomId + '/'); 
 
         var classroomIdInput = document.getElementById('classroomId');
         classroomIdInput.value = classroomId; 
 
         document.getElementById('passwordError').style.display = 'none';
-
+        document.getElementById('password').value = '';
+        document.getElementById('password').style.border = '';
     });
 
     var joinModal = document.getElementById('joinModal');
