@@ -615,7 +615,6 @@ def update_allow_chat(request, classroom_id):
         classroom = get_object_or_404(Classroom, id=classroom_id)
         try:
             data = json.loads(request.body)
-            print(data)
             allow_chat = data.get('allow_chat')
             classroom.allow_chat = allow_chat
             classroom.save()
@@ -983,15 +982,21 @@ def manage_classroom_detail(request, id):
     sections = classroom.sections.all()
     participants = classroom.participants.all()
     assignments = Submission.objects.filter(section__classroom=classroom, submission_type='assignment').prefetch_related('student_files')
+    question_tests = Submission.objects.filter(section__classroom=classroom, submission_type='question_test')
     num_sections = sections.count()
     num_participants = participants.count()
+    parent_sections, child_sections = classroom.count_sections()
     context = {
         'classroom': classroom,
         'sections': sections,
         'participants': participants,
         'assignments': assignments,
+        'question_tests': question_tests,
         'num_sections': num_sections,
         'num_participants': num_participants,
+        'parent_sections': parent_sections,
+        'child_sections': child_sections,
+
     }
     return render(request, 'manage_classroom_detail.html', context)
 
@@ -1008,12 +1013,7 @@ def create_section_submission(request):
             parent_section_id = request.POST.get('parent_section')
             parent_section = None
 
-            if not title or not description:
-                return JsonResponse({'status': 'error', 'message': 'Title and description are required for section.'})
-
             if section_type == 'sub':
-                if not parent_section_id:
-                    return JsonResponse({'status': 'error', 'message': 'Parent section is required for subsection.'})
                 parent_section = get_object_or_404(Section, id=parent_section_id)
 
             section = Section.objects.create(
@@ -1023,7 +1023,6 @@ def create_section_submission(request):
                 parent_section=parent_section
             )
             section.save()
-            messages.success(request, 'Section/Subsection created successfully!')
             if classroom.participants.filter(user__notify_sections=True).exists():
                 notify_participants(classroom, 'section', title, classroom.participants.filter(user__notify_sections=True))
             return JsonResponse({'status': 'success', 'message': 'Section/Subsection created successfully!'})
@@ -1033,9 +1032,6 @@ def create_section_submission(request):
             open_date = request.POST.get('open_date')
             close_date = request.POST.get('close_date')
             parent_section_id = request.POST.get('parent_section')
-
-            if not (parent_section_id and open_date and close_date and submission_type and title and description):
-                return JsonResponse({'status': 'error', 'message': 'All fields are required for submission.'})
 
             section = get_object_or_404(Section, id=parent_section_id)
 
@@ -1048,7 +1044,6 @@ def create_section_submission(request):
                 close_date=close_date
             )
             submission.save()
-            messages.success(request, 'Submission created successfully!')
             if classroom.participants.filter(user__notify_sections=True).exists():
                 notify_participants(classroom, 'submission', title, classroom.participants.filter(user__notify_sections=True))
             return JsonResponse({'status': 'success', 'message': 'Submission created successfully!'})
@@ -1307,14 +1302,14 @@ def delete_section(request, section_id):
     if request.method == 'POST':
         section = get_object_or_404(Section, id=section_id)
         section.delete()
-        return JsonResponse({'success': True})
+        return JsonResponse({'success': True, 'message': 'Section deleted successfully.'})
     
 
 def delete_submission(request, submission_id):
     if request.method == 'POST':
         submission = get_object_or_404(Submission, id=submission_id)
         submission.delete()
-        return JsonResponse({'success': True})
+        return JsonResponse({'success': True, 'message': 'Submission deleted successfully.'})
 
 @csrf_exempt
 def delete_member(request):
@@ -1324,7 +1319,7 @@ def delete_member(request):
         try:
             participant = Participant.objects.get(id=member_id)
             participant.delete()
-            return JsonResponse({'success': True})
+            return JsonResponse({'success': True, 'message': 'Participant deleted successfully.'})
         except Participant.DoesNotExist:
             return JsonResponse({'success': False, 'error': 'Participant not found'})
     return JsonResponse({'success': False, 'error': 'Invalid request'})
@@ -1334,12 +1329,12 @@ def block_member(request):
     if request.method == 'POST':
         data = json.loads(request.body)
         member_id = data.get('member_id')
-        reason = data.get('reason', '')  # Thêm lý do
+        reason = data.get('reason', '') 
         try:
             participant = Participant.objects.get(id=member_id)
             BlockedParticipant.objects.create(user=participant.user, classroom=participant.classroom, reason=reason)
             participant.delete()
-            return JsonResponse({'success': True})
+            return JsonResponse({'success': True, 'message': 'Participant blocked successfully.'})
         except Participant.DoesNotExist:
             return JsonResponse({'success': False, 'error': 'Participant not found'})
     return JsonResponse({'success': False, 'error': 'Invalid request'})

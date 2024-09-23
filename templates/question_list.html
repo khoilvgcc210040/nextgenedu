@@ -131,6 +131,7 @@
                         <div class="form-group">
                             <label for="timeInput" style="font-size: 16px; font-weight: 500;">New Time</label>
                             <input type="datetime-local" class="form-control" id="timeInput" required>
+                            <div id="error-message" style="color: red; display: none; margin-top: 5px;"></div>
                         </div>
                         <input type="hidden" id="timeType">
                         <button type="submit" class="btn float-right" style="background-color: var(--accent-color); color: #fff; border: none; border-radius: 5px; padding: 10px 20px; font-size: 14px; font-weight: 500; cursor: pointer; transition: transform 0.2s;">Save changes</button>
@@ -172,23 +173,27 @@
         </div>      
 
         <div class="table-question">
+            <input type="text" id="searchInput" placeholder="Search questions" onkeyup="searchQuestions()" style="padding: 5px; border-radius: 5px; border: 1px solid #ccc; margin-bottom: 10px;">
             <table class="question-table">
                 <thead>
                     <tr>
                         <th>{{ questions.count }} question(s)</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="questionTableBody">
                     {% for question in questions %}
                     <tr>
                         <td>
-                            
                             <div class="d-flex justify-content-between align-items-center mt-2">
                                 <div>
-                                    <div style="font-weight: 500; margin-bottom: 10px; font-size: 16px;">{{ question.text }}</div>
-                                    {% for answer in question.answers.all %}
-                                        {% if answer.is_correct %}<i class="fas fa-key fa-lg text-warning"></i>{% else %}<i class="fas fa-key fa-lg" style="color: var(--accent-color)"></i>{% endif %} <span style="font-size: 14px;">{{ answer.text }} </span>
-                                    {% endfor %}
+                                    <div style="font-weight: 500; margin-bottom: 10px; font-size: 16px;"><span style="font-weight: 700; color: var(--accent-color);">Question:</span> {{ question.text }}</div>
+                                    <div style="display: flex; flex-direction: column;">
+                                        {% for answer in question.answers.all %}
+                                            <div style="margin-bottom: 5px;">
+                                                {% if answer.is_correct %}<i class="fas fa-check-circle fa-lg text-success"></i>{% else %}<i class="fas fa-times-circle fa-lg text-danger"></i>{% endif %} <span style="font-size: 14px;">{{ answer.text }} </span>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
                                 </div>
                                 <div class="question-actions">
                                     <a href="{% url 'edit_question' submission.id question.id %}">
@@ -226,6 +231,27 @@
                 </tbody>
             </table>
         </div>
+        <script>
+            function searchQuestions() {
+                var input, filter, table, tr, td, i, txtValue;
+                input = document.getElementById("searchInput");
+                filter = input.value.toLowerCase();
+                table = document.querySelector(".question-table");
+                tr = table.getElementsByTagName("tr");
+
+                for (i = 1; i < tr.length; i++) {
+                    td = tr[i].getElementsByTagName("td")[0];
+                    if (td) {
+                        txtValue = td.textContent || td.innerText;
+                        if (txtValue.toLowerCase().indexOf(filter) > -1) {
+                            tr[i].style.display = "";
+                        } else {
+                            tr[i].style.display = "none";
+                        }
+                    }
+                }
+            }
+        </script>
     </div>
     <div id="preloader">
         <div></div>
@@ -259,12 +285,53 @@
         modal.find('#timeInput').val(currentTime);
     });
 
+    $('#editTimeModal').on('hidden.bs.modal', function () {
+        document.getElementById('error-message').style.display = 'none';
+    });
+
+    $('#timeInput').on('input', function () {
+        document.getElementById('error-message').style.display = 'none';
+    });
+
     $('#editTimeForm').on('submit', function (event) {
         event.preventDefault();
         var timeType = $('#timeType').val();
         var newTime = $('#timeInput').val();
         var submissionId = {{ submission.id }};
-        
+        var openDateTime = new Date("{{ submission.open_date|date:'Y-m-d\\TH:i' }}");
+        var closeDateTime = new Date("{{ submission.close_date|date:'Y-m-d\\TH:i' }}");
+        var newDateTime = new Date(newTime);
+        var now = new Date();
+        var errorMessage = '';
+
+        if (newDateTime < now) {
+            errorMessage = 'New time must be current or future date.';
+        }   
+        if (timeType === 'close' && newDateTime <= openDateTime) {
+            errorMessage = 'Close date must be after open date.';
+            document.getElementById('error-message').innerText = errorMessage;
+            document.getElementById('error-message').style.display = 'block';
+            return;
+        }
+        if (timeType === 'open' && newDateTime >= closeDateTime) {
+            errorMessage = 'Open date must be before close date.';
+            document.getElementById('error-message').innerText = errorMessage;
+            document.getElementById('error-message').style.display = 'block';
+            return;
+        }
+        if (timeType === 'open' && (closeDateTime - newDateTime) < (24 * 60 * 60 * 1000)) {
+            errorMessage = 'The time gap between open date and close date must be at least 1 day.';
+        }
+        if (timeType === 'close' && (newDateTime - openDateTime) < (24 * 60 * 60 * 1000)) {
+            errorMessage = 'The time gap between open date and close date must be at least 1 day.';
+        }
+
+        if (errorMessage) {
+            document.getElementById('error-message').innerText = errorMessage;
+            document.getElementById('error-message').style.display = 'block';
+            return;
+        }
+
         $.ajax({
             url: '{% url "edit_submission_time" %}',
             method: 'POST',

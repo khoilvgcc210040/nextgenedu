@@ -67,6 +67,12 @@ class Classroom(models.Model):
             link = ''.join(random.choices(string.ascii_letters + string.digits, k=10))
             if not Classroom.objects.filter(link=link).exists():
                 return link
+            
+    def count_sections(self):
+        total_sections = self.sections.count()
+        parent_sections = self.sections.filter(parent_section__isnull=True).count()
+        child_sections = total_sections - parent_sections
+        return parent_sections, child_sections
 
     def save(self, *args, **kwargs):
         if not self.link:
