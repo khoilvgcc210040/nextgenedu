@@ -331,6 +331,26 @@
 <body>
     {% include "headerMain.html" %}
 
+    <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-sm" style="position: fixed; bottom: 10px; left: 10px;">
+            <div class="modal-content" style="border: 2px solid var(--accent-color);">
+                <div class="modal-body" style="background-color: var(--accent-color); border-radius: 5px;">
+                    <p id="successMessage" class="text-center m-0" style="color: #fff;"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="loadingSpinner" class="spinner-border" role="status" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9999; animation: spin 1s linear infinite; color: var(--accent-color) !important;">
+        <span class="visually-hidden" style="font-size: 0.8em;">Loading...</span>
+    </div>
+    <style>
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+
 
     <!-- Modal for delete confirmation -->
     <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
@@ -477,7 +497,7 @@
                             <label for="open_date" id="sectionNameLabel">Section name:</label>
                             <input type="text" name="title" class="modal-input mb-3" placeholder="Name of the section... (max 20 characters)" maxlength="20">
                             <label for="open_date" id="sectionDescriptionLabel">Section description:</label>
-                            <textarea name="description" class="mb-4" id="" placeholder="Description of the section (you should describe about 50-60 words)..."></textarea>
+                            <textarea name="description" class="mb-4" id="sectionDescription" placeholder="Description of the section (you should describe about 50-60 words)..."></textarea>
                             <button type="submit" class="submit-modal btn btn-dark w-100 border-0" style="background-color: var(--accent-color); overflow: hidden; transition: all 0.3s ease;">
                                 <span class="btn-text">Create a section</span>
                             </button>
@@ -494,7 +514,7 @@
             const actionType = document.getElementById('actionType').value;
             const sectionType = document.getElementById('sectionType').value;
             const title = document.querySelector('input[name="title"]').value;
-            const description = document.querySelector('textarea[name="description"]').value;
+            const description = document.getElementById('sectionDescription').value;
             const parentSection = document.getElementById('parentSection').value;
             const openDate = document.querySelector('input[name="open_date"]').value;
             const closeDate = document.querySelector('input[name="close_date"]').value;
@@ -511,8 +531,6 @@
                 const now = new Date();
                 const openDateTime = new Date(openDate);
                 const closeDateTime = new Date(closeDate);
-
-                
 
                 if (!title || !description || !openDate || !closeDate || !submissionType) {
                     errorMessage = 'All fields are required for submission.';
@@ -538,7 +556,36 @@
                 document.getElementById('error-message').innerText = errorMessage;
                 document.getElementById('error-message').style.display = 'block';
             } else {
-                this.submit();
+                const form = event.target;
+                const formData = new FormData(form);
+
+                fetch(form.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+                        document.getElementById('successMessage').innerText = data.message;
+                        document.getElementById('loadingSpinner').style.display = 'block';
+                        successModal.show();
+                        setTimeout(function() {
+                            document.getElementById('loadingSpinner').style.display = 'none';
+                            successModal.hide();
+                            location.reload(); 
+                        }, 1000);
+                    } else {
+                        {% comment %} alert(data.message); {% endcomment %}
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    {% comment %} alert('An error occurred. Please try again.'); {% endcomment %}
+                });
             }
         });
 
@@ -639,7 +686,7 @@
         <div id="sections-content" class="classroom-content">
             <div class="sections-list">
                 <div class="d-flex justify-content-end">
-                    <button id="createSectionBtn" class="addBtn" data-bs-toggle="modal" data-bs-target="#createModal" onclick="updateModalTitle('Create a section')">✙ Add Section</button>
+                    <button id="createSectionBtn" class="addBtn" data-bs-toggle="modal" data-bs-target="#createModal" data-action="section" onclick="updateModalTitle('Create a section')">✙ Add Section</button>
                 </div>
                 {% for section in sections %}
                 <div class="section-card">
@@ -676,9 +723,22 @@
                     <script>
                         function copyInvitationLink() {
                             var copyText = document.getElementById("invitationLink");
+                            var copyText1 = document.getElementById("invitationLink1");
+                            var copyText2 = document.getElementById("invitationLink2");
                             copyText.select();
+                            copyText1.select();
+                            copyText2.select();
                             copyText.setSelectionRange(0, 99999);
-                            document.execCommand("copy");
+                            copyText1.setSelectionRange(0, 99999);
+                            copyText2.setSelectionRange(0, 99999);
+
+                            const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+                            document.getElementById('successMessage').innerText = "Copied to clipboard!";
+                            successModal.show();
+
+                            setTimeout(function() {
+                                successModal.hide();
+                            }, 800);
                         }
                     </script>
                 </div>
@@ -686,7 +746,19 @@
                     <label style="font-weight: 700; font-size: 18px; margin-bottom: 10px;">CLASSROOM DETAILS</label><br>
                     <div class="detail-item">
                         <span class="detail-icon">📚</span>
-                        <span style="font-weight: 500;">Number of sections: {{ num_sections }}</span>
+                        <span style="font-weight: 500;">Number of sections: {{ parent_sections }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-icon">📕</span>
+                        <span style="font-weight: 500;">Number of subsections: {{ child_sections }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-icon">📝</span>
+                        <span style="font-weight: 500;">Number of assignments: {{ assignments.count }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-icon">❓</span>
+                        <span style="font-weight: 500;">Number of question tests: {{ question_tests.count }}</span>
                     </div>
                     <div class="detail-item">
                         <span class="detail-icon">👥</span>
@@ -719,27 +791,39 @@
             <div class="invitation-details">
                 <div class="invitation-link">
                     <label style="font-weight: 700; font-size: 18px; margin-bottom: 10px;">INVITATION LINK</label><br>
-                    <input type="text" value="{{ request.scheme }}://{{ request.get_host }}{% url 'access_join_classroom' classroom.link %}" readonly>
+                    <input type="text" id="invitationLink1" value="{{ request.scheme }}://{{ request.get_host }}{% url 'access_join_classroom' classroom.link %}" readonly>
                     <button class="copy-btn" onclick="copyInvitationLink()">Copy</button>
                 </div>
                 <div class="classroom-details">
                     <label style="font-weight: 700; font-size: 18px; margin-bottom: 10px;">CLASSROOM DETAILS</label><br>
                     <div class="detail-item">
                         <span class="detail-icon">📚</span>
-                        <span style="font-weight: 500;">Number of sections: {{ num_sections }}</span>
+                        <span style="font-weight: 500;">Number of sections: {{ parent_sections }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-icon">📕</span>
+                        <span style="font-weight: 500;">Number of subsections: {{ child_sections }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-icon">📝</span>
+                        <span style="font-weight: 500;">Number of assignments: {{ assignments.count }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-icon">❓</span>
+                        <span style="font-weight: 500;">Number of question tests: {{ question_tests.count }}</span>
                     </div>
                     <div class="detail-item">
                         <span class="detail-icon">👥</span>
                         <span style="font-weight: 500;">Number of participants: {{ num_participants }}</span>
                     </div>
-                </div>                
+                </div>               
             </div>
         </div>
 
         <div id="submissions-content" class="classroom-content hidden">
             <div class="sections-list">
                 <div class="d-flex justify-content-end">
-                    <button id="createSubmissionBtn" class="addBtn" data-bs-toggle="modal" data-bs-target="#createModal" onclick="updateModalTitle('Create a submission')">✙ Add Submission</button>
+                    <button id="createSubmissionBtn" class="addBtn" data-bs-toggle="modal" data-bs-target="#createModal" data-action="submission" onclick="updateModalTitle('Create a submission')">✙ Add Submission</button>
                 </div>
                 {% for section in sections %}
                     {% for submission in section.submissions.all %}
@@ -775,20 +859,32 @@
             <div class="invitation-details">
                 <div class="invitation-link">
                     <label style="font-weight: 700; font-size: 18px; margin-bottom: 10px;">INVITATION LINK</label><br>
-                    <input type="text" value="{{ request.scheme }}://{{ request.get_host }}{% url 'access_join_classroom' classroom.link %}" readonly>
+                    <input type="text" id="invitationLink2" value="{{ request.scheme }}://{{ request.get_host }}{% url 'access_join_classroom' classroom.link %}" readonly>
                     <button class="copy-btn" onclick="copyInvitationLink()">Copy</button>
                 </div>
                 <div class="classroom-details">
                     <label style="font-weight: 700; font-size: 18px; margin-bottom: 10px;">CLASSROOM DETAILS</label><br>
                     <div class="detail-item">
                         <span class="detail-icon">📚</span>
-                        <span style="font-weight: 500;">Number of sections: {{ num_sections }}</span>
+                        <span style="font-weight: 500;">Number of sections: {{ parent_sections }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-icon">📕</span>
+                        <span style="font-weight: 500;">Number of subsections: {{ child_sections }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-icon">📝</span>
+                        <span style="font-weight: 500;">Number of assignments: {{ assignments.count }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-icon">❓</span>
+                        <span style="font-weight: 500;">Number of question tests: {{ question_tests.count }}</span>
                     </div>
                     <div class="detail-item">
                         <span class="detail-icon">👥</span>
                         <span style="font-weight: 500;">Number of participants: {{ num_participants }}</span>
                     </div>
-                </div>                
+                </div>               
             </div>
         </div>
     </main>
@@ -852,32 +948,6 @@
     });
 
 
-    document.getElementById('createForm').addEventListener('submit', function(event) {
-        event.preventDefault();
-        const form = event.target;
-        const formData = new FormData(form);
-
-        fetch(form.action, {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-CSRFToken': formData.get('csrfmiddlewaretoken')
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                location.reload();  // Reload the page to reflect changes
-            } else {
-                {% comment %} alert(data.message); {% endcomment %}
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            {% comment %} alert('An error occurred. Please try again.'); {% endcomment %}
-        });
-    });
-
     document.getElementById('sectionType').addEventListener('change', function() {
         var parentSectionContainer = document.getElementById('parentSectionContainer');
         var submissionFields = document.getElementById('submissionFields');
@@ -925,7 +995,15 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    location.reload();
+                    const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+                    document.getElementById('successMessage').innerText = data.message;
+                    document.getElementById('loadingSpinner').style.display = 'block';
+                    successModal.show();
+                    setTimeout(function() {
+                        document.getElementById('loadingSpinner').style.display = 'none';
+                        successModal.hide();
+                        location.reload();
+                    }, 1000);
                 } else {
                     alert('Failed to delete section.');
                 }
@@ -947,7 +1025,15 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    location.reload();
+                    const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+                    document.getElementById('successMessage').innerText = data.message;
+                    document.getElementById('loadingSpinner').style.display = 'block';
+                    successModal.show();
+                    setTimeout(function() {
+                        document.getElementById('loadingSpinner').style.display = 'none';
+                        successModal.hide();
+                        location.reload();
+                    }, 1000);
                 } else {
                     {% comment %} alert('Failed to delete submission.'); {% endcomment %}
                 }
@@ -957,21 +1043,30 @@
     });
 
     document.getElementById('createSectionBtn').addEventListener('click', function() {
+
         document.getElementById('actionType').value = 'section';
+
         var sectionTypeElement = document.getElementById('sectionType');
+
         sectionTypeElement.value = 'new';
+
         
         var event = new Event('change');
         sectionTypeElement.dispatchEvent(event);
     });
 
+
     document.getElementById('createSubmissionBtn').addEventListener('click', function() {
         document.getElementById('actionType').value = 'submission';
+
         var sectionTypeElement = document.getElementById('sectionType');
+
         sectionTypeElement.value = 'submission';
 
         var event = new Event('change');
+
         sectionTypeElement.dispatchEvent(event);
+
     });
 
     let memberIdToDelete = null;
@@ -1002,7 +1097,15 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    location.reload();
+                    const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+                    document.getElementById('successMessage').innerText = data.message;
+                    document.getElementById('loadingSpinner').style.display = 'block';
+                    successModal.show();
+                    setTimeout(function() {
+                        document.getElementById('loadingSpinner').style.display = 'none';
+                        successModal.hide();
+                        location.reload();
+                    }, 1000);
                 } else {
                     {% comment %} alert('Failed to delete member.'); {% endcomment %}
                 }
@@ -1025,7 +1128,15 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    location.reload();
+                    const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+                    document.getElementById('successMessage').innerText = data.message;
+                    document.getElementById('loadingSpinner').style.display = 'block';
+                    successModal.show();
+                    setTimeout(function() {
+                        document.getElementById('loadingSpinner').style.display = 'none';
+                        successModal.hide();
+                        location.reload();
+                    }, 1000);
                 } else {
                     {% comment %} alert('Failed to block member.'); {% endcomment %}
                 }
@@ -1036,21 +1147,30 @@
 
     document.querySelectorAll('[data-action]').forEach(button => {
         button.addEventListener('click', function() {
+
             const action = this.getAttribute('data-action');
+
             const sectionTypeSelect = document.getElementById('sectionType');
+
             const options = sectionTypeSelect.options;
+
 
             for (let i = 0; i < options.length; i++) {
                 if (action === 'section' && options[i].value === 'submission') {
                     options[i].style.display = 'none';
+
                 } else if (action === 'submission' && (options[i].value === 'new' || options[i].value === 'sub')) {
                     options[i].style.display = 'none';
+
                 } else {
                     options[i].style.display = 'block';
                 }
+
             }
 
+
             sectionTypeSelect.value = action === 'section' ? 'new' : 'submission';
+
             sectionTypeSelect.dispatchEvent(new Event('change'));
         });
     });
