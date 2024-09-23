@@ -281,9 +281,6 @@
                 <li><a href="{% url "subjects" %}">Subjects</a></li>
                 {% if user.role == 'teacher' %}
                 <li><a href="{% url "manage_classroom_list" %}">Manage</a></li>
-                {% elif user.role == 'student' %}
-                <li><a href="{% url "myclassroom" %}">My Classroom</a></li>
-                {% endif %}
                 <li class="dropdown">
                     <a href="#">
                         <span style="display: flex; align-items: center; gap: 5px;"><i class="fa-solid fa-plus"></i> Create</span> 
@@ -293,6 +290,10 @@
                       <li><a href="#" data-bs-toggle="modal" data-bs-target="#createClassroomModal"><i class="fa-solid fa-plus"></i>&nbsp; Create a classroom</a></li>
                     </ul>
                 </li>
+                {% elif user.role == 'student' %}
+                <li><a href="{% url "myclassroom" %}">My Classroom</a></li>
+                {% endif %}
+                
                 <li class="dropdown" style="padding: 0 40px 0 10px;"><a href="#"><img style="width: 30px; height: 30px; border-radius: 50%;" src="{% static 'account.png' %}" alt="user"><i class="bi bi-chevron-down toggle-dropdown d-xl-none"></i></a>
                     <ul style="padding: 0; box-shadow: 0 0 10px rgba(0, 0, 0, 0.7); border-radius: 5px; border: 1px solid #e0e0e0;">
                       <li style="padding: 0;">
@@ -308,6 +309,7 @@
                       <li><a href="{% url "achivement" %}" style="display: flex; align-items: center; justify-content: left; gap: 10px;"><i class="fa-solid fa-trophy"></i> Achievement</a></li>
                       <li><a href="{% url "favorite" %}" style="display: flex; align-items: center; justify-content: left; gap: 10px;"><i class="fa-solid fa-star"></i> Favorite</a></li>
                       <li><a href="{% url "setting" %}" style="display: flex; align-items: center; justify-content: left; gap: 10px;"><i class="fa-solid fa-gear"></i> Setting</a></li>
+                      <li><a href="{% url "notification" %}" style="display: flex; align-items: center; justify-content: left; gap: 10px;"><i class="fas fa-envelope"></i> Notification</a></li>
                       {% if user.role == 'admin' %}
                       <li><a href="{% url "adminPage" %}" style="display: flex; align-items: center; justify-content: left; gap: 10px; background-color: #f97316; color: #fff; transition: transform 0.3s;"><span style="transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-1px)';" onmouseout="this.style.transform='translateY(0)';"><i class="fa-solid fa-user-tie"></i> Admin</span></a></li>
                       {% endif %}

@@ -69,4 +69,10 @@ urlpatterns = [
     path('forum/post/<int:post_id>/approve/', views.approve_post, name='approve_post'),
     path('forum/post/<int:post_id>/reject/', views.reject_post, name='reject_post'),
     path('forum/post/<int:post_id>/comment/', views.add_comment, name='add_comment'),
+
+    path('classify/', views.classify, name='classify'),
+    path('chatbot/', views.chatbot, name='chatbot'),
+    path('notification/', views.notification, name='notification'),
+    path('join/<str:link>/', views.access_join_classroom, name='access_join_classroom'),
+    path('leave_classroom/<int:classroom_id>/', views.leave_classroom, name='leave_classroom'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

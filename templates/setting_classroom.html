@@ -121,6 +121,7 @@
 
         .btn-delete:hover {
             background-color: #b91c1c;
+            border: none;
         }
 
         .toggle-switch {
@@ -174,17 +175,17 @@
 
         .toggle-switch input[type="checkbox"]:checked + .toggle-switch-handle {
             transform: translateX(45px);
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2), 0 0 0 3px #05c46b;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2), 0 0 0 3px var(--accent-color);
         }
 
         .toggle-switch input[type="checkbox"]:checked + .toggle-switch-background {
-            background-color: #05c46b;
-            box-shadow: inset 0 0 0 2px #04b360;
+            background-color: var(--accent-color);
+            box-shadow: inset 0 0 0 2px var(--accent-color);
         }
 
         .toggle-switch input[type="checkbox"]:checked + .toggle-switch:before {
             content: "On";
-            color: #05c46b;
+            color: var(--accent-color);
             right: -15px;
         }
 
@@ -211,6 +212,39 @@
 </head>
 <body>
     {% include "headerMain.html" %}
+
+    <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-sm" style="position: fixed; bottom: 10px; left: 10px;">
+            <div class="modal-content" style="border: 2px solid var(--accent-color);">
+                <div class="modal-body" style="background-color: var(--accent-color); border-radius: 5px;">
+                    <p id="successMessage" class="text-center m-0" style="color: #fff;"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="loadingSpinner" class="spinner-border" role="status" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9999; animation: spin 1s linear infinite; color: var(--accent-color) !important;">
+        <span class="visually-hidden" style="font-size: 0.8em;">Loading...</span>
+    </div>
+    <style>
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+
+    <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-sm" style="position: fixed; bottom: 10px; left: 10px;">
+            <div class="modal-content" style="border: 2px solid var(--accent-color);">
+                <div class="modal-body" style="background-color: var(--accent-color); border-radius: 5px;">
+                    <div id="loadingSpinner" class="spinner-border text-light" role="status" style="display: none;">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p id="successMessage" class="text-center m-0" style="color: #fff;"></p>
+                </div>
+            </div>
+        </div>
+    </div>
     
     <div class="sidebar">
         <ul class="nav flex-column">
@@ -224,8 +258,19 @@
                 <a class="nav-link toggle-link" data-content="blocked-content" href="#">Blocked Participants</a>
             </li>
             <li class="nav-item">
-                <a class="btn-back nav-link-back toggle-link" href="{% url "classroom_detail" classroom.id %}"><i class="fa-solid fa-backward"></i>&nbsp;Back</a>
+                <a id="back-link" class="btn-back nav-link-back toggle-link" href="#"><i class="fa-solid fa-backward"></i>&nbsp;Back</a>
             </li>
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    const backLink = document.getElementById('back-link');
+                    backLink.addEventListener('click', function(event) {
+                        event.preventDefault();
+                        const referrer = document.referrer;
+                        window.location.href = referrer;
+                    });
+                });
+            </script>
         </ul>
     </div>
     
@@ -301,6 +346,40 @@
             </div>
         </div>
 
+        <script>
+            const allowChatCheckbox = document.getElementById('allowChatCheckbox');
+            allowChatCheckbox.addEventListener('change', function() {
+                const isChecked = allowChatCheckbox.checked;
+
+                
+
+                fetch("{% url 'update_allow_chat' classroom.id %}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({ allow_chat: isChecked })
+                }).then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+                        document.getElementById('successMessage').innerText = data.message;
+                        document.getElementById('loadingSpinner').style.display = 'block';
+                        successModal.show();
+                        setTimeout(function() {
+                            document.getElementById('loadingSpinner').style.display = 'none';
+                            successModal.hide();
+                        }, 1000);
+                    } else {
+                        alert(data.message);
+                    }
+                }).catch(error => {
+                    console.error('Error:', error);
+                });
+            });
+        </script>
+
         <div id="blocked-content" class="content-section pb-lg-5">
             <div class="text-center">
                 <h1 style="font-weight: 700;" class="text-truncate ">BLOCKED PARTICIPANTS</h1>
@@ -320,11 +399,37 @@
                         <tr>
                             <td style="font-weight: 500;">{{ participant.user.username }}</td>
                             <td style="font-weight: 500; text-align: center;">
-                                {% if participant.reason|length > 20 %}
-                                    {{ participant.reason|slice:":20" }}...
+                                {% if participant.reason|length > 30 %}
+                                    <span type="button" class="text-decoration-underline" data-bs-toggle="modal" data-bs-target="#reasonModal{{ participant.id }}">
+                                        {{ participant.reason|slice:":30" }}...
+                                    </span>
                                 {% else %}
                                     {{ participant.reason }}
                                 {% endif %}
+                                <div class="modal fade" id="reasonModal{{ participant.id }}" tabindex="-1" aria-labelledby="reasonModalLabel{{ participant.id }}" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+
+                                        <div class="modal-content" style="border: 5px solid var(--accent-color); border-radius: 15px;">
+
+                                            <div class="modal-header" style="background-color: var(--accent-color);">
+
+                                                <h5 class="modal-title" id="reasonModalLabel{{ participant.id }}" style="color: #fff;">Reason</h5>
+
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="background-color: #fff; border: none;"></button>
+
+                                            </div>
+
+                                            <div class="modal-body" style="max-height: 400px; overflow-y: auto; border-bottom: 2px solid var(--accent-color); text-align: left;">
+
+                                                <p style="white-space: pre-wrap; word-wrap: break-word; margin: 0;">{{ participant.reason|linebreaksbr }}</p>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
                             </td>
                             <td>
                                 <button class="btn-unblock" style="font-weight: 500; color: #fff; background-color: var(--accent-color); border: 2px solid var(--accent-color); border-radius: 10px;" data-bs-toggle="modal" data-bs-target="#unblockModal" data-username="{{ participant.user.username }}" data-id="{{ participant.id }}">Unblock</button>
@@ -360,6 +465,53 @@
         </div>
     </div>
 
+    <script>
+        const previousState = localStorage.getItem('contentState');
+        if (previousState) {
+            document.querySelectorAll('.content-section').forEach(section => section.classList.remove('active'));
+            document.getElementById(previousState).classList.add('active');
+
+            localStorage.removeItem('contentState');
+        }
+
+        document.getElementById('unblockForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const form = this;
+            const formData = new FormData(form);
+            const url = form.action;
+
+            // Save the current state to localStorage
+            localStorage.setItem('contentState', 'blocked-content');
+
+            fetch(url, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+                    document.getElementById('successMessage').innerText = data.message;
+                    document.getElementById('loadingSpinner').style.display = 'block';
+                    successModal.show();
+                    setTimeout(function() {
+                        document.getElementById('loadingSpinner').style.display = 'none';
+                        successModal.hide();
+                        location.reload();
+                    }, 2000);
+                } else {
+                    alert(data.message);
+                }
+            })                
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    </script>
+
     <!-- Modal for editing classroom information -->
     <div class="modal fade" id="editClassroomModal" tabindex="-1" aria-labelledby="editClassroomModalLabel" aria-hidden="true" data-bs-backdrop="false">
         <div class="modal-dialog modal-lg" style="padding: 5%;">
@@ -382,20 +534,116 @@
                                 <option value="Private" {% if classroom.status == True %}selected{% endif %}>Private</option>
                             </select>
                         </div>
-                        <div class="mb-3" id="passwordField" style="display: none;">
+                        <div class="mb-3" id="passwordField" style="display: none; position: relative;">
                             <label for="classroomPassword" class="form-label" style="color: var(--accent-color); font-weight: 700;">Password</label>
-                            <input type="password" id="classroomPassword" placeholder="Enter password" name="password" class="form-control" style="border: 2px solid var(--accent-color);">
+                            <input type="password" id="classroomPassword" placeholder="Enter password" name="password" class="form-control" style="border: 2px solid var(--accent-color);" value="{{ classroom.password }}">
+                            <span id="toggle-password" style="position: absolute; right: 10px; top: 70%; transform: translateY(-50%); cursor: pointer;">
+                                <img id="toggle-password-icon" src="{% static "show.png" %}" alt="Toggle Password" style="width: 20px; height: 20px;">
+                            </span>
                         </div>
                         <div id="errorMessages" class="text-danger mb-3 text-center" style="display: none; border: 1px solid #dc3545; padding: 2px 4px;"></div>
                     </div>
                     <div class="modal-footer d-flex justify-content-end">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn" style="background-color: var(--accent-color); color: #fff;">Save changes</button>
+                        <button type="submit" class="btn" style="background-color: var(--accent-color); color: #fff;" onclick="validateForm()">Save changes</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const classroomStatus = document.getElementById('classroomStatus');
+            const passwordField = document.getElementById('passwordField');
+            const passwordInput = document.getElementById('classroomPassword');
+            const errorMessages = document.getElementById('errorMessages');
+            const togglePassword = document.getElementById('toggle-password');
+            const togglePasswordIcon = document.getElementById('toggle-password-icon');
+    
+            classroomStatus.addEventListener('change', function() {
+                if (this.value === 'Private') {
+                    passwordField.style.display = 'block';
+                } else {
+                    passwordField.style.display = 'none';
+                    errorMessages.style.display = 'none';
+                    passwordInput.style.border = '';
+                }
+            });
+    
+            if (classroomStatus.value === 'Private') {
+                passwordField.style.display = 'block';
+            } 
+
+            document.getElementById('editClassroomModal').addEventListener('hidden.bs.modal', function () {
+                errorMessages.style.display = 'none';
+            });
+
+            togglePassword.addEventListener('click', function() {
+                const type = passwordInput.type === 'password' ? 'text' : 'password';
+                passwordInput.type = type;
+
+                const iconSrc = type === 'password' ? '{% static "show.png" %}' : '{% static "hide.png" %}';
+                togglePasswordIcon.src = iconSrc;
+            });
+        });
+
+        function validateForm() {
+            const classroomName = document.getElementById('classroomName').value;
+            const classroomStatus = document.getElementById('classroomStatus').value;
+            const classroomPassword = document.getElementById('classroomPassword').value;
+            const errorMessages = document.getElementById('errorMessages');
+            let errorMessage = '';
+
+            if (classroomName.trim() === '') {
+                errorMessage = 'Classroom name cannot be empty';
+            } else if (classroomStatus === 'Private' && classroomPassword.length < 6) {
+                errorMessage = 'Password must be at least 6 characters long';
+            }
+
+            if (errorMessage) {
+                errorMessages.style.display = 'block';
+                errorMessages.innerText = errorMessage;
+                event.preventDefault();
+            } else {
+                errorMessages.style.display = 'none';
+            }
+        }
+
+        document.getElementById('editClassroomForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const form = this;
+            const formData = new FormData(form);
+            const url = form.action;
+
+            fetch(url, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+                    successModal.show();
+                    document.getElementById('successMessage').innerText = data.message;
+                    document.getElementById('loadingSpinner').style.display = 'block';
+                    setTimeout(function() {
+                        document.getElementById('loadingSpinner').style.display = 'none';
+                        successModal.hide();
+                        location.reload();
+                    }, 2000);
+                } else {
+                    alert(data.message);
+                }
+            })                
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    </script>
 
     <!-- Modal for deleting classroom -->
     <div class="modal fade" id="deleteClassroomModal" tabindex="-1" aria-labelledby="deleteClassroomModalLabel" aria-hidden="true">
@@ -468,62 +716,7 @@
                 const deleteModal = new bootstrap.Modal(document.getElementById('deleteClassroomModal'));
                 deleteModal.show();
             });
-
-
-            const allowChatCheckbox = document.getElementById('allowChatCheckbox');
-            allowChatCheckbox.addEventListener('change', function() {
-                const isChecked = allowChatCheckbox.checked;
-                fetch("{% url 'update_allow_chat' classroom.id %}", {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': '{{ csrf_token }}'
-                    },
-                    body: JSON.stringify({ allow_chat: isChecked })
-                }).then(response => response.json())
-                .then(data => {
-                    if (data.status === 'success') {
-                        {% comment %} alert('Allow chat updated successfully'); {% endcomment %}
-                    } else {
-                        {% comment %} alert('Failed to update allow chat'); {% endcomment %}
-                    }
-                }).catch(error => {
-                    console.error('Error:', error);
-                });
-            });
-
-            document.getElementById('editClassroomForm').addEventListener('submit', function(event) {
-                event.preventDefault();
-                const form = this;
-                const formData = new FormData(form);
-                const url = form.action;
-    
-                fetch(url, {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-CSRFToken': formData.get('csrfmiddlewaretoken')
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    const errorMessages = document.getElementById('errorMessages');
-                    errorMessages.innerHTML = ''; 
-                    if (data.status === 'success') {
-                        alert(data.message);
-                        location.reload();
-                    } else {
-                        var passwordInput = document.getElementById('classroomPassword');
-                        passwordInput.value = '';
-                        passwordInput.style.border = '1px solid #dc3545';
-                        errorMessages.innerText = 'Password must be at least 6 characters long if the classroom is private';
-                        errorMessages.style.display = 'block';
-                    }
-                })                
-                .catch(error => {
-                    console.error('Error:', error);
-                });
-            });
+            
 
             document.getElementById('confirmDeleteButton').addEventListener('click', function () {
                 const classroomId = '{{ classroom.id }}';
@@ -546,34 +739,6 @@
                 .catch(error => {
                     console.error('Error:', error);
                 });
-            });
-        });
-
-        document.addEventListener('DOMContentLoaded', function () {
-            // Code xử lý sự kiện khi trạng thái Classroom thay đổi
-            const classroomStatus = document.getElementById('classroomStatus');
-            const passwordField = document.getElementById('passwordField');
-            const passwordInput = document.getElementById('classroomPassword');
-            const errorMessages = document.getElementById('errorMessages');
-    
-            classroomStatus.addEventListener('change', function() {
-                if (this.value === 'Private') {
-                    passwordField.style.display = 'block';
-                } else {
-                    passwordField.style.display = 'none';
-                    errorMessages.style.display = 'none';
-                    passwordInput.style.border = '';
-                }
-            });
-    
-            // Hiển thị trường mật khẩu nếu trạng thái ban đầu là Private
-            if (classroomStatus.value === 'Private') {
-                passwordField.style.display = 'block';
-            } 
-
-            // Ẩn thông báo lỗi khi modal bị tắt
-            document.getElementById('editClassroomModal').addEventListener('hidden.bs.modal', function () {
-                errorMessages.style.display = 'none';
             });
         });
     </script>

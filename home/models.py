@@ -2,6 +2,8 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.forms import ValidationError
 from django.utils import timezone
+import random
+import string
 
 class Subjects(models.Model):
     GRADE_CHOICES = [
@@ -50,6 +52,7 @@ class Classroom(models.Model):
     password = models.TextField(max_length=20, null=True, blank=True)
     likes = models.IntegerField(default=0)
     allow_chat = models.BooleanField(default=True)
+    link = models.TextField(max_length=200, null=True, blank=True)
     created_at = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
@@ -59,7 +62,15 @@ class Classroom(models.Model):
         if self.status and (not self.password or len(self.password) < 6):
             raise ValidationError('Password must be at least 6 characters long if the classroom is private.')
 
+    def generate_unique_link(self):
+        while True:
+            link = ''.join(random.choices(string.ascii_letters + string.digits, k=10))
+            if not Classroom.objects.filter(link=link).exists():
+                return link
+
     def save(self, *args, **kwargs):
+        if not self.link:
+            self.link = self.generate_unique_link()
         self.full_clean() 
         super().save(*args, **kwargs)
 
@@ -267,3 +278,16 @@ class ForumComment(models.Model):
     def __str__(self):
         return f"Comment by {self.user.username} on {self.post.title}"
 
+class NotificationSystem(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    text = models.TextField()
+    created_at = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f"Notification by {self.user.username}"
+
+class Contact(models.Model):
+    name = models.TextField(max_length=50)
+    email = models.TextField(max_length=60)
+    subject = models.TextField(max_length=30)
+    message = models.TextField(max_length=255)

@@ -243,6 +243,18 @@
 
 
     </style>
+
+    <script language='javascript' type='text/javascript'>
+        document.addEventListener('DOMContentLoaded', function() {
+            function DisableBackButton() {
+                window.history.forward()
+            }
+            DisableBackButton();
+            window.onload = DisableBackButton;
+            window.onpageshow = function(evt) { if (evt.persisted) DisableBackButton() }
+            window.onunload = function() { void (0) }
+        });
+    </script>
 </head>
 <body>
     <div class="container mt-4">
@@ -356,7 +368,7 @@
     
         document.addEventListener("DOMContentLoaded", () => {
             startTimer();
-            updateProgressBar(); // Update the progress bar on page load
+            updateProgressBar(); 
         });
     
         // Maintain selected answer's active state
@@ -369,12 +381,7 @@
             });
         });
     
-        // Prevent back navigation and preserve elapsed time
-        window.history.pushState(null, "", window.location.href);
-        window.onpopstate = function() {
-            window.history.pushState(null, "", window.location.href);
-            alert("You cannot go back to the previous question!");
-        };
+        
     
         // Stop the timer on form submit and store elapsed time
         document.querySelector('form').addEventListener('submit', function() {
@@ -382,5 +389,10 @@
             stopTimer();
         });
     </script>
+    
+    
+    
+    
+    
 </body>
 </html>

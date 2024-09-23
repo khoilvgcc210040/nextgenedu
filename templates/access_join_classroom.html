@@ -1,0 +1,24 @@
+{% if requires_password %}
+    <form method="POST">
+        {% csrf_token %}
+        <p>{{ classroom.name }}</p>
+        <p>{{ classroom.description }}</p>
+        <input type="password" name="password" placeholder="Enter classroom password" required>
+        <button type="submit">Join now</button>
+    </form>
+{% else %}
+    <p>{{ classroom.name }}</p>
+    <p>{{ classroom.description }}</p>
+    <form method="POST">
+        {% csrf_token %}
+        <button type="submit">Join now</button>
+    </form>
+{% endif %}
+
+{% if messages %}
+    <ul>
+        {% for message in messages %}
+            <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
