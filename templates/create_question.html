@@ -14,7 +14,7 @@
             border-radius: 5px;
             border: 5px solid var(--accent-color);
             padding: 20px;
-            max-width: 500px;
+            max-width: 600px;
             width: 100%;
             box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
         }
@@ -168,33 +168,29 @@
         <div class="container-question">
             <div class="question-container">
                 <h3>Create the question</h3>
-                <form method="POST">
+                <p id="error-message" style="color: red; display: none; text-align: center;"></p>
+                <form method="POST" onsubmit="return validateForm()">
                     {% csrf_token %}
                     <div class="form-group">
-                        <input type="text" name="question_text" placeholder="Enter a question..." required>
+                        <input type="text" id="question_text" name="question_text" placeholder="Enter a question..." >
                     </div>
                     <div class="option-container">
-                        <div class="option">
-                            <input type="text" name="option1" placeholder="Option 1" required>
+                        <div class="option d-flex align-items-center">
+                            <input type="radio" style="margin-right: 10px;" name="correct_option" value="1">
+                            <input type="text" class="option-input" id="option1" name="option1" placeholder="Option 1">
                         </div>
-                        <div class="option">
-                            <input type="text" name="option2" placeholder="Option 2" required>
+                        <div class="option d-flex align-items-center">
+                            <input type="radio" style="margin-right: 10px;" name="correct_option" value="2">
+                            <input type="text" class="option-input" id="option2" name="option2" placeholder="Option 2">
                         </div>
-                        <div class="option">
-                            <input type="text" name="option3" placeholder="Option 3" required>
+                        <div class="option d-flex align-items-center">
+                            <input type="radio" style="margin-right: 10px;" name="correct_option" value="3">
+                            <input type="text" class="option-input" id="option3" name="option3" placeholder="Option 3">
                         </div>
-                        <div class="option">
-                            <input type="text" name="option4" placeholder="Option 4" required>
+                        <div class="option d-flex align-items-center">
+                            <input type="radio" style="margin-right: 10px;" name="correct_option" value="4">
+                            <input type="text" class="option-input" id="option4" name="option4" placeholder="Option 4">
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="correct_option" style="font-size: 18px; font-weight: 500; color: var(--accent-color);">Correct Option:</label>
-                        <select name="correct_option" style="padding: 3px 6px; border: 2px solid var(--accent-color); border-radius: 3px; background-color: var(--accent-color); color: #fff;" required>
-                            <option value="1">Option 1</option>
-                            <option value="2">Option 2</option>
-                            <option value="3">Option 3</option>
-                            <option value="4">Option 4</option>
-                        </select>
                     </div>
                     <div class="submit-btn">
                         <button type="submit">Submit</button>
@@ -203,6 +199,51 @@
             </div>
         </div>
     </div>
+    <script>
+        function validateForm() {
+            var questionText = document.getElementById('question_text').value;
+            var option1 = document.getElementById('option1').value;
+            var option2 = document.getElementById('option2').value;
+            var option3 = document.getElementById('option3').value;
+            var option4 = document.getElementById('option4').value;
+            var correctOption = document.querySelector('input[name="correct_option"]:checked');
+
+            if (!questionText || !option1 || !option2 || !option3 || !option4) {
+                document.getElementById('error-message').textContent = 'Please fill in all fields.';
+                document.getElementById('error-message').style.display = 'block';
+                return false;
+            } else if (!correctOption) {
+                document.getElementById('error-message').textContent = 'Please select the correct option.';
+                document.getElementById('error-message').style.display = 'block';
+                return false;
+            }
+            return true;
+        }
+
+        document.querySelectorAll('input[type="radio"][name="correct_option"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                document.querySelectorAll('.option-input').forEach(option => {
+                    option.style.backgroundColor = '';
+                });
+                this.closest('.option').querySelector('input[type="text"]').style.backgroundColor = '#f97316';
+                document.getElementById('error-message').style.display = 'none';
+            });
+        });
+
+        document.querySelectorAll('.option-input').forEach(input => {
+            input.addEventListener('input', function() {
+                if (this.value.trim() !== '') {
+                    document.getElementById('error-message').style.display = 'none';
+                }
+            });
+        });
+
+        document.getElementById('question_text').addEventListener('input', function() {
+            if (this.value.trim() !== '') {
+                document.getElementById('error-message').style.display = 'none';
+            }
+        });
+    </script>
 
     <div id="preloader">
         <div></div>

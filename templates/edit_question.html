@@ -143,54 +143,135 @@
     {% include "headerMain.html" %}
     <div class="create-question-section">
         <div class="submission-title d-flex justify-content-between align-items-center">
+
             <button class="btn-back" onclick="history.back()" style="outline: none;">
                 <svg height="16" width="16" fill="currentColor" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 1024 1024">
                     <path d="M874.690416 495.52477c0 11.2973-9.168824 20.466124-20.466124 20.466124l-604.773963 0 188.083679 188.083679c7.992021 7.992021 7.992021 20.947078 0 28.939099-4.001127 3.990894-9.240455 5.996574-14.46955 5.996574-5.239328 0-10.478655-1.995447-14.479783-5.996574l-223.00912-223.00912c-3.837398-3.837398-5.996574-9.046027-5.996574-14.46955 0-5.433756 2.159176-10.632151 5.996574-14.46955l223.019353-223.029586c7.992021-7.992021 20.957311-7.992021 28.949332 0 7.992021 8.002254 7.992021 20.957311 0 28.949332l-188.073446 188.073446 604.753497 0C865.521592 475.058646 874.690416 484.217237 874.690416 495.52477z"></path>
+
                 </svg>
                 <span>Back</span>
+
             </button>
+
             <p class="mb-0" style="font-size: 20px; font-weight: 500; margin-right: 100px">Edit the question</p>
         </div>
 
         <div class="container-question">
+
             <div class="question-container">
+
                 <h3>Edit the question</h3>
-                <form method="POST">
+                <p id="error-message" style="color: red; display: none; text-align: center;"></p>
+                <form method="POST" onsubmit="return validateForm()">
+
                     {% csrf_token %}
                     <div class="form-group">
-                        <input type="text" name="question_text" value="{{ question.text }}" required>
+
+                        <input type="text" id="question_text" name="question_text" value="{{ question.text }}">
+
                     </div>
+
                     <div class="option-container">
                         {% for answer in answers %}
-                            <div class="option">
-                                <input type="text" name="option{{ forloop.counter }}" value="{{ answer.text }}" required>
+
+                            <div class="option d-flex align-items-center">
+                                <input type="radio" style="margin-right: 10px;" name="correct_option" value="{{ forloop.counter }}" {% if answer.is_correct %}checked{% endif %}>
+
+                                <input type="text" class="option-input" id="option{{ forloop.counter }}" name="option{{ forloop.counter }}" value="{{ answer.text }}">
+
                             </div>
+
                         {% endfor %}
-                    </div>
-                    <div class="form-group">
-                        <label for="correct_option" style="font-size: 18px; font-weight: 500; color: var(--accent-color);">Correct Option:</label>
-                        <select name="correct_option" style="padding: 3px 6px; border: 2px solid var(--accent-color); border-radius: 3px; background-color: var(--accent-color); color: #fff;" required>
-                            {% for answer in answers %}
-                                <option value="{{ forloop.counter }}" {% if answer.is_correct %}selected{% endif %}>Option {{ forloop.counter }}</option>
-                            {% endfor %}
-                        </select>
+
                     </div>
                     <div class="submit-btn">
+
                         <button type="submit">Save changes</button>
                     </div>
                 </form>
+
             </div>
         </div>
+
     </div>
+
+    <script>
+
+        function validateForm() {
+            var questionText = document.getElementById('question_text').value.trim();
+            var options = document.querySelectorAll('.option-input');
+            var correctOption = document.querySelector('input[name="correct_option"]:checked');
+    
+            if (!questionText) {
+                document.getElementById('error-message').textContent = 'Please fill in the question text.';
+                document.getElementById('error-message').style.display = 'block';
+                return false;
+            }
+    
+            for (var i = 0; i < options.length; i++) {
+                if (!options[i].value.trim()) {
+                    document.getElementById('error-message').textContent = 'Please fill in all fields.';
+                    document.getElementById('error-message').style.display = 'block';
+                    return false;
+                }
+            }
+    
+            if (!correctOption) {
+                document.getElementById('error-message').textContent = 'Please select the correct option.';
+                document.getElementById('error-message').style.display = 'block';
+                return false;
+            }
+    
+            return true;
+        }
+
+        document.querySelectorAll('input[type="radio"][name="correct_option"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                document.querySelectorAll('.option-input').forEach(option => {
+                    option.style.backgroundColor = '';
+                });
+                this.closest('.option').querySelector('input[type="text"]').style.backgroundColor = '#f97316';
+                document.getElementById('error-message').style.display = 'none';
+            });
+        });
+    
+        document.querySelectorAll('.option-input').forEach(input => {
+            input.addEventListener('input', function() {
+                if (this.value.trim() !== '') {
+                    document.getElementById('error-message').style.display = 'none';
+                }
+            });
+        });
+    
+        document.getElementById('question_text').addEventListener('input', function() {
+            if (this.value.trim() !== '') {
+                document.getElementById('error-message').style.display = 'none';
+            }
+        });
+    
+        // Đặt màu nền cho option đang được chọn khi tải trang
+        document.addEventListener('DOMContentLoaded', function() {
+            var checkedRadio = document.querySelector('input[type="radio"][name="correct_option"]:checked');
+            if (checkedRadio) {
+                checkedRadio.closest('.option').querySelector('input[type="text"]').style.backgroundColor = '#f97316';
+            }
+        });
+
+    </script>
+
+
     <div id="preloader">
+
         <div></div>
         <div></div>
         <div></div>
         <div></div>
     </div>
 
+
     <!-- Main JS File -->
     <script src="{% static 'assets/js/main.js' %}"></script>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

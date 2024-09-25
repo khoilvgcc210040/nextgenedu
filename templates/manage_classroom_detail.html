@@ -723,22 +723,20 @@
                     <script>
                         function copyInvitationLink() {
                             var copyText = document.getElementById("invitationLink");
-                            var copyText1 = document.getElementById("invitationLink1");
-                            var copyText2 = document.getElementById("invitationLink2");
                             copyText.select();
-                            copyText1.select();
-                            copyText2.select();
                             copyText.setSelectionRange(0, 99999);
-                            copyText1.setSelectionRange(0, 99999);
-                            copyText2.setSelectionRange(0, 99999);
 
-                            const successModal = new bootstrap.Modal(document.getElementById('successModal'));
-                            document.getElementById('successMessage').innerText = "Copied to clipboard!";
-                            successModal.show();
+                            navigator.clipboard.writeText(copyText.value).then(function() {
+                                const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+                                document.getElementById('successMessage').innerText = "Copied to clipboard!";
+                                successModal.show();
 
-                            setTimeout(function() {
-                                successModal.hide();
-                            }, 800);
+                                setTimeout(function() {
+                                    successModal.hide();
+                                }, 800);
+                            }, function(err) {
+                                console.error('Could not copy text: ', err);
+                            });
                         }
                     </script>
                 </div>

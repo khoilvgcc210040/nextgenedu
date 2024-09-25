@@ -56,7 +56,7 @@ urlpatterns = [
     path('view_answer_history/<int:quiz_result_id>/', views.view_answer_history, name='view_answer_history'),
     path('edit_submission_time/', views.edit_submission_time, name='edit_submission_time'),
     path('update-account/', views.update_account, name='update_account'),
-    path('auth-receiver', views.auth_receiver, name='auth_receiver'),
+    path('auth-receiver/', views.auth_receiver, name='auth_receiver'),
     path('complete-profile/', views.complete_profile, name='complete_profile'),
 
     path('forum/<int:classroom_id>/', views.forum, name='forum'),
@@ -75,4 +75,7 @@ urlpatterns = [
     path('notification/', views.notification, name='notification'),
     path('join/<str:link>/', views.access_join_classroom, name='access_join_classroom'),
     path('leave_classroom/<int:classroom_id>/', views.leave_classroom, name='leave_classroom'),
+    path('edit_assignment_time/', views.edit_assignment_time, name='edit_assignment_time'),
+    path('verify-otp/', views.verify_otp, name='verify_otp'),
+    path('resend-otp/', views.resend_otp, name='resend_otp'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

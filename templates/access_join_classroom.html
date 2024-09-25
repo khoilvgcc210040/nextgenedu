@@ -1,24 +1,108 @@
-{% if requires_password %}
-    <form method="POST">
-        {% csrf_token %}
-        <p>{{ classroom.name }}</p>
-        <p>{{ classroom.description }}</p>
-        <input type="password" name="password" placeholder="Enter classroom password" required>
-        <button type="submit">Join now</button>
-    </form>
-{% else %}
-    <p>{{ classroom.name }}</p>
-    <p>{{ classroom.description }}</p>
-    <form method="POST">
-        {% csrf_token %}
-        <button type="submit">Join now</button>
-    </form>
-{% endif %}
-
-{% if messages %}
-    <ul>
-        {% for message in messages %}
-            <li>{{ message }}</li>
-        {% endfor %}
-    </ul>
-{% endif %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% include 'headermain.html' %}
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <style>
+        body {
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .modal-dialog {
+            max-width: 600px;
+            margin-top: 30px;
+        }
+        .modal-content {
+            background-color: var(--accent-color);
+            color: white;
+            border-radius: 5px;
+            padding: 20px;
+            text-align: center;
+            overflow-y: auto;
+            height: 400px;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none;  /* Internet Explorer 10+ */
+        }
+        .modal-content::-webkit-scrollbar { 
+            display: none;  /* Safari and Chrome */
+        }
+        .modal-header, .modal-footer {
+            border: none;
+        }
+        .btn-primary {
+            background-color: var(--accent-color);
+            border: none;
+        }
+        .btn-primary:hover {
+            background-color: #5b6eae;
+        }
+        .classroom-info {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+        .classroom-info h3 {
+            margin-top: 20px;
+            color: #f97316;
+        }
+    </style>
+</head>
+<body>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" style="text-align: center; background-color: #f97316; border-radius: 5px 5px 0 0;">
+                <h2 class="modal-title" style="color: white;">{{ classroom.name }}</h2>
+            </div>
+            <div class="modal-body">
+                <div class="classroom-info">
+                    <h3>General Information</h3>
+                    <p style="text-align: justify;"><strong>Description:</strong> {{ classroom.description }}</p>
+                    <p style="text-align: justify;"><strong>Participants:</strong> {{ classroom.participants.count }}</p>
+                    <p style="text-align: justify;"><strong>Likes:</strong> {{ classroom.likes }}</p>
+                    <p><strong>Average Rating:</strong> {{ classroom.average_rating }}</p>
+                </div>
+                <div class="classroom-info">
+                    <h3>Teacher Information</h3>
+                    <p style="text-align: justify; margin: 20px 0px;"><strong>Teacher:</strong> {{ classroom.teacher.username }}</p>
+                </div>
+                <div class="classroom-info">
+                    <h3>Classroom Details</h3>
+                    <p style="text-align: justify; margin: 20px 0px;"><strong>Subject:</strong> {{ classroom.subject.name }}</p>
+                    <p style="text-align: justify; margin: 20px 0px;"><strong>Grade:</strong> {{ classroom.grade }}</p>
+                    <p style="text-align: justify; margin: 20px 0px;"><strong>School:</strong> {{ classroom.school }}</p>
+                    <p style="text-align: justify; margin: 20px 0px;"><strong>Academic Year:</strong> {{ classroom.academic_year.open_year }} - {{ classroom.academic_year.close_year }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="join-button-container" style="max-width: 100%; text-align: center; margin-top: 20px; margin-left: 35%; margin-right: 35%;">
+        {% if requires_password %}
+            <form method="POST" class="form-inline">
+                {% csrf_token %}
+                {% if messages %}
+                    <div class="messages">
+                        <ul  style="list-style-type: none; background-color: transparent; color: red;">
+                            {% for message in messages %}
+                                <li class="list-group-item">{{ message }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+                <div class="d-flex justify-content-between">
+                    
+                    <div class="form-group mb-2" style="width: 60%;">
+                        <input type="password" class="form-control" name="password" placeholder="Enter classroom password">
+                    </div>
+                    <button type="submit" class="btn btn-primary mb-2">Join now</button>
+                </div>
+            </form>
+        {% else %}
+            <form method="POST">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary" style="width: 80%;">Join now</button>
+            </form>
+        {% endif %}
+    </div>
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+</body>
+</html>

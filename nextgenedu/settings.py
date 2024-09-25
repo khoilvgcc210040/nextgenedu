@@ -53,6 +53,8 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'nextgenedu03.info@gmail.com'
 EMAIL_HOST_PASSWORD = 'wxkkufvwgdqchqfc'
 
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -159,7 +161,7 @@ USE_I18N = True
 
 USE_TZ = True
 
-LOGIN_URL = 'login'
+LOGIN_URL = '/auth/?form=login'
 
 AUTH_USER_MODEL = 'home.CustomUser'
 
