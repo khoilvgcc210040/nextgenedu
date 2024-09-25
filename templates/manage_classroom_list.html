@@ -180,6 +180,41 @@
 
             </ul>
 
+            <div class="search-bar mb-4 d-flex justify-content-end">
+                <input type="text" id="searchInput" class="form-control" style="width: 300px;" placeholder="Search for classrooms..." onkeyup="searchClassrooms()">
+            </div>
+            <script>
+                function searchClassrooms() {
+                    var input, filter, ul, li, a, i, txtValue;
+                    input = document.getElementById('searchInput');
+                    filter = input.value.toUpperCase();
+                    
+                    ul = document.querySelector('#public-tab-pane .list-unstyled');
+                    li = ul.getElementsByTagName('li');
+                    for (i = 0; i < li.length; i++) {
+                        a = li[i].getElementsByTagName("a")[0];
+                        txtValue = a.textContent || a.innerText;
+                        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                            li[i].style.display = "";
+                        } else {
+                            li[i].style.display = "none";
+                        }
+                    }
+            
+                    ul = document.querySelector('#private-tab-pane .list-unstyled');
+                    li = ul.getElementsByTagName('li');
+                    for (i = 0; i < li.length; i++) {
+                        a = li[i].getElementsByTagName("a")[0];
+                        txtValue = a.textContent || a.innerText;
+                        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                            li[i].style.display = "";
+                        } else {
+                            li[i].style.display = "none";
+                        }
+                    }
+                }
+            </script>
+
             <!-- Tab Content -->
             <div class="tab-content" id="classroomTabContent">
                 <!-- Public Classrooms -->

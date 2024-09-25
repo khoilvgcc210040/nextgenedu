@@ -72,7 +72,8 @@ def classify(request):
         return JsonResponse({'response': response_message})
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=400)
-    
+
+@login_required
 def chatbot(request):
     return render(request, 'chatbot.html')
 
@@ -94,14 +95,68 @@ def home(request):
     }
     return render(request, 'home.html', context)
 
+from django.utils.crypto import get_random_string
+def send_otp(email):
+    otp = get_random_string(length=6, allowed_chars='0123456789')
+    send_mail(
+        'Your OTP Code',
+        f'Your OTP code is {otp}',
+        'your-email@example.com',  # Replace with your email
+        [email],
+        fail_silently=False,
+    )
+    return otp
+
+def verify_otp(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        otp = data.get('otp')
+
+        if otp == request.session.get('otp'):
+            signup_data = request.session.get('signup_data', {})
+            user = CustomUser.objects.create_user(
+                username=signup_data['username'],
+                email=signup_data['email'],
+                password=signup_data['password'],
+                date_of_birth=date(
+                    int(signup_data['year']),
+                    int(signup_data['month']),
+                    int(signup_data['day'])
+                ),
+                role=signup_data['role'],
+                grade=signup_data['grade'],
+                terms_accepted=signup_data['terms'],
+                subject=Subjects.objects.get(id=signup_data['subject']) if signup_data['subject'] else None
+            )
+                
+            del request.session['signup_data']
+            del request.session['otp']
+
+            backend = get_backends()[0]
+            user.backend = f'{backend.__module__}.{backend.__class__.__name__}'
+            login(request, user)
+            next_url = request.session.pop('next', None)
+            if (next_url):
+                return JsonResponse({'success': True, 'redirect_url': reverse(next_url)})
+            return JsonResponse({'success': True, 'redirect_url': reverse('home')})
+        else:
+            return JsonResponse({'success': False})
+
+def resend_otp(request):
+    if request.method == 'POST':
+        email = request.session.get('signup_data', {}).get('email')
+        otp = send_otp(email)
+        request.session['otp'] = otp
+        return JsonResponse({'success': True})
+
 def authPage(request):
     if request.method == 'POST':
         form_type = request.POST.get('form', 'signup')
         signup_error = False
-        login_error = False
+        login_error = False 
 
         if form_type == 'signup':
-            email = request.POST.get('email') 
+            email = request.POST.get('email')
             username = request.POST.get('username')
             password = request.POST.get('password')
             confirmPassword = request.POST.get('confirm-password')
@@ -109,18 +164,27 @@ def authPage(request):
             month = int(request.POST.get('month'))
             year = int(request.POST.get('year'))
             role = request.POST.get('role')
+            terms = request.POST.get('terms') == 'on'
             subject = None
             grade = None
+
             if role == 'teacher':
                 subject_id = request.POST.get('subject')
                 if subject_id:
                     subject = Subjects.objects.get(id=subject_id)
-                    grade = subject.grade 
+                    grade = subject.grade
             elif role == 'student':
                 grade = request.POST.get('grade')
-            terms = request.POST.get('terms') == 'on'
 
             errors = False
+
+            if not email or not username or not password or not confirmPassword or not day or not month or not year:
+                messages.info(request, '❌ Please fill in all the information.', extra_tags='signup')
+                errors = True
+
+            if not terms:
+                messages.info(request, '❌ Please accept the Terms of Service and Privacy Policy.', extra_tags='signup')
+                errors = True   
 
             if CustomUser.objects.filter(email=email).exists():
                 messages.info(request, '❌ This email is already registered. Please use a different email address.', extra_tags='signup')
@@ -139,6 +203,8 @@ def authPage(request):
                 request.session['signup_data'] = {
                     'email': email,
                     'username': username,
+                    'password': password,
+                    'confirmPassword': confirmPassword,
                     'day': day,
                     'month': month,
                     'year': year,
@@ -147,55 +213,64 @@ def authPage(request):
                     'grade': grade,
                     'terms': terms
                 }
-                return redirect('/auth/?form=signup&signup_error=True')
+                return JsonResponse({'success': False, 'redirect_url': '/auth/?form=signup&signup_error=True'})
+            
             else:
-                user = CustomUser.objects.create_user(username=username, email=email, password=password)
-                user.date_of_birth = date(year, month, day)
-                user.role = role
-                user.grade = grade if grade else ''
-                user.terms_accepted = terms
-                user.subject = subject.name if subject else None
-                user.save()
+                request.session['signup_data'] = {
+                    'email': email,
+                    'username': username,
+                    'password': password,
+                    'day': day,
+                    'month': month,
+                    'year': year,
+                    'role': role,
+                    'subject': subject_id if subject else None,
+                    'grade': grade,
+                    'terms': terms
+                }
 
-                user = authenticate(request, email=email, password=password)   
-                login(request, user)
-                next_url = request.session.pop('next', None)
-                if next_url:
-                    return redirect(next_url)
-                return redirect('home')
+                otp = send_otp(email)
+                request.session['otp'] = otp
+                return JsonResponse({'success': True}) 
 
         elif form_type == 'login':
-            email = request.POST.get('email')  
+            email = request.POST.get('email')
             password = request.POST.get('login-password')
 
             user = authenticate(request, email=email, password=password)
 
             if user is not None:
+                # Lấy backend đầu tiên từ danh sách các backend
+                backend = get_backends()[0]
+                user.backend = f'{backend.__module__}.{backend.__class__.__name__}'
                 login(request, user)
                 next_url = request.session.pop('next', None)
-                if next_url:
+                if (next_url):
                     return redirect(next_url)
                 return redirect('home')
             else:
-                messages.info(request, 'Oops. Something went wrong 😅. Please try again.', extra_tags='login')
                 login_error = True
+                messages.info(request, 'Oops. Something went wrong 😅. Please try again.', extra_tags='login')
                 request.session['login_email'] = email
                 return redirect('/auth/?form=login&login_error=True')
     else:
-        form_type = request.POST.get('form', 'signup')
-        signup_error = request.GET.get('signup_error', 'False') == 'True'
         login_error = request.GET.get('login_error', 'False') == 'True'
+        signup_error = request.GET.get('signup_error', 'False') == 'True'
+        open_otp = request.GET.get('open_otp', 'False') == 'True'
         signup_data = request.session.pop('signup_data', {})
-        days = list(range(1, 32)) 
+        days = list(range(1, 32))
         months = {i: month for i, month in enumerate(["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"], start=1)}
-        years = list(range(1900, 2024 + 1)) 
+        years = list(range(1900, 2024 + 1))
         subjects = Subjects.objects.all()
+
         context = {
-            'form_type': form_type,
-            'signup_error': signup_error,
             'login_error': login_error,
+            'signup_error': signup_error,
+            'open_otp': open_otp,
             'email': signup_data.get('email', ''),
             'username': signup_data.get('username', ''),
+            'password': signup_data.get('password', ''),
+            'confirmPassword': signup_data.get('confirmPassword', ''),
             'day': signup_data.get('day', ''),
             'month': signup_data.get('month', ''),
             'year': signup_data.get('year', ''),
@@ -226,6 +301,8 @@ def generate_unique_username(base_username):
 @csrf_exempt
 def auth_receiver(request):
     token = request.POST['credential']
+
+    print(token)
 
     try:
         user_data = id_token.verify_oauth2_token(
@@ -462,11 +539,15 @@ def access_join_classroom(request, link):
 
         if request.method == 'POST':
             password = request.POST.get('password')
-            if password == classroom.password:
-                Participant.objects.create(user=user, classroom=classroom)
-                return redirect('classroom_detail', id=classroom.id)
+
+            if password != '':
+                if password == classroom.password:
+                    Participant.objects.create(user=user, classroom=classroom)
+                    return redirect('classroom_detail', id=classroom.id)
+                else:
+                    messages.error(request, 'Incorrect password. Please try again.')
             else:
-                messages.error(request, 'Incorrect password. Please try again.')
+                messages.error(request, 'Please enter the password.')
     
         return render(request, 'access_join_classroom.html', {
             'classroom': classroom,
@@ -529,10 +610,12 @@ def classrooms(request, subject_id, grade):
     else:
         classrooms = Classroom.objects.filter(subject=subject, grade=grade)
     
-    blocked_classrooms = BlockedParticipant.objects.filter(user=user).values_list('classroom_id', flat=True)
-    classrooms = classrooms.exclude(id__in=blocked_classrooms)
-
-    participant_classrooms = Participant.objects.filter(user=user, classroom__in=classrooms).values_list('classroom_id', flat=True)
+    if user.is_authenticated:
+        blocked_classrooms = BlockedParticipant.objects.filter(user=user).values_list('classroom_id', flat=True)
+        classrooms = classrooms.exclude(id__in=blocked_classrooms)
+        participant_classrooms = Participant.objects.filter(user=user, classroom__in=classrooms).values_list('classroom_id', flat=True)
+    else:
+        participant_classrooms = []
 
     context = {
         'subject': subject,
@@ -1126,6 +1209,26 @@ def edit_submission_time(request):
             return JsonResponse({'success': False, 'error': 'Submission not found'})
     return JsonResponse({'success': False, 'error': 'Invalid request method'})
 
+@csrf_exempt
+def edit_assignment_time(request):
+    if request.method == 'POST':
+        assignment_id = request.POST.get('assignment_id')
+        time_type = request.POST.get('time_type')
+        new_time = request.POST.get('new_time')
+        
+        try:
+            assignment = Submission.objects.get(id=assignment_id)
+            if time_type == 'open':
+                assignment.open_date = parse_datetime(new_time)
+            elif time_type == 'close':
+                assignment.close_date = parse_datetime(new_time)
+            assignment.save()
+            return JsonResponse({'success': True})
+        except Submission.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Assignment not found'})
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
+    
+
 def create_question(request, submission_id):
     submission = get_object_or_404(Submission, id=submission_id, submission_type='question_test')
 
@@ -1207,52 +1310,46 @@ def delete_question(request, submission_id, question_id):
     return render(request, 'question_list.html', context)
 
 
+from django.http import JsonResponse
+
+import json
+
 def marking(request, assignment_id):
     assignment = get_object_or_404(Submission, id=assignment_id)
     student_files = assignment.student_files.all()
 
-    total_participants = assignment.section.classroom.participants.count()
-    submitted_participants = student_files.values('student').distinct().count()
-
-    show_modal = False
-    show_success_message = False
-    student_file_to_mark = None
+    total_participants = assignment.section.classroom.participants.filter(user__role='student').count()
+    submitted_participants = student_files.filter(student__role='student').values('student').distinct().count()
 
     if request.method == 'POST':
-        student_file_id = request.POST.get('student_file_id')
-        score = request.POST.get('score')
-
-        if student_file_id and score:
-            try:
-                score = float(score)
-                if 0 <= score <= 10:
-                    student_file = get_object_or_404(StudentFile, id=student_file_id)
-                    student_file.score = score
-                    student_file.save()
-                    show_success_message = True
-                else:
-                    messages.error(request, 'Score must be between 0 and 10.')
-                    show_modal = True
-                    student_file_to_mark = student_file_id
-            except ValueError:
-                messages.error(request, 'Invalid score. Please enter a number.')
-                show_modal = True
-                student_file_to_mark = student_file_id
-        else:
-            messages.error(request, 'All fields are required.')
-            show_modal = True
-            student_file_to_mark = student_file_id
-
-        if not show_modal and show_success_message:
-            return redirect('marking', assignment_id=assignment.id)
+        try:
+            data = json.loads(request.body)
+            student_file_id = data.get('student_file_id')
+            score = data.get('score')
+            feedback = data.get('feedback')
+            if student_file_id and score:
+                try:
+                    score = float(score)
+                    if 0 <= score <= 10:
+                        student_file = get_object_or_404(StudentFile, id=student_file_id)
+                        student_file.score = score
+                        student_file.feedback = feedback
+                        student_file.save()
+                        return JsonResponse({'status': 'success', 'message': 'Score updated successfully.'})
+                    else:
+                        return JsonResponse({'status': 'error', 'message': 'Score must be between 0 and 10.'})
+                except ValueError:
+                    return JsonResponse({'status': 'error', 'message': 'Invalid score. Please enter a number.'})
+            else:
+                return JsonResponse({'status': 'error', 'message': 'All fields are required.'})
+        except json.JSONDecodeError:
+            return JsonResponse({'status': 'error', 'message': 'Invalid JSON data.'})
 
     context = {
         'assignment': assignment,
         'student_files': student_files,
         'total_participants': total_participants,
         'submitted_participants': submitted_participants,
-        'show_modal': show_modal,
-        'student_file_to_mark': student_file_to_mark,
     }
 
     return render(request, 'marking.html', context)
@@ -1342,8 +1439,8 @@ def block_member(request):
 def question_test_marking(request, submission_id):
     submission = get_object_or_404(Submission, id=submission_id)
     quiz_results = submission.quiz_results.all()
-    number_of_participants = quiz_results.count()
-    total_participants = submission.section.classroom.participants.count()
+    number_of_participants = quiz_results.filter(student__role='student').count()
+    total_participants = submission.section.classroom.participants.filter(user__role='student').count()
     context = {
         'submission': submission,
         'quiz_results': quiz_results,
@@ -1361,7 +1458,10 @@ def view_answer_history(request, quiz_result_id):
     }
     return render(request, 'view_answer_history.html', context)
 
+@login_required
 def adminPage(request):
+    if not request.user.is_superuser:
+        return redirect('home')
     statistical_data = []  # Thêm dữ liệu thống kê nếu có
     accounts = CustomUser.objects.all()
     subjects = Subjects.objects.all()
@@ -1444,10 +1544,13 @@ def favorite(request):
     public_classrooms = [fav.classroom for fav in favorite_classrooms if not fav.classroom.status]
     private_classrooms = [fav.classroom for fav in favorite_classrooms if fav.classroom.status]
 
+    participant_classrooms = Participant.objects.filter(user=user).values_list('classroom_id', flat=True)
+
     context = {
         'public_classrooms': public_classrooms,
         'private_classrooms': private_classrooms,
         'status': status,
+        'participant_classrooms': participant_classrooms,
     }
     return render(request, 'favorite.html', context)
 
@@ -1485,7 +1588,11 @@ def searchPage(request):
     query = request.GET.get('q', '')
     public_classrooms = Classroom.objects.filter(status=False, name__icontains=query) | Classroom.objects.filter(status=False, teacher__username__icontains=query)
     private_classrooms = Classroom.objects.filter(status=True, name__icontains=query) | Classroom.objects.filter(status=True, teacher__username__icontains=query)
-    participant_classrooms = Participant.objects.filter(user=request.user).values_list('classroom_id', flat=True)
+    
+    participant_classrooms = []
+    if request.user.is_authenticated:
+        participant_classrooms = Participant.objects.filter(user=request.user).values_list('classroom_id', flat=True)
+    
     return render(request, 'searchPage.html', {
         'public_classrooms': public_classrooms,
         'private_classrooms': private_classrooms,
