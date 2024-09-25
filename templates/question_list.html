@@ -190,7 +190,10 @@
                                     <div style="display: flex; flex-direction: column;">
                                         {% for answer in question.answers.all %}
                                             <div style="margin-bottom: 5px;">
-                                                {% if answer.is_correct %}<i class="fas fa-check-circle fa-lg text-success"></i>{% else %}<i class="fas fa-times-circle fa-lg text-danger"></i>{% endif %} <span style="font-size: 14px;">{{ answer.text }} </span>
+                                                <div style="display: flex; align-items: center;">
+                                                    {% if answer.is_correct %}<i class="fas fa-check-circle fa-lg text-success"></i>{% else %}<i class="fas fa-times-circle fa-lg text-danger"></i>{% endif %}
+                                                    <span style="font-size: 14px; word-break: break-word; margin-left: 5px;">{{ answer.text }}</span>
+                                                </div>
                                             </div>
                                         {% endfor %}
                                     </div>
@@ -208,9 +211,9 @@
                     <div class="modal fade" id="deleteModal{{ question.id }}" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel{{ question.id }}" aria-hidden="true">
                         <div class="modal-dialog" role="document">
                             <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="deleteModalLabel{{ question.id }}">Confirm Delete</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <div class="modal-header" style="background-color: var(--accent-color); color: #fff;">
+                                    <h5 class="modal-title" id="deleteModalLabel{{ question.id }}" style="color: #fff;">Confirm Delete</h5>
+                                    <button type="button" class="close" style="color: #fff;" data-dismiss="modal" aria-label="Close">
                                         <span aria-hidden="true">&times;</span>
                                     </button>
                                 </div>

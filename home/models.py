@@ -159,6 +159,7 @@ class StudentFile(models.Model):
     student = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='student_files')
     file = models.FileField(upload_to='student_files/')
     score = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    feedback = models.TextField(null=True, blank=True)
     date_submitted = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

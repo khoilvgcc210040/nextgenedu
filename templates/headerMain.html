@@ -310,7 +310,7 @@
                       <li><a href="{% url "favorite" %}" style="display: flex; align-items: center; justify-content: left; gap: 10px;"><i class="fa-solid fa-star"></i> Favorite</a></li>
                       <li><a href="{% url "setting" %}" style="display: flex; align-items: center; justify-content: left; gap: 10px;"><i class="fa-solid fa-gear"></i> Setting</a></li>
                       <li><a href="{% url "notification" %}" style="display: flex; align-items: center; justify-content: left; gap: 10px;"><i class="fas fa-envelope"></i> Notification</a></li>
-                      {% if user.role == 'admin' %}
+                      {% if user.is_superuser %}
                       <li><a href="{% url "adminPage" %}" style="display: flex; align-items: center; justify-content: left; gap: 10px; background-color: #f97316; color: #fff; transition: transform 0.3s;"><span style="transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-1px)';" onmouseout="this.style.transform='translateY(0)';"><i class="fa-solid fa-user-tie"></i> Admin</span></a></li>
                       {% endif %}
                       <li><a href="{% url "logout" %}" style="display: flex; align-items: center; justify-content: left; gap: 10px; background-color: var(--accent-color); color: #fff; border-radius: 0 0 5px 5px; transition: transform 0.3s;"><span style="transition: transform 0.3s;" onmouseover="this.style.transform='translateX(-3px)';" onmouseout="this.style.transform='translateY(0)';"><i class="fa-solid fa-arrow-left"></i> Logout</span></a></li>
@@ -330,7 +330,7 @@
                             {% endfor %}
                         </ul>
                     </li>
-                    <li><a href="{% url "auth" %}?form=login" style="font-weight: 700; background-color: #a3a3a3; color: #fff; padding: 10px 15px; border-radius: 5px; transition: opacity 0.3s;" onmouseover="this.style.opacity=0.7;" onmouseout="this.style.opacity=1;">Log in</a></li>
+                    <li><a href="{% url "auth" %}?form=login" style="font-weight: 700; border: 1px solid var(--accent-color); color: var(--accent-color); padding: 10px 15px; border-radius: 5px; transition: opacity 0.3s;" onmouseover="this.style.opacity=0.7;" onmouseout="this.style.opacity=1;">Log in</a></li>
                     <li style="padding: 0 10px;"><a href="{% url "auth" %}?form=signup" style="font-weight: 700; background-color: var(--accent-color); color: #fff; padding: 10px 15px; border-radius: 5px; transition: opacity 0.3s;" onmouseover="this.style.opacity=0.7;" onmouseout="this.style.opacity=1;">Sign up</a></li>
                     {% if request.session.user_data %}
                     <div>
