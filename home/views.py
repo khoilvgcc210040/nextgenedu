@@ -331,26 +331,29 @@ def auth_receiver(request):
         else:
             # Nếu không thì vẫn lưu username gg account đến session google_user_data
             username = base_username
+
+        password = get_random_string(length=12)
         # Lưu thông tin vào session và chuyển hướng đến trang hoàn thành hồ sơ
         request.session['google_user_data'] = {
             'email': email,
             'username': username,
+            'password': password,
         }
         return redirect('complete_profile')
     
 def complete_profile(request):
-    if request.method == 'POST':
-        google_user_data = request.session.get('google_user_data')
-        if not google_user_data:
-            return redirect('/auth/?form=login')  # Trường hợp không có dữ liệu trong session, quay lại trang đăng nhập
+    google_user_data = request.session.get('google_user_data')
+    if not google_user_data:
+        return redirect('/auth/?form=login') 
 
+    if request.method == 'POST':
         email = google_user_data['email']
         username = google_user_data['username']
         
         role = request.POST.get('role')
         grade = request.POST.get('grade')
         subject_id = request.POST.get('subject')
-        
+        password = google_user_data['password']
         day = int(request.POST.get('day'))
         month = int(request.POST.get('month'))
         year = int(request.POST.get('year'))
@@ -359,6 +362,7 @@ def complete_profile(request):
         user = CustomUser.objects.create_user(
             username=username,
             email=email,
+            password=password,
             date_of_birth=date(year, month, day),
             terms_accepted=True,
             role=role,
@@ -366,6 +370,27 @@ def complete_profile(request):
             subject=Subjects.objects.get(id=subject_id) if role == 'teacher' else None
         )
         user.save()
+
+        # Gửi email chứa thông tin người dùng và mật khẩu ngẫu nhiên
+        subject = "Complete Your Profile - NextGenEdu"
+        message = f"""
+Hi {username},
+
+Welcome to NextGenEdu! Here are your account details:
+
+Username: {username}
+Email: {email}
+Password: {password}
+
+Please log in and change your password as soon as possible for security reasons.
+
+Best regards,
+NextGenEdu Team
+"""
+        email = EmailMessage(subject, message, to=[email])
+        email.send()
+
+
 
         # Đăng nhập người dùng sau khi hoàn tất hồ sơ
         login(request, user, backend='home.backends.EmailBackend')

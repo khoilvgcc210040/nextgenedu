@@ -227,7 +227,7 @@
 <body>
     <!-- Loading Overlay -->
     <div id="loading-overlay" class="loading-overlay d-none" style="z-index: 9999;">
-        <div class="spinner-border text-primary" role="status">
+        <div class="spinner-border" style="color: var(--accent-color);" role="status">
             <span class="visually-hidden">Loading...</span>
         </div>
     </div>
@@ -361,7 +361,7 @@
                 </div>                      
                 <div class="divider">or email</div>
                 {% if signup_error and messages %}
-                    <div class="error-signup">
+                    <div class="error-signup" id="error-signup">
                         <ul class="message-list-signup">
                             {% for message in messages %}
                                 <li style="color: #dc2626; margin-bottom:10px; line-height: 25px;">{{ message }}</li>
@@ -369,7 +369,7 @@
                         </ul>
                     </div>
                 {% endif %}
-                <form method="post">
+                <form method="post" oninput="document.getElementById('error-signup').style.display='none'">
                     {% csrf_token %}
                     <input type="hidden" name="form" value="signup">
                     <div>
@@ -417,14 +417,14 @@
                     <div class="student-info d-flex align-items-center" style="margin-bottom: 35px;">
                         <div style="margin-right: 45px;">
                             <label for="role" class="form-label">Who are you?</label>
-                            <select class="form-select" style="padding: 10px; color: white; font-weight: 600; border-radius: 6px; border: 1px solid #d1d5da; background-color: var(--accent-color); width: 110px;" id="role" name="role" onchange="toggleFields()">
+                            <select style="padding: 10px; color: white; font-weight: 600; border-radius: 6px; border: 1px solid #d1d5da; background-color: var(--accent-color); width: 110px;" id="role" name="role" onchange="toggleFields()">
                                 <option value="student" {% if role == 'student' %}selected{% endif %}>Student</option>
                                 <option value="teacher" {% if role == 'teacher' %}selected{% endif %}>Teacher</option>
                             </select>
                         </div>
                         <div id="grade-container">
                             <label for="grade" class="form-label">What grade are you in?</label>
-                            <select class="form-select" style="padding: 10px; color: white; font-weight: 600; border-radius: 6px; border: 1px solid #d1d5da; background-color: var(--accent-color); width: 80px;" id="grade" name="grade">
+                            <select style="padding: 10px; color: white; font-weight: 600; border-radius: 6px; border: 1px solid #d1d5da; background-color: var(--accent-color); width: 80px;" id="grade" name="grade">
                                 <option value="10" {% if grade == '10' %}selected{% endif %}>10</option>
                                 <option value="11" {% if grade == '11' %}selected{% endif %}>11</option>
                                 <option value="12" {% if grade == '12' %}selected{% endif %}>12</option>
@@ -464,7 +464,7 @@
                 </form>
             </div>   
             <div id="login-form" style="display: none;">
-                <form action="#"m method="post" >
+                <form action="#"m method="post" oninput="document.getElementById('error-login').style.display='none'">
                     {% csrf_token %}
                     <input type="hidden" name="form" value="login">
                     <div class="mb-3">
@@ -489,7 +489,7 @@
                     </div>                    
                     <div class="divider">or email</div>
                     {% if login_error and messages %}
-                    <div class="error-signup">
+                    <div class="error-signup" id="error-login">
                         <ul class="message-list-login">
                             {% for message in messages %}
                                 <li style="color: #dc2626; margin-bottom:10px; line-height: 25px;">{{ message }}</li>
@@ -507,7 +507,7 @@
                             <a href="{% url 'forgot_password' %}" class="text-decoration-underline mb-2 fw-bold forgot-pass" style="font-size: 14px;">Forgot password</a>
                         </div>
                         <input type="password" style="padding-right: 40px;" placeholder=" ● ● ● ● ● ● ● ● ●" class="form-control-signup text-white" id="login-password" name="login-password" required>
-                        <span id="toggle-login-password" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer;">
+                        <span id="toggle-login-password" style="position: absolute; right: 10px; top: 47%; transform: translateY(-50%); cursor: pointer;">
                             <img id="toggle-login-password-icon" src="{% static "invisible.png" %}" alt="Toggle Password" style="width: 20px; height: 20px; filter: invert(100%);">
                         </span>
                     </div>  
