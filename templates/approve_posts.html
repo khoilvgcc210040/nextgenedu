@@ -8,7 +8,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Approve Forum Posts</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.min.js"></script>
 
@@ -138,6 +137,33 @@
 
     {% include "headerMain.html" %}
 
+    <div class="modal fade" id="contentModal" tabindex="-1" aria-labelledby="contentModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border: 5px solid var(--accent-color); border-radius: 15px;">
+                <div class="modal-header" style="background-color: var(--accent-color);">
+                    <h5 class="modal-title" id="contentModalLabel" style="color: #fff;">Full Content</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="background-color: #fff; border: none;" onclick="hideFullContent()"></button>
+                </div>
+                <div class="modal-body" style="max-height: 400px; overflow-y: auto; border-bottom: 2px solid var(--accent-color); text-align: left;">
+                    <p id="fullContent" style="white-space: pre-wrap; word-wrap: break-word; margin: 0;"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showFullContent(postId, content) {
+            document.getElementById('fullContent').innerText = content;
+            var contentModal = new bootstrap.Modal(document.getElementById('contentModal'));
+            contentModal.show();
+        }
+
+        function hideFullContent() {
+            var contentModal = bootstrap.Modal.getInstance(document.getElementById('contentModal'));
+            contentModal.hide();
+        }
+    </script>
+
     <div class="content-wrapper">
 
         <div class="post-title d-flex justify-content-between align-items-center">
@@ -188,12 +214,12 @@
                 {% for post in posts %}
                     {% if not post.is_approved and not post.is_rejected %}
                         <tr>
-                            <td>{{ post.title|truncatewords:20 }}</td>
+                            <td>{{ post.title|slice:":20" }}...</td>
                             <td>
                                 {% if post.content|length > 20 %}
-                                    <a href="#" class="text-decoration-underline" data-toggle="modal" data-target="#contentModal{{ post.id }}">{{ post.content|slice:":20" }}...</a>
+                                    <a href="#" class="text-decoration-underline" onclick="showFullContent('{{ post.id }}', '{{ post.content|escapejs }}')">{{ post.content|slice:":20" }}...</a>
                                 {% else %}
-                                    {{ post.content|truncatewords:20 }}
+                                    {{ post.content|slice:":20" }}
                                 {% endif %}
                             </td>
                             <td>{{ post.user.username }}</td>
@@ -226,12 +252,12 @@
                 {% for post in posts %}
                     {% if post.is_approved %}
                         <tr>
-                            <td>{{ post.title|truncatewords:20 }}</td>
+                            <td>{{ post.title|slice:":20" }}...</td>
                             <td>
                                 {% if post.content|length > 20 %}
-                                    <a href="#" class="text-decoration-underline" data-toggle="modal" data-target="#contentModal{{ post.id }}">{{ post.content|slice:":20" }}...</a>
+                                <a href="#" class="text-decoration-underline" onclick="showFullContent('{{ post.id }}', '{{ post.content|escapejs }}')">{{ post.content|slice:":20" }}...</a>
                                 {% else %}
-                                    {{ post.content|truncatewords:20 }}
+                                    {{ post.content|slice:":20" }}
                                 {% endif %}
                             </td>
                             <td>{{ post.user.username }}</td>
@@ -260,12 +286,12 @@
                 {% for post in posts %}
                     {% if post.is_rejected %}
                         <tr>
-                            <td>{{ post.title|truncatewords:20 }}</td>
+                            <td>{{ post.title|slice:":20" }}...</td>
                             <td>
                                 {% if post.content|length > 20 %}
-                                    <a href="#" class="text-decoration-underline" data-toggle="modal" data-target="#contentModal{{ post.id }}">{{ post.content|slice:":20" }}...</a>
+                                    <a href="#" class="text-decoration-underline" onclick="showFullContent('{{ post.id }}', '{{ post.content|escapejs }}')">{{ post.content|slice:":20" }}...</a>
                                 {% else %}
-                                    {{ post.content|truncatewords:20 }}
+                                    {{ post.content|slice:":20" }}
                                 {% endif %}
                             </td>
                             <td>{{ post.user.username }}</td>
@@ -312,7 +338,6 @@
     <script src="{% static 'assets/js/main.js' %}"></script>
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
