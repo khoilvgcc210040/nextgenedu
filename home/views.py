@@ -1380,21 +1380,43 @@ def marking(request, assignment_id):
     return render(request, 'marking.html', context)
 
 from django.contrib.auth import update_session_auth_hash
-
+import random
 @login_required
 def setting(request):
     user = request.user
 
     if request.method == 'POST':
         if 'save_changes' in request.POST:
-            user.email = request.POST.get('email')
-            user.username = request.POST.get('username')
+            new_email = request.POST.get('email')
+            new_username = request.POST.get('username')
             from datetime import date
 
             year = int(request.POST.get('dob-year'))
             month = int(request.POST.get('dob-month'))
             day = int(request.POST.get('dob-day'))
             user.date_of_birth = date(year, month, day)
+
+            if new_email != user.email:
+                if CustomUser.objects.filter(email=new_email).exists():
+                    return JsonResponse({'status': 'error', 'message': 'This email is already registered. Please use a different email address.'})
+                otp = ''.join(random.choices('0123456789', k=6))
+                request.session['otp'] = otp
+                request.session['new_email'] = new_email
+                send_mail(
+                    'Your OTP Code',
+                    f'Your OTP code is {otp}',
+                    'from@example.com',
+                    [new_email],
+                    fail_silently=False,
+                )
+                return JsonResponse({'status': 'otp_required', 'message': 'OTP sent to your new email.'})
+
+            if new_username != user.username:
+                if user.username_changed:
+                    return JsonResponse({'status': 'error', 'message': 'Username can only be changed once.'})
+                user.username = new_username
+                user.username_changed = True
+
             user.save()
             return JsonResponse({'status': 'success', 'message': 'Personal information updated successfully.'})
 
@@ -1410,15 +1432,43 @@ def setting(request):
                     update_session_auth_hash(request, user)
                     return JsonResponse({'status': 'success', 'message': 'Password updated successfully.'})
                 else:
-                    return JsonResponse({'status': 'error', 'message': 'Current password is incorrect.'})
+                    return JsonResponse({'status': 'error', 'message': 'Current password is incorrect.', 'error_type': 'current_password'})
             else:
-                return JsonResponse({'status': 'error', 'message': 'New password and confirmation do not match.'})
+                return JsonResponse({'status': 'error', 'message': 'New password and confirmation do not match.', 'error_type': 'password_mismatch'})
 
         elif 'delete_account' in request.POST:
             user.delete()
             return JsonResponse({'status': 'success', 'message': 'Account deleted successfully.', 'redirect_url': reverse('home')})
 
     return render(request, 'setting.html', {'user': user})
+
+@login_required
+def verify_email_otp(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)  # Đọc dữ liệu từ request body
+        otp = data.get('otp')  # Lấy mã OTP từ dữ liệu
+        if otp == request.session.get('otp'):
+            user = request.user
+            user.email = request.session.get('new_email')
+            user.save()
+            del request.session['otp']
+            del request.session['new_email']
+            return JsonResponse({'success': True, 'message': 'Email updated successfully!'})
+        return JsonResponse({'success': False})
+
+@login_required
+def resend_email_otp(request):
+    if request.method == 'POST':
+        otp = ''.join(random.choices('0123456789', k=6))
+        request.session['otp'] = otp
+        send_mail(
+            'Your OTP Code',
+            f'Your OTP code is {otp}',
+            'from@example.com',
+            [request.session.get('new_email')],
+            fail_silently=False,
+        )
+        return JsonResponse({'success': True})
 
 def delete_section(request, section_id):
     if request.method == 'POST':
@@ -1626,25 +1676,44 @@ def searchPage(request):
     })
 
 from .models import ForumComment, ForumPost
-
+from django.core.paginator import Paginator
 def forum(request, classroom_id):
+    user = request.user
     classroom = get_object_or_404(Classroom, id=classroom_id)
-    posts = ForumPost.objects.filter(classroom=classroom)
-    return render(request, 'forum.html', {'classroom': classroom, 'posts': posts})
+    
+    questions = ForumPost.objects.filter(classroom=classroom, post_type='question', is_approved=True)
+    discussions = ForumPost.objects.filter(classroom=classroom, post_type='discussion', is_approved=True)
+
+    forum_posts = ForumPost.objects.filter(user=user, classroom=classroom)
+    
+    return render(request, 'forum.html', {
+        'classroom': classroom,
+        'questions': questions,
+        'discussions': discussions,
+        'forum_posts': forum_posts,
+    })
 
 def forum_detail(request, post_id):
     post = get_object_or_404(ForumPost, id=post_id)
     comments = post.forum_comments.all()
+    if request.user not in post.views_by.all(): 
+        post.views += 1
+        post.views_by.add(request.user)
+        post.save()
     return render(request, 'forum_detail.html', {'post': post, 'comments': comments})
 
 
 def add_comment(request, post_id):
     if request.method == 'POST':
         post = get_object_or_404(ForumPost, id=post_id)
-        comment_text = request.POST.get('comment_text')
-        ForumComment.objects.create(user=request.user, post=post, text=comment_text)
-        return redirect('forum_detail', post_id=post_id)
-    
+        comment_text = request.POST.get('comment')
+        if comment_text:
+            ForumComment.objects.create(user=request.user, post=post, text=comment_text)
+            return JsonResponse({'status': 'success', 'message': 'Comment added successfully!', 'scroll': True})
+        else:
+            return JsonResponse({'status': 'error', 'message': 'Please provide a comment.'})
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method.'})
+
 def create_post(request, classroom_id):
     if request.method == 'POST':
         title = request.POST.get('title')
@@ -1652,56 +1721,117 @@ def create_post(request, classroom_id):
         post_type = request.POST.get('post_type')  # 'question' hoặc 'discussion'
         classroom = get_object_or_404(Classroom, id=classroom_id)
         
+        if not title or not content or not post_type:
+            return JsonResponse({'status': 'error', 'message': 'All fields are required.'})
+        
         ForumPost.objects.create(
             title=title,
             content=content,
             post_type=post_type,
             classroom=classroom,
-            user=request.user
+            user=request.user,
+            is_approved=True if request.user.id == classroom.teacher.id else False
         )
-        return redirect('forum', classroom_id=classroom_id)
+        return JsonResponse({'status': 'success', 'message': 'Post created successfully!', 'redirect_url': reverse('manage_posts', args=[classroom_id])})
     
     return render(request, 'create_post.html', {'classroom_id': classroom_id})
 
 def manage_posts(request, classroom_id):
+    """
+    View để hiển thị trang quản lý bài post của một lớp học cụ thể.
+    """
     classroom = get_object_or_404(Classroom, id=classroom_id)
     posts = ForumPost.objects.filter(classroom=classroom, user=request.user)
-    return render(request, 'manage_posts.html', {'posts': posts, 'classroom_id': classroom_id})
+    return render(request, 'manage_posts.html', {'posts': posts, 'classroom_id': classroom_id, 'classroom': classroom})
 
+from django.views.decorators.http import require_POST
+@require_POST
 def edit_post(request, post_id):
+    """
+    View để xử lý cập nhật bài post.
+    Trả về JsonResponse để hiển thị thông báo thành công hoặc lỗi.
+    """
     post = get_object_or_404(ForumPost, id=post_id, user=request.user)
-    if request.method == 'POST':
-        post.title = request.POST.get('title')
-        post.content = request.POST.get('content')
-        post.save()
-        return redirect('manage_posts', classroom_id=post.classroom.id)
+    title = request.POST.get('title')
+    content = request.POST.get('content')
+    post_type = request.POST.get('post_type') 
 
+
+    if title and content:
+        post.title = title
+        post.content = content
+        post.post_type = post_type
+        post.save()
+        # Trả về JSONResponse để xử lý modal thông báo thành công
+        return JsonResponse({'status': 'success', 'message': 'Post updated successfully.'})
+    
+    # Trả về JSONResponse nếu có lỗi
+    return JsonResponse({'status': 'error', 'message': 'Failed to update the post. Title and Content are required.'})
+
+@require_POST
 def delete_post(request, post_id):
+    """
+    View để xử lý xóa bài post.
+    Trả về JsonResponse để hiển thị thông báo thành công hoặc lỗi.
+    """
     post = get_object_or_404(ForumPost, id=post_id, user=request.user)
-    if request.method == 'POST':
-        post.delete()
-        return redirect('manage_posts', classroom_id=post.classroom.id)
+    post.delete()
+    # Trả về JSONResponse để xử lý modal thông báo thành công
+    return JsonResponse({'status': 'success', 'message': 'Post deleted successfully.'})
     
 def manage_approve_posts(request, classroom_id):
     classroom = get_object_or_404(Classroom, id=classroom_id)
-    posts = ForumPost.objects.filter(classroom=classroom, is_approved=False)
-    return render(request, 'approve_posts.html', {'posts': posts, 'classroom_id': classroom_id})
+    posts = ForumPost.objects.filter(classroom=classroom)
+    return render(request, 'approve_posts.html', {'posts': posts, 'classroom_id': classroom_id, 'classroom': classroom})
 
 def approve_post(request, post_id):
     post = get_object_or_404(ForumPost, id=post_id)
     if request.method == 'POST':
         post.is_approved = True
+        post.is_rejected = False
         post.save()
-        return redirect('manage_approve_posts', classroom_id=post.classroom.id)
-    
+        
+        # Gửi mail thông báo
+        subject = 'Your post has been approved'
+        message = f'Hi {post.user.username},\n\nYour post titled "{post.title}" has been approved.\n\nBest regards,\nYour Classroom Team'
+        recipient_list = [post.user.email]
+        send_mail(subject, message, 'no-reply@classroom.com', recipient_list)
+        
+        return JsonResponse({'status': 'success', 'message': 'Post approved successfully.'})
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=400)
+
 def reject_post(request, post_id):
     post = get_object_or_404(ForumPost, id=post_id)
     if request.method == 'POST':
         reason = request.POST.get('reason')
         post.reason = reason
         post.is_rejected = True
+        post.is_approved = False
         post.save()
-        return redirect('manage_approve_posts', classroom_id=post.classroom.id)
+        
+        # Gửi mail thông báo
+        subject = 'Your post has been rejected'
+        message = f'Hi {post.user.username},\n\nYour post titled "{post.title}" has been rejected for the following reason:\n\n{reason}\n\nBest regards,\nYour Classroom Team'
+        recipient_list = [post.user.email]
+        send_mail(subject, message, 'no-reply@classroom.com', recipient_list)
+        
+        return JsonResponse({'status': 'success', 'message': 'Post rejected successfully.'})
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=400)
+
+@require_POST
+def toggle_like(request, post_id):
+    post = get_object_or_404(ForumPost, id=post_id)
+    user = request.user
+    if user in post.liked_by.all():
+        post.liked_by.remove(user)
+        post.likes -= 1
+        message = 'Post unliked successfully.'
+    else:
+        post.liked_by.add(user)
+        post.likes += 1
+        message = 'Post liked successfully.'
+    post.save()
+    return JsonResponse({'status': 'success', 'likes': post.likes, 'message': message})
 
 def notification(request):
     return render(request, 'notification.html')

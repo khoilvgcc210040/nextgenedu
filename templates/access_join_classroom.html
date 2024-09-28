@@ -10,7 +10,7 @@
             background-color: #f0f0f0;
         }
         .modal-dialog {
-            max-width: 600px;
+            max-width: 60%;
             margin-top: 30px;
         }
         .modal-content {
@@ -45,12 +45,31 @@
             margin-top: 20px;
             color: #f97316;
         }
+
+        .form-control-password {
+            padding: 10px;
+            border: 0px solid #ccc;
+            border-radius: 7px;
+            background-color: var(--accent-color);
+            font-weight: 600;
+        }
+
+        .form-control-password::placeholder {
+            color: #586380;
+            font-weight: 600;
+        }
+
+        .form-control-password:focus {
+            outline: none;
+            box-shadow: none;
+            background-color: var(--accent-color);
+        }
     </style>
 </head>
 <body>
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header" style="text-align: center; background-color: #f97316; border-radius: 5px 5px 0 0;">
+            <div class="modal-header" style="display: flex; justify-content: center; border-radius: 5px 5px 0 0; padding: 0px;">
                 <h2 class="modal-title" style="color: white;">{{ classroom.name }}</h2>
             </div>
             <div class="modal-body">
@@ -91,15 +110,15 @@
                 <div class="d-flex justify-content-between">
                     
                     <div class="form-group mb-2" style="width: 60%;">
-                        <input type="password" class="form-control" name="password" placeholder="Enter classroom password">
+                        <input type="password" class="form-control form-control-password" style="color: #fff;" name="password" placeholder="Enter classroom password">
                     </div>
-                    <button type="submit" class="btn btn-primary mb-2">Join now</button>
+                    <button type="submit" class="btn btn-primary mb-2" style="font-weight: 600;">Join now</button>
                 </div>
             </form>
         {% else %}
             <form method="POST">
                 {% csrf_token %}
-                <button type="submit" class="btn btn-primary" style="width: 80%;">Join now</button>
+                <button type="submit" class="btn btn-primary" style="width: 80%; font-weight: 600;">Join now</button>
             </form>
         {% endif %}
     </div>

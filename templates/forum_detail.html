@@ -1,18 +1,510 @@
-<h2>{{ post.title }}</h2>
-<p>{{ post.content }}</p>
-<hr>
-<h4>Comments:</h4>
-{% for comment in comments %}
-    <div class="comment">
-        <p>{{ comment.text }}</p>
-        <p><small>Commented by {{ comment.user.username }} on {{ comment.created_at }}</small></p>
-    </div>
-{% endfor %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forum Detail</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.min.js"></script>
+</head>
+<style>
+    .search-bar {
+        display: flex;
+        justify-content: center;
+        margin-top: 10px;
+    }
+    
+    .search-bar input {
+        width: 50%;
+        padding: 10px;
+    }
+    
+    .breadcrumb {
+        margin: 20px;
+    }
+    
+    .breadcrumb a {
+        text-decoration: none;
+        color: #007bff;
+    }
+    
+    .breadcrumb span {
+        color: #555;
+    }
+    
+    main {
+        margin: 20px;
+    }
 
-<!-- Add comment form -->
-<h5>Add a Comment:</h5>
-<form method="post" action="{% url 'add_comment' post.id %}">
-    {% csrf_token %}
-    <textarea name="comment_text" required></textarea>
-    <button type="submit">Submit</button>
-</form>
+    .post {
+        border: 2px solid var(--accent-color);
+        padding: 20px;
+        margin-bottom: 30px;
+    }
+
+    section {
+        border: 2px solid var(--accent-color);
+        padding: 20px !important;
+    }
+
+    .manage-header {
+        display: block;
+        padding: 10px 100px 20px 100px;
+        background-color: var(--accent-color);
+    }
+
+    .manage-header h1 {
+        margin: 0;
+        font-size: 40px;
+    }
+
+    .btn-back {
+        display: flex;
+        height: 3em;
+        width: 10%;
+        align-items: center;
+        justify-content: center;
+        border-radius: 3px;
+        letter-spacing: 1px;
+        transition: all 0.2s linear;
+        cursor: pointer;
+        border: none;
+        color: #fff;
+        background-color: transparent;
+    }
+
+    .btn-back > svg {
+        margin-right: 5px;
+        margin-left: 5px;
+        font-size: 20px;
+        transition: all 0.4s ease-in;
+    }
+
+    .btn-back:hover > svg {
+        font-size: 1.2em;
+        transform: translateX(-5px);
+    }
+
+    .btn-back:hover {
+        transform: translateY(-2px);
+    }
+
+    .manage-posts-icon img{
+        margin-right: 10px;
+        width: 60px;
+        height: 60px;
+    }
+
+    .dropdown-post {
+        background-color: transparent !important; 
+        border: 1px solid #fff; 
+        outline: none; 
+        z-index: 1000; 
+        cursor: pointer; 
+        color: #fff; 
+        font-size: 20px;
+    }
+
+    .dropdown-item {
+        color: #fff !important;
+    }
+
+    .dropdown-item:hover {
+        background-color: #f97316 !important;
+        color: #fff !important;
+    }
+
+    .dropdown-menu {
+        background-color: var(--accent-color) !important;
+        border: 3px solid #f97316 !important;
+        border-radius: 3px !important;
+        color: #000 !important;
+        box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
+        transform: translate3d(0px, 40px, 0px) !important;
+    }
+
+    .dropdown-menu-post {
+        transform: translate3d(-160px, 40px, 0px) !important;
+    }
+
+    .dropdown-item {
+        color: #fff !important;
+    }
+
+    .dropdown-item:hover {
+        background-color: #f97316 !important;
+        color: #fff !important;
+    }
+
+    .classroom-navigation {
+        display: flex;
+        justify-content: center;
+        background-color: transparent;
+        padding: 10px 0 20px 0;
+    }
+
+    .classroom-navigation button {
+        background-color: #fff;
+        border: 2px solid #f97316;
+        border-radius: 3px;
+        padding: 10px 30px;
+        cursor: pointer;
+        margin: 0 5px;
+        font-size: 16px;
+        font-weight: 700;
+        transition: background-color 0.5s ease-in-out;
+    }
+
+    .btn-like.active {
+        background-color: #f97316 !important;
+        color: #fff !important;
+    }
+</style>
+<body>
+    {% include 'headerMain.html' %}
+
+    <div class="manage-header">
+        <div class="mt-4">
+            <button id="back-link" class="btn-back" style="outline: none;">
+                <svg height="16" width="16" fill="currentColor" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 1024 1024">
+                    <path d="M874.690416 495.52477c0 11.2973-9.168824 20.466124-20.466124 20.466124l-604.773963 0 188.083679 188.083679c7.992021 7.992021 7.992021 20.947078 0 28.939099-4.001127 3.990894-9.240455 5.996574-14.46955 5.996574-5.239328 0-10.478655-1.995447-14.479783-5.996574l-223.00912-223.00912c-3.837398-3.837398-5.996574-9.046027-5.996574-14.46955 0-5.433756 2.159176-10.632151 5.996574-14.46955l223.019353-223.029586c7.992021-7.992021 20.957311-7.992021 28.949332 0 7.992021 8.002254 7.992021 20.957311 0 28.949332l-188.073446 188.073446 604.753497 0C865.521592 475.058646 874.690416 484.217237 874.690416 495.52477z"></path>
+                </svg>
+                <span>Back</span>
+            </button>
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    const backLink = document.getElementById('back-link');
+                    backLink.addEventListener('click', function(event) {
+                        event.preventDefault();
+                        const referrer = document.referrer;
+                        window.location.href = referrer;
+                    });
+                    
+                    document.querySelectorAll('.dropdown-item[href="#"]').forEach(item => {
+                        item.addEventListener('click', function(event) {
+                            event.preventDefault();
+                            const postId = this.getAttribute('onclick').match(/\d+/)[0];
+                            const action = this.textContent.trim().toLowerCase();
+                            if (action === 'edit') {
+                                const editModal = new bootstrap.Modal(document.getElementById(`editModal${postId}`));
+                                editModal.show();
+                                document.getElementById(`editModal${postId}`).querySelector('.btn-close').addEventListener('click', function() {
+                                    editModal.hide();
+                                });
+                            } else if (action === 'delete') {
+                                const deleteModal = new bootstrap.Modal(document.getElementById(`deleteModal${postId}`));
+                                deleteModal.show();
+                                document.getElementById(`deleteModal${postId}`).querySelector('.btn-close').addEventListener('click', function() {
+                                    deleteModal.hide();
+                                });
+                            }
+                        });
+                    });
+                });
+            </script>
+        </div> 
+        <div class="d-flex align-items-center justify-content-around mb-3">
+            <div class="d-flex align-items-center">
+                <div class="manage-posts-icon">
+                    <img src="{% static 'open.png' %}" alt="Folder Icon">
+                </div>
+                <h1 style="font-weight: 700; color: #fff">{{ post.classroom.name|truncatechars:30 }}</h1>
+            </div>
+
+            {% if user.id == post.user.id %}
+            <div class="d-flex align-items-center">  
+                <div class="post-options dropdown">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" style="cursor: pointer; margin-left: 15px; transition: transform 0.3s;" fill="#fff" class="bi bi-gear" viewBox="0 0 16 16" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                        <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492M5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0"/>
+                        <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115z"/>
+                    </svg>  
+                    <ul class="dropdown-menu dropdown-menu-post" aria-labelledby="dropdownMenuButton">
+                        <li><a class="dropdown-item" href="{% url 'manage_posts' post.classroom.id %}">Manage This Post</a></li>
+                    </ul>
+                </div>
+            </div>
+            {% endif %}
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    const dropdownButton = document.getElementById('dropdownMenuButton');
+                    dropdownButton.addEventListener('click', function() {
+                        this.style.transform = this.style.transform === 'rotate(90deg)' ? 'rotate(0deg)' : 'rotate(90deg)';
+                    });
+                });
+            </script>
+        </div>
+
+        <div class="classroom-navigation">
+            <button id="sections-btn" class="active"><i class="fas fa-history"></i> {{post.created_at|timesince}} ago</button>
+            <button id="submissions-btn"><i class="fas fa-comment"></i> {{post.forum_comments.count}} Replies</button>
+            <button id="like-btn"><i class="fas fa-thumbs-up"></i> <span id="like-count-btn">{{post.likes}}</span> Likes</button>
+            <button id="members-btn"><i class="fas fa-eye"></i> {{post.views}} Views</button>
+        </div>
+    </div>
+    <main>
+        <article class="post">
+            <span class="badge bg-design" style="margin: 0; margin: 10px 0; padding: 5px 10px; font-size: 14px; background-color: #f97316 !important;"><i class="fa-regular fa-circle-question"></i> {{ post.post_type|title }}</span>
+            <div class="modal-body" style="max-height: 400px; overflow-y: auto; border-bottom: 2px solid var(--accent-color); text-align: left; padding-bottom: 20px;">
+                <h1 style="white-space: pre-wrap; word-wrap: break-word; margin: 0;">{{ post.title|linebreaksbr }}</h1>
+            </div>
+            <div class="modal-body" style="max-height: 400px; overflow-y: auto; border-bottom: 2px solid var(--accent-color); text-align: left; padding-top: 20px; padding-bottom: 20px;">
+                <p style="white-space: pre-wrap; word-wrap: break-word; margin: 0;">{{ post.content|linebreaksbr }}</p>
+            </div>
+
+            <div class="like-button-container" style="display: flex; justify-content: flex-end; margin-top: 20px;">
+                <button id="like-button" class="btn-like {% if user in post.liked_by.all %}active{% endif %}" onclick="toggleLike()" style="background-color: var(--accent-color); color: #fff; border: none; border-radius: 5px; padding: 10px 20px; font-size: 16px; cursor: pointer; transition: background-color 0.3s;">
+                    <i class="fa-regular fa-thumbs-up" style="margin-right: 10px;"></i> Like (<span id="like-count">{{ post.likes }}</span>)
+                </button>
+            </div>
+    
+            
+            
+        </article>
+        <style>
+            .comment-content {
+                margin-left: 10px;
+            }
+            
+            .comment-content textarea {
+                width: 100%;
+                border: none;
+                outline: none;
+                resize: none;
+                padding: 5px;
+                font-size: 16px;
+            }
+            
+            .comment-box {
+                border: 2px solid #ccc;
+                border-radius: 15px;
+                padding: 10px;
+                width: 100%;
+                position: relative;
+            }
+
+            .user-icon img {
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+            }
+
+            .send-button img {
+                width: 40px;
+                height: 40px;
+                cursor: pointer;
+                transition: transform 0.3s ease-in-out;
+            }
+    
+            .send-button img:hover {
+                transform: translatey(-5%);
+            }
+
+            .divider {
+                display: flex;
+                align-items: center;
+                text-align: center;
+            }
+            .divider::before,
+            .divider::after {
+                content: '';
+                flex: 1;
+                border-bottom: 1px solid #ccc;
+            }
+            .divider:not(:empty)::before {
+                margin-right: .25em;
+            }
+            .divider:not(:empty)::after {
+                margin-left: .25em;
+            }
+        </style>
+        <section class="add-comment" >
+            <h3 style="font-weight: 700; margin-bottom: 20px; color: var(--accent-color);">Add a Comment:</h3>
+            <div class="d-flex pb-3">
+                <div class="user-icon mr-3" style="margin-right: 10px;">
+                    <img src="{% static "account.png" %}" alt="User Icon">
+                </div>
+                <div class="comment-box">
+                    <form id="commentForm" method="post" action="{% url 'add_comment' post.id %}">
+                        {% csrf_token %}
+                        <div class="comment-content">
+                            <textarea id="comment" name="comment" placeholder="Please share your thoughts about the classroom. So that you know, you can only leave a comment once..." oninput="clearErrorMessage()"></textarea>
+                            <div id="error-message" class="error-message" style="color: red; padding: 5px; font-size: 14px;"></div>
+                        </div>
+                        <div class="send-button d-flex justify-content-end align-items-center">
+                            <img src="{% static "rocket.png" %}" alt="Send Icon" onclick="submitCommentForm();">
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const preloader = document.getElementById('loadingSpinner');
+                    const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+                    const successMessage = document.getElementById('successMessage');
+            
+                    function showSuccessModal(message) {
+                        successMessage.innerText = message;
+                        successModal.show();
+                        setTimeout(function() {
+                            successModal.hide();
+                        }, 2000);
+                    }
+            
+                    function submitCommentForm() {
+                        const comment = document.getElementById('comment').value;
+                        const errorMessage = document.getElementById('error-message');
+                        const form = document.getElementById('commentForm');
+                        const formData = new FormData(form);
+            
+                        if (!comment) {
+                            errorMessage.textContent = "Please provide a comment.";
+                            return;
+                        }
+            
+                        preloader.style.display = 'block';
+            
+                        fetch(form.action, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRFToken': '{{ csrf_token }}'
+                            },
+                            body: formData
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            preloader.style.display = 'none';
+                            showSuccessModal(data.message);
+                            if (data.status === 'success') {
+                                document.getElementById('comment').value = '';
+                                errorMessage.textContent = '';
+                                if (data.scroll) {
+                                    window.location.href = window.location.href.split('?')[0] + '?scroll_to_comment=true';
+                                }
+                            } else {
+                                errorMessage.textContent = data.message;
+                            }
+                        });
+                    }
+            
+                    document.querySelector('.send-button img').addEventListener('click', submitCommentForm);
+            
+                    // Check if the URL has the scroll_to_comment parameter
+                    const urlParams = new URLSearchParams(window.location.search);
+                    if (urlParams.get('scroll_to_comment') === 'true') {
+                        document.querySelector('.add-comment').scrollIntoView({ behavior: 'smooth' });
+                    }
+                });
+
+                function clearErrorMessage() {
+                    const errorMessage = document.getElementById('error-message');
+                    errorMessage.textContent = '';
+                }
+            </script>
+            <div class="divider pb-3">forum comments</div>
+            <h3 style="font-weight: 700; margin-bottom: 20px; color: var(--accent-color);">Comments:</h3>
+            <div class="pb-5">
+                {% for comment in comments reversed %}
+                <div class="d-flex align-items-center mt-3">
+                    <div class="user-icon mr-3">
+                        <img src="{% static "account.png" %}" alt="User Icon">
+                    </div>
+                    <div class="comment-content">
+                        <p class="m-0">{{ comment.user.username }}<span class="ml-3 text-muted" style="font-size: 11px">&nbsp;({{ comment.created_at|date:"H:i, d-m-Y"}})</span></p>
+                        
+                    </div>
+                </div>
+                <div class="modal-body" style="max-height: 400px; overflow-y: auto; border-bottom: 2px solid var(--accent-color); text-align: left; padding-top: 20px; padding-bottom: 20px;">
+                    <p style="white-space: pre-wrap; word-wrap: break-word; margin: 0;">{{ comment.text|linebreaksbr }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+    </main>
+
+    <div id="loadingSpinner" class="spinner-border" role="status" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9999; animation: spin 1s linear infinite; color: var(--accent-color) !important;">
+        <span class="visually-hidden" style="font-size: 0.8em;">Loading...</span>
+    </div>
+    <style>
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+
+    <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+
+        <div class="modal-dialog modal-sm" style="position: fixed; bottom: 10px; left: 10px;">
+            <div class="modal-content" style="border: 2px solid var(--accent-color);">
+
+                <div class="modal-body" style="background-color: var(--accent-color); border-radius: 5px;">
+                    <p id="successMessage" class="text-left m-0" style="color: #fff;"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="preloader">
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+    </div>
+
+    <script src="{% static 'assets/js/main.js' %}"></script>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const preloader = document.getElementById('loadingSpinner');
+        const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+        const successMessage = document.getElementById('successMessage');
+
+        function showSuccessModal(message) {
+            successMessage.innerText = message;
+            successModal.show();
+            setTimeout(function() {
+                successModal.hide();
+            }, 2000);
+        }
+        
+        function toggleLike(event) {
+            event.preventDefault();
+            const likeButton = document.getElementById('like-button');
+            const likeBtn = document.getElementById('like-count-btn');
+            const likeCount = document.getElementById('like-count');
+            let likes = parseInt(likeCount.textContent);
+
+            preloader.style.display = 'block';
+
+            // Gửi yêu cầu AJAX để cập nhật số lượt thích trên máy chủ
+            fetch("{% url 'toggle_like' post.id %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({})
+            })
+            .then(response => response.json())
+            .then(data => {
+                preloader.style.display = 'none';
+                showSuccessModal(data.message);
+                if (data.status === 'success') {
+                    likeCount.textContent = data.likes;
+                    likeBtn.textContent = data.likes;
+                    likeButton.classList.toggle('active');
+                }
+            });
+        }
+
+        document.getElementById('like-button').addEventListener('click', toggleLike);
+    });
+</script>

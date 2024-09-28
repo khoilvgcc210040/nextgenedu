@@ -78,4 +78,7 @@ urlpatterns = [
     path('edit_assignment_time/', views.edit_assignment_time, name='edit_assignment_time'),
     path('verify-otp/', views.verify_otp, name='verify_otp'),
     path('resend-otp/', views.resend_otp, name='resend_otp'),
+    path('verify-email-otp/', views.verify_email_otp, name='verify_email_otp'),
+    path('resend-email-otp/', views.resend_email_otp, name='resend_email_otp'),
+    path('toggle_like/<int:post_id>/', views.toggle_like, name='toggle_like'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
