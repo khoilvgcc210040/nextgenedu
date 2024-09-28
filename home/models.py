@@ -27,6 +27,7 @@ class CustomUser(AbstractUser):
     subject = models.ForeignKey(Subjects, on_delete=models.CASCADE, null=True, blank=True)
     notify_sections = models.BooleanField(default=True)
     terms_accepted = models.BooleanField(default=False)
+    username_changed = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.username} - {self.grade}"
@@ -270,7 +271,9 @@ class ForumPost(models.Model):
     is_approved = models.BooleanField(default=False)
     is_rejected = models.BooleanField(default=False)
     likes = models.IntegerField(default=0)
+    liked_by = models.ManyToManyField(CustomUser, related_name='liked_posts', blank=True)
     views = models.IntegerField(default=0)
+    views_by = models.ManyToManyField(CustomUser, related_name='viewed_posts', blank=True)
     reason = models.TextField(null=True, blank=True)
 
     def __str__(self):
