@@ -73,9 +73,55 @@ def classify(request):
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=400)
 
+from django.utils import timezone
+from datetime import timedelta
 @login_required
 def chatbot(request):
-    return render(request, 'chatbot.html')
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        user_message = data.get('message')
+        reset_days = data.get('reset_days')
+        delete_history = data.get('delete_history', False)
+        set_reset_days = data.get('set_reset_days', False)
+
+        if delete_history:
+            Chatbot.objects.filter(user=request.user).delete()
+            return JsonResponse({'response': 'Chat history deleted.'})
+
+        if set_reset_days:
+            request.user.reset_days = int(reset_days)
+            request.user.save()
+            return JsonResponse({'response': 'Reset days set.'})
+
+        if reset_days:
+            reset_date = timezone.now() - timedelta(days=int(reset_days))
+            Chatbot.objects.filter(user=request.user, timestamp__lt=reset_date).delete()
+
+        X_new = vectorizer.transform([user_message])
+        predicted_label = model.predict(X_new)[0]
+        label_text = label_encoder.inverse_transform([predicted_label])[0]
+
+        if label_text == "education":
+            response_message = get_chatgpt_response(user_message)
+        else:
+            response_message = "Sorry, I can only help with educational questions."
+
+        chat_message = Chatbot.objects.create(
+            user=request.user,
+            message=user_message,
+            response=response_message
+        )
+
+        return JsonResponse({'response': response_message})
+
+    # Xóa các tin nhắn cũ khi người dùng tải trang
+    reset_days = request.user.reset_days
+    if reset_days:
+        reset_date = timezone.now() - timedelta(days=int(reset_days))
+        Chatbot.objects.filter(user=request.user, timestamp__lt=reset_date).delete()
+
+    chat_messages = Chatbot.objects.filter(user=request.user).order_by('timestamp')
+    return render(request, 'chatbot.html', {'chat_messages': chat_messages, 'reset_days': reset_days})
 
 def home(request):
     if 'login_email' in request.session:
@@ -488,18 +534,33 @@ def create_classroom(request):
     if request.method == "POST":
         errors = []
 
-        name = request.POST['name']
-        description = request.POST['description']
-        school = request.POST['school']
-        academic_year_id = request.POST['academic_year']
-        academic_year = AcademicYear.objects.get(id=academic_year_id)
+        name = request.POST.get('name', '').strip()
+        description = request.POST.get('description', '').strip()
+        school = request.POST.get('school', '').strip()
+        academic_year_id = request.POST.get('academic_year')
+        status = request.POST.get('status', 'public')
+        password = request.POST.get('classroom_password', '').strip()
+
+        if not name:
+            errors.append('Classroom name is required.')
+        if not school:
+            errors.append('School name is required.')
+        if not description:
+            errors.append('Description is required.')
+        if status == 'private' and len(password) < 6:
+            errors.append('Password must be at least 6 characters long if the classroom is private.')
+
+        if errors:
+            return JsonResponse({'status': 'error', 'errors': errors})
+
+        try:
+            academic_year = AcademicYear.objects.get(id=academic_year_id)
+        except AcademicYear.DoesNotExist:
+            return JsonResponse({'status': 'error', 'errors': ['Invalid academic year.']})
 
         teacher = request.user
         grade = teacher.grade
         subject = teacher.subject
-        status = request.POST.get('status', 'public')
-        password = request.POST.get('classroom_password', '')
-        next_template = request.POST.get('next_template', request.resolver_match.view_name)
 
         try:
             classroom = Classroom(
@@ -513,39 +574,21 @@ def create_classroom(request):
                 password=password if status == 'private' else '',
                 teacher=teacher,
             )
-            classroom.full_clean()  
+            classroom.full_clean()
             classroom.save()
 
-            section = Section.objects.create(
-                classroom=classroom,
-                title="Welcome",
-            )
-            section.save()
+            Section.objects.create(classroom=classroom, title="Welcome")
+            Participant.objects.create(user=request.user, classroom=classroom, role='teacher')
 
-            Participant.objects.create(user=request.user, classroom=classroom)
-
-            return redirect('manage_classroom_detail', id=classroom.id)
+            return JsonResponse({'status': 'success', 'redirect_url': reverse('manage_classroom_detail', args=[classroom.id])})
 
         except ValidationError as e:
-            errors.extend(e.messages)
+            return JsonResponse({'status': 'error', 'errors': e.messages})
 
         except IntegrityError:
-            errors.append('Classroom with this name already exists for this teacher.')
+            return JsonResponse({'status': 'error', 'errors': ['Classroom with this name already exists for this teacher.']})
 
-        if errors:
-            query_params = {
-                'errors': errors,
-                'name': name,
-                'description': description,
-                'school': school,
-                'academic_year_id': academic_year_id,
-                'status': status,
-                'password': password
-            }
-            url = reverse(next_template) + '?' + urlencode(query_params, doseq=True)
-            return HttpResponseRedirect(url)
-
-    return redirect('home')
+    return JsonResponse({'status': 'error', 'errors': ['Invalid request method.']})
 
 def access_join_classroom(request, link):
     classroom = get_object_or_404(Classroom, link=link)
@@ -561,13 +604,17 @@ def access_join_classroom(request, link):
             # Người dùng chưa đăng nhập
             request.session['next'] = request.get_full_path()
             return redirect('/auth/?form=login')  # Điều hướng đến trang đăng nhập
-
+        
+        if user.role == 'teacher' and user.id != classroom.teacher.id:
+            # Chuyển hướng giáo viên đến trang classrooms và hiển thị modal request
+            return redirect(f"{reverse('classrooms', args=[classroom.subject.id, classroom.grade])}?show_request_modal=True&classroom_id={classroom.id}")
+        
         if request.method == 'POST':
             password = request.POST.get('password')
 
             if password != '':
                 if password == classroom.password:
-                    Participant.objects.create(user=user, classroom=classroom)
+                    Participant.objects.create(user=user, classroom=classroom, role='student')
                     return redirect('classroom_detail', id=classroom.id)
                 else:
                     messages.error(request, 'Incorrect password. Please try again.')
@@ -583,9 +630,12 @@ def access_join_classroom(request, link):
     if not user.is_authenticated:
         request.session['next'] = request.get_full_path()
         return redirect('/auth/?form=login')  # Điều hướng đến trang đăng nhập
+    
+    if user.role == 'teacher' and user.id != classroom.teacher.id:
+        return redirect(f"{reverse('classrooms', args=[classroom.subject.id, classroom.grade])}?show_request_modal=True&classroom_id={classroom.id}")
 
     if request.method == 'POST' and user.is_authenticated:
-        Participant.objects.create(user=user, classroom=classroom)
+        Participant.objects.create(user=user, classroom=classroom, role='student')
         return redirect('classroom_detail', id=classroom.id)
 
     return render(request, 'access_join_classroom.html', {
@@ -639,8 +689,10 @@ def classrooms(request, subject_id, grade):
         blocked_classrooms = BlockedParticipant.objects.filter(user=user).values_list('classroom_id', flat=True)
         classrooms = classrooms.exclude(id__in=blocked_classrooms)
         participant_classrooms = Participant.objects.filter(user=user, classroom__in=classrooms).values_list('classroom_id', flat=True)
+        co_teacher_requests = CoTeacherRequest.objects.filter(requester=user).values_list('classroom_id', flat=True)
     else:
         participant_classrooms = []
+        co_teacher_requests = []
 
     context = {
         'subject': subject,
@@ -648,8 +700,18 @@ def classrooms(request, subject_id, grade):
         'classrooms': classrooms,
         'status': status,
         'participant_classrooms': participant_classrooms,
+        'co_teacher_requests': co_teacher_requests,
     }
     return render(request, 'classrooms.html', context)
+
+@login_required
+def request_co_teacher(request, classroom_id):
+    if request.method == 'POST':
+        classroom = get_object_or_404(Classroom, id=classroom_id)
+        message = request.POST.get('request_message')
+        CoTeacherRequest.objects.create(requester=request.user, classroom=classroom, message=message)
+        return JsonResponse({'status': 'success', 'message': 'Request sent successfully!'})
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=400)
 
 @login_required
 def join_classroom(request, classroom_id):
@@ -661,7 +723,7 @@ def join_classroom(request, classroom_id):
         return redirect('classroom_detail', id=classroom_id)
 
     if request.method == 'POST':
-        Participant.objects.create(user=user, classroom=classroom)
+        Participant.objects.create(user=user, classroom=classroom, role='student')
         return redirect('classroom_detail', id=classroom_id)
 
     return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
@@ -685,7 +747,7 @@ def enter_password(request, classroom_id):
             participant_exists = Participant.objects.filter(user=request.user, classroom=classroom).exists()
             
             if not participant_exists:
-                Participant.objects.create(user=request.user, classroom=classroom)
+                Participant.objects.create(user=request.user, classroom=classroom, role='student')
                 
             return JsonResponse({'status': 'success', 'redirect_url': reverse('classroom_detail', args=[classroom.id])})
         else:
@@ -757,7 +819,7 @@ def classroom_detail(request, id):
 
     scores_data = []
     for participant in participants:
-        if participant.user.role == 'student':  # Chỉ so sánh các role student
+        if participant.user.role == 'student': 
             quiz_results = QuizResult.objects.filter(
                 submission__section__classroom=classroom,
                 student=participant.user,
@@ -776,10 +838,11 @@ def classroom_detail(request, id):
                 'total_score': total_score,
                 'num_tests': num_tests,
                 'total_time': total_time_hms,  # Convert to minutes
+                'total_time_seconds': total_time.total_seconds()  # Thêm thời gian dưới dạng giây để so sánh
             })
 
-    # Sort by total_score and total_time for ranking purposes
-    scores_data.sort(key=lambda x: (-x['total_score'], x['total_time']))
+    # Sort by total_score and total_time_seconds for ranking purposes
+    scores_data.sort(key=lambda x: (-x['total_score'], -x['total_time_seconds']))
 
     # Lấy tất cả các submissions trong lớp học
     submissions = Submission.objects.filter(section__classroom=classroom)
@@ -935,10 +998,24 @@ def submit_assignment(request, submission_id):
 
     return render(request, 'submit_assignment.html', {'submission': submission})
 
+@csrf_exempt
+def save_remaining_time(request):
+    if request.method == 'POST':
+        submission_id = request.POST.get('submission_id')
+        remaining_time = int(request.POST.get('remaining_time', '0'))
+        
+        try:
+            quiz_result = QuizResult.objects.get(submission_id=submission_id, student=request.user)
+            quiz_result.time_taken = timedelta(seconds=remaining_time)
+            quiz_result.save()
+            return JsonResponse({'status': 'success'})
+        except QuizResult.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Quiz result not found'}, status=404)
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=400)
+
 def take_quiz(request, submission_id, question_id):
     submission = get_object_or_404(Submission, id=submission_id)
     question = get_object_or_404(Question, id=question_id)
-
     total_questions = submission.questions.count()
 
     quiz_result, created = QuizResult.objects.get_or_create(
@@ -948,26 +1025,31 @@ def take_quiz(request, submission_id, question_id):
     )
     answered_questions = quiz_result.answered_questions
 
-    elapsed_time = quiz_result.time_taken.total_seconds() if quiz_result.time_taken else 0
+    if created:
+        quiz_result.time_taken = submission.duration
+        quiz_result.save()
+
+    remaining_time = quiz_result.time_taken.total_seconds()
 
     previous_question = Question.objects.filter(submission=submission, id__lt=question_id).last()
 
-    # Kiểm tra xem câu hỏi hiện tại đã được trả lời chưa
-    answered = AnsweredQuestion.objects.filter(quiz_result=quiz_result, question=question).exists()
-
-    # Giảm số lượng câu hỏi đã trả lời nếu người dùng quay lại câu hỏi trước đó
     if 'previous' in request.GET:
         quiz_result.answered_questions -= 1
         quiz_result.save()
-        
+
+    answered_question = AnsweredQuestion.objects.filter(quiz_result=quiz_result, question=question).first()
+    answered = answered_question is not None
+    selected_answer = answered_question.selected_answer.id if answered else None
+
     return render(request, 'take_quiz.html', {
         'submission': submission,
-        'current_question': question,
+        'current_question': question,  # Đảm bảo current_question luôn được cập nhật đúng
         'total_questions': total_questions,
         'answered_questions': quiz_result.answered_questions,
-        'elapsed_time': elapsed_time,
+        'remaining_time': remaining_time,
         'previous_question': previous_question,
-        'answered': answered
+        'answered': answered,
+        'selected_answer': selected_answer
     })
 
 def submit_answer(request, submission_id, question_id):
@@ -998,7 +1080,6 @@ def submit_answer(request, submission_id, question_id):
         if correct:
             quiz_result.correct_answers += 1
     else:
-        # Nếu câu hỏi đã được trả lời trước đó, cập nhật câu trả lời nếu cần
         if answered_question.selected_answer != selected_answer:
             if answered_question.selected_answer.is_correct:
                 quiz_result.correct_answers -= 1
@@ -1010,16 +1091,14 @@ def submit_answer(request, submission_id, question_id):
     quiz_result.total_questions = submission.questions.count()
     quiz_result.score = (quiz_result.correct_answers / quiz_result.total_questions) * 10
 
-    elapsed_time = int(request.POST.get('elapsed_time', '0'))
+    remaining_time = int(request.POST.get('elapsed_time', '0'))
+    quiz_result.time_taken = timedelta(seconds=remaining_time)
+    quiz_result.save()
 
     next_question = Question.objects.filter(submission=submission, id__gt=question_id).first()
     if next_question:
-        quiz_result.time_taken = timedelta(seconds=elapsed_time)
-        quiz_result.save()
         return redirect('take_quiz', submission_id=submission.id, question_id=next_question.id)
     else:
-        quiz_result.time_taken = timedelta(seconds=elapsed_time)
-        quiz_result.save()
         return redirect('quiz_result', submission_id=submission.id)
 
 def quiz_result(request, submission_id):
@@ -1037,7 +1116,9 @@ def exit_quiz(request, submission_id):
     classroom = submission.section.classroom
     quiz_result = QuizResult.objects.filter(submission=submission, student=request.user).first()
     if quiz_result:
-        quiz_result.delete()
+        remaining_time = int(request.POST.get('elapsed_time', '0'))
+        quiz_result.time_taken = timedelta(seconds=remaining_time)
+        quiz_result.save()
     return redirect('classroom_detail', id=classroom.id)
 
 
@@ -1094,6 +1175,8 @@ def manage_classroom_detail(request, id):
     num_sections = sections.count()
     num_participants = participants.count()
     parent_sections, child_sections = classroom.count_sections()
+    co_teacher_requests = CoTeacherRequest.objects.filter(classroom=classroom)
+
     context = {
         'classroom': classroom,
         'sections': sections,
@@ -1104,9 +1187,36 @@ def manage_classroom_detail(request, id):
         'num_participants': num_participants,
         'parent_sections': parent_sections,
         'child_sections': child_sections,
-
+        'co_teacher_requests': co_teacher_requests,
     }
     return render(request, 'manage_classroom_detail.html', context)
+
+@csrf_exempt
+@login_required
+def handle_co_teacher_request(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        request_id = data.get('request_id')
+        action = data.get('action')
+
+        try:
+            co_teacher_request = CoTeacherRequest.objects.get(id=request_id)
+            if action == 'accept':
+                # Logic để chấp nhận yêu cầu
+                Participant.objects.create(user=co_teacher_request.requester, classroom=co_teacher_request.classroom, role='co_teacher')
+                co_teacher_request.delete()
+                return JsonResponse({'status': 'success', 'message': 'Request accepted successfully!'})
+            elif action == 'reject':
+                # Logic để từ chối yêu cầu
+                co_teacher_request.delete()
+                return JsonResponse({'status': 'success', 'message': 'Request rejected successfully!'})
+            else:
+                return JsonResponse({'status': 'error', 'message': 'Invalid action.'})
+        except CoTeacherRequest.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Request not found.'})
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=400)
+
+from datetime import timedelta
 
 def create_section_submission(request):
     if request.method == 'POST':
@@ -1139,7 +1249,14 @@ def create_section_submission(request):
             submission_type = request.POST.get('submission_type')
             open_date = request.POST.get('open_date')
             close_date = request.POST.get('close_date')
+            duration_str = request.POST.get('duration')
             parent_section_id = request.POST.get('parent_section')
+
+            try:
+                duration_minutes = int(duration_str)
+                duration = timedelta(minutes=duration_minutes)
+            except (ValueError, TypeError):
+                duration = timedelta(0)
 
             section = get_object_or_404(Section, id=parent_section_id)
 
@@ -1149,7 +1266,8 @@ def create_section_submission(request):
                 submission_type=submission_type,
                 description=description,
                 open_date=open_date,
-                close_date=close_date
+                close_date=close_date,
+                duration=duration
             )
             submission.save()
             if classroom.participants.filter(user__notify_sections=True).exists():
@@ -1232,6 +1350,23 @@ def edit_submission_time(request):
             return JsonResponse({'success': True})
         except Submission.DoesNotExist:
             return JsonResponse({'success': False, 'error': 'Submission not found'})
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
+
+@csrf_exempt
+def edit_submission_duration(request):
+    if request.method == 'POST':
+        submission_id = request.POST.get('submission_id')
+        new_duration = request.POST.get('new_duration')
+        
+        try:
+            submission = Submission.objects.get(id=submission_id)
+            submission.duration = timedelta(minutes=int(new_duration))
+            submission.save()
+            return JsonResponse({'success': True})
+        except Submission.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Submission not found'})
+        except ValueError:
+            return JsonResponse({'success': False, 'error': 'Invalid duration value'})
     return JsonResponse({'success': False, 'error': 'Invalid request method'})
 
 @csrf_exempt
@@ -1533,6 +1668,20 @@ def view_answer_history(request, quiz_result_id):
     }
     return render(request, 'view_answer_history.html', context)
 
+def delete_quiz_result(request, quiz_result_id):
+    if request.method == 'POST':
+        quiz_result = get_object_or_404(QuizResult, id=quiz_result_id)
+        quiz_result.delete()
+        return JsonResponse({'success': True})
+    return JsonResponse({'success': False})
+
+def delete_assignment(request, assignment_id):
+    if request.method == 'POST':
+        assignment = get_object_or_404(StudentFile, id=assignment_id)
+        assignment.delete()
+        return JsonResponse({'success': True})
+    return JsonResponse({'success': False})
+
 @login_required
 def adminPage(request):
     if not request.user.is_superuser:
@@ -1542,7 +1691,7 @@ def adminPage(request):
     subjects = Subjects.objects.all()
     subsection_files = SubsectionFile.objects.all()
     submission_files = SubmissionFile.objects.all()
-    subjects = Subjects.objects.all()   
+    users = CustomUser.objects.all()  # Thêm dòng này
 
     context = {
         'statistical_data': statistical_data,
@@ -1550,7 +1699,7 @@ def adminPage(request):
         'subjects': subjects,
         'subsection_files': subsection_files,
         'submission_files': submission_files,
-        'subjects': subjects,
+        'users': users,  # Thêm dòng này
     }
     return render(request, 'adminPage.html', context)
 
@@ -1620,12 +1769,14 @@ def favorite(request):
     private_classrooms = [fav.classroom for fav in favorite_classrooms if fav.classroom.status]
 
     participant_classrooms = Participant.objects.filter(user=user).values_list('classroom_id', flat=True)
+    co_teacher_requests = CoTeacherRequest.objects.filter(requester=user).values_list('classroom_id', flat=True)
 
     context = {
         'public_classrooms': public_classrooms,
         'private_classrooms': private_classrooms,
         'status': status,
         'participant_classrooms': participant_classrooms,
+        'co_teacher_requests': co_teacher_requests,
     }
     return render(request, 'favorite.html', context)
 
@@ -1675,7 +1826,7 @@ def searchPage(request):
         'participant_classrooms': participant_classrooms,
     })
 
-from .models import ForumComment, ForumPost
+from .models import Chatbot, CoTeacherRequest, ForumComment, ForumPost, NotificationSystem
 from django.core.paginator import Paginator
 def forum(request, classroom_id):
     user = request.user
@@ -1835,6 +1986,29 @@ def toggle_like(request, post_id):
 
 def notification(request):
     return render(request, 'notification.html')
+
+@login_required
+def send_notification(request):
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        content = request.POST.get('content')
+        type = request.POST.get('type')
+        user_ids = request.POST.getlist('users')
+
+        if not title or not content:
+            return JsonResponse({'status': 'error', 'message': 'Title and content are required.'})
+
+        if 'all' in user_ids:
+            users = CustomUser.objects.all()
+        else:
+            users = CustomUser.objects.filter(id__in=user_ids)
+
+        for user in users:
+            NotificationSystem.objects.create(user=user, text=content, type=type)
+
+        return JsonResponse({'status': 'success', 'message': 'Notification sent successfully.'})
+
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method.'})
     
 
 
