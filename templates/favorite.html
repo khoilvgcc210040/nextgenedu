@@ -230,7 +230,17 @@
                                         <div class="classroom-info">
                                             <div class="card-title d-flex jutify-content-center align-items-center">
                                                 <h4>🌐 &nbsp;</h4>
-                                                <a href="{% url 'classroom_detail' classroom.id %}">{{ classroom.name }}</a>
+                                                {% if user.role == 'student' %}
+                                                    <a href="{% url 'classroom_detail' classroom.id %}">{{ classroom.name }}</a>
+                                                {% elif user.role == 'teacher' and user.id != classroom.teacher.id %}
+                                                    {% if classroom.id in co_teacher_requests %}
+                                                        <a href="#" data-bs-toggle="modal" data-bs-target="#requestSentModal" data-classroom-id="{{ classroom.id }}">{{ classroom.name }}</a>        
+                                                    {% else %}
+                                                        <a href="#" data-bs-toggle="modal" data-bs-target="#requestModal" data-classroom-id="{{ classroom.id }}">{{ classroom.name }}</a>        
+                                                    {% endif %}
+                                                {% elif user.role == 'teacher' and user.id == classroom.teacher.id %}
+                                                    <a href="{% url 'classroom_detail' classroom.id %}">{{ classroom.name }}</a>
+                                                {% endif %}
                                                 <img src="{% static 'link.png' %}" alt="Joined" style="width: 20px; height: 20px; margin-left: 10px;">
                                             </div>
                                             <p class="card-text truncate mt-2" style="width: 900px;">&nbsp;📝{{ classroom.description }}</p>
@@ -256,7 +266,17 @@
                                         <div class="classroom-info">
                                             <div class="card-title d-flex jutify-content-center align-items-center">
                                                 <h4>🌐 &nbsp;</h4>
-                                                <a href="#" data-bs-toggle="modal" data-bs-target="#joinModal" data-classroom-id="{{ classroom.id }}">{{ classroom.name }}</a>
+                                                {% if user.role == 'student' %}
+                                                    <a href="#" data-bs-toggle="modal" data-bs-target="#joinModal" data-classroom-id="{{ classroom.id }}">{{ classroom.name }}</a>
+                                                {% elif user.role == 'teacher' and user.id != classroom.teacher.id %}
+                                                    {% if classroom.id in co_teacher_requests %}
+                                                        <a href="#" data-bs-toggle="modal" data-bs-target="#requestSentModal" data-classroom-id="{{ classroom.id }}">{{ classroom.name }}</a>        
+                                                    {% else %}
+                                                        <a href="#" data-bs-toggle="modal" data-bs-target="#requestModal" data-classroom-id="{{ classroom.id }}">{{ classroom.name }}</a>        
+                                                    {% endif %}
+                                                {% elif user.role == 'teacher' and user.id == classroom.teacher.id %}
+                                                    <a href="{% url 'classroom_detail' classroom.id %}">{{ classroom.name }}</a>
+                                                {% endif %}
                                             </div>
                                             <p class="card-text truncate mt-2" style="width: 900px;">&nbsp;📝{{ classroom.description }}</p>
                                             <div class="classroom-meta text-muted d-flex align-items-center">
@@ -291,7 +311,17 @@
                                         <div class="classroom-info">
                                             <div class="card-title d-flex jutify-content-center align-items-center">
                                                 <h4>🔒 &nbsp;</h4>
-                                                <a href="{% url 'classroom_detail' classroom.id %}">{{ classroom.name }}</a>
+                                                {% if user.role == 'student' %}
+                                                    <a href="#" data-bs-toggle="modal" data-bs-target="#joinModal" data-classroom-id="{{ classroom.id }}">{{ classroom.name }}</a>
+                                                {% elif user.role == 'teacher' and user.id != classroom.teacher.id %}
+                                                    {% if classroom.id in co_teacher_requests %}
+                                                        <a href="#" data-bs-toggle="modal" data-bs-target="#requestSentModal" data-classroom-id="{{ classroom.id }}">{{ classroom.name }}</a>        
+                                                    {% else %}
+                                                        <a href="#" data-bs-toggle="modal" data-bs-target="#requestModal" data-classroom-id="{{ classroom.id }}">{{ classroom.name }}</a>        
+                                                    {% endif %}
+                                                {% elif user.role == 'teacher' and user.id == classroom.teacher.id %}   
+                                                    <a href="{% url 'classroom_detail' classroom.id %}">{{ classroom.name }}</a>
+                                                {% endif %}
                                             </div>
                                             <p class="card-text truncate mt-2" style="width: 900px;">&nbsp;📝{{ classroom.description }}</p>
                                             <div class="classroom-meta text-muted d-flex align-items-center">
@@ -316,7 +346,17 @@
                                         <div class="classroom-info">
                                             <div class="card-title d-flex jutify-content-center align-items-center">
                                                 <h4>🔒 &nbsp;</h4>
-                                                <a href="" data-bs-toggle="modal" data-bs-target="#passwordModal" data-classroom-id="{{ classroom.id }}">{{ classroom.name }}</a>
+                                                {% if user.role == 'student' %}
+                                                    <a href="" data-bs-toggle="modal" data-bs-target="#passwordModal" data-classroom-id="{{ classroom.id }}">{{ classroom.name }}</a>
+                                                {% elif user.role == 'teacher' and user.id != classroom.teacher.id %}
+                                                    {% if classroom.id in co_teacher_requests %}
+                                                        <a href="#" data-bs-toggle="modal" data-bs-target="#requestSentModal" data-classroom-id="{{ classroom.id }}">{{ classroom.name }}</a>        
+                                                    {% else %}
+                                                        <a href="#" data-bs-toggle="modal" data-bs-target="#requestModal" data-classroom-id="{{ classroom.id }}">{{ classroom.name }}</a>        
+                                                    {% endif %}
+                                                {% elif user.role == 'teacher' and user.id == classroom.teacher.id %}
+                                                    <a href="{% url 'classroom_detail' classroom.id %}">{{ classroom.name }}</a>
+                                                {% endif %}
                                             </div>
                                             <p class="card-text truncate mt-2" style="width: 900px;">&nbsp;📝{{ classroom.description }}</p>
                                             <div class="classroom-meta text-muted d-flex align-items-center">
@@ -390,6 +430,128 @@
                         </form>                    
                     </div>
                 </div>                
+            </div>
+        </div>
+    </div>
+
+    <!-- Request Sent Modal -->
+    <div class="modal fade" id="requestSentModal" tabindex="-1" aria-labelledby="requestSentModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content d-flex justify-content-center align-items-center bg-transparent border-0">
+                <div class="card p-4" style="max-width: 400px; width: 100%; border: 5px solid var(--accent-color); position: relative;">
+                    <button type="button" class="btn-close position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <div class="card-body">
+                        <h5 class="card-title text-center mb-4 font-weight-bold" style="color: var(--accent-color)">Request Sent</h5>
+                        <p>Your request to be a co-teacher has been sent. Please wait for a response.</p>
+                    </div>
+                </div>                
+            </div>
+        </div>
+    </div>
+
+    <!-- Request Modal -->
+    <div class="modal fade" id="requestModal" tabindex="-1" aria-labelledby="requestModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content d-flex justify-content-center align-items-center bg-transparent border-0">
+                <div class="card p-4" style="max-width: 400px; width: 100%; border: 5px solid var(--accent-color); position: relative;">
+                    <button type="button" class="btn-close position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <div class="card-body">
+                        <h5 class="card-title text-center mb-4 font-weight-bold" style="color: var(--accent-color)">Request to be Co-Teacher</h5>
+                        <form method="POST" action="{% url 'request_co_teacher' classroom_id=0 %}" id="requestForm">
+                            {% csrf_token %}
+                            <input type="hidden" id="classroomId" name="classroom_id">
+                            <div class="mb-3">
+                                <label for="requestMessage" class="form-label">Message</label>
+                                <textarea class="form-control" id="requestMessage" name="request_message" placeholder="Enter your request message"></textarea>
+                            </div>
+                            <button type="submit" class="submit-modal btn btn-dark w-100 border-0" style="background-color: var(--accent-color); overflow: hidden; transition: all 0.3s ease;">
+                                <span class="btn-text">Send Request ➜</span>
+                            </button>
+                        </form>                    
+                    </div>
+                </div>                
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const preloader = document.getElementById('loadingSpinner');
+            const successMessage = document.getElementById('successMessage');
+            const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+    
+            function showSuccessModal(message) {
+                successMessage.innerText = message;
+                preloader.style.display = 'block';
+                successModal.show();
+                setTimeout(function() {
+                    preloader.style.display = 'none';
+                    successModal.hide();
+                }, 2000);
+            }
+    
+            document.getElementById('requestForm').addEventListener('submit', function(event) {
+                event.preventDefault();
+                preloader.style.display = 'block';
+                var form = event.target;
+                var formData = new FormData(form);
+                var classroomId = document.getElementById('classroomId').value;
+    
+                fetch(form.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    preloader.style.display = 'none';
+                    if (data.status === 'success') {
+                        showSuccessModal(data.message);
+                        
+                        var requestModal = new bootstrap.Modal(document.getElementById('requestModal'));
+                        requestModal.hide();
+    
+                        setTimeout(() => window.location.href = window.location.origin + window.location.pathname, 2000);
+                    } else {
+                        alert('Failed to send request: ' + data.message);
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            });
+    
+            var requestModal = document.getElementById('requestModal');
+    
+            requestModal.addEventListener('show.bs.modal', function (event) {
+                var button = event.relatedTarget; 
+                var classroomId = button.getAttribute('data-classroom-id'); 
+    
+                var form = document.getElementById('requestForm');
+                form.action = form.action.replace('/0/', '/' + classroomId + '/'); 
+    
+                var classroomIdInput = document.getElementById('classroomId');
+                classroomIdInput.value = classroomId; 
+            });
+        });
+    </script>
+
+    <div id="loadingSpinner" class="spinner-border" role="status" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9999; animation: spin 1s linear infinite; color: var(--accent-color) !important;">
+        <span class="visually-hidden" style="font-size: 0.8em;">Loading...</span>
+    </div>
+    <style>
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+
+    <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-sm" style="position: fixed; bottom: 10px; left: 10px;">
+            <div class="modal-content" style="border: 2px solid var(--accent-color);">
+                <div class="modal-body" style="background-color: var(--accent-color); border-radius: 5px;">
+                    <p id="successMessage" class="text-left m-0" style="color: #fff;"></p>
+                </div>
             </div>
         </div>
     </div>
