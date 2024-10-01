@@ -199,10 +199,10 @@
                         <form method="POST" action="{% url 'create_classroom' %}" id="createClassroomForm">
                             {% csrf_token %}
                             <input type="hidden" name="next_template" value="{{ request.resolver_match.view_name }}">
-                            <input type="text" class="modal-input mb-3" name="name" placeholder="Enter a classroom name..." value="{{ name|default_if_none:'' }}" required>
-                            <input type="text" class="modal-input mb-3" name="school" placeholder="Enter the name of the school..." value="{{ school|default_if_none:'' }}" required>
+                            <input type="text" class="modal-input mb-3" name="name" placeholder="Enter a classroom name..." value="{{ name|default_if_none:'' }}">
+                            <input type="text" class="modal-input mb-3" name="school" placeholder="Enter the name of the school..." value="{{ school|default_if_none:'' }}">
                             <textarea type="text" class="modal-input mb-3" name="description" placeholder="Enter a class description (you should describe about 50-60 words)...">{{ description|default_if_none:'' }}</textarea>
-                            <select class="modal-input mb-3" name="academic_year" required>
+                            <select class="modal-input mb-3" name="academic_year">
                                 {% for year in academic_years %}
                                 <option value="{{ year.id }}" {% if year.id == academic_year_id %}selected{% endif %}>{{ year.open_year }} - {{ year.close_year }}</option>
                                 {% endfor %}
@@ -213,17 +213,9 @@
                                 <button type="button" id="privateBtn" class="status-btn">Private</button>
                             </div>
                             <div id="passwordInputContainer"></div>
-                            {% if errors %}
-                                <div class="error-signup">
-                                    <ul class="message-list-login">
-                                        {% for error in errors %}
-                                            <li style="color: #dc2626; margin-bottom:10px; line-height: 25px; display: list-item;">
-                                                {{ error }}
-                                            </li>
-                                        {% endfor %}
-                                    </ul>
-                                </div>
-                            {% endif %}
+                            <div class="error-signup" id="error-create-classroom" style="display: none;">
+                                <ul class="message-list-login"></ul>
+                            </div>
                             <button type="submit" class="submit-modal btn btn-dark w-100 border-0" style="background-color: var(--accent-color); transition: opacity 0.3s;">
                                 <span class="btn-text">Submit</span>
                             </button>
@@ -279,6 +271,7 @@
                 <li><a href="{% url "home" %}">Home</a></li>
                 {% if user.is_authenticated %}
                 <li><a href="{% url "subjects" %}">Subjects</a></li>
+                <li><a href="{% url "chatbot" %}">Chat bot</a></li>
                 {% if user.role == 'teacher' %}
                 <li><a href="{% url "manage_classroom_list" %}">Manage</a></li>
                 <li class="dropdown">
@@ -309,7 +302,7 @@
                       <li><a href="{% url "achivement" %}" style="display: flex; align-items: center; justify-content: left; gap: 10px;"><i class="fa-solid fa-trophy"></i> Achievement</a></li>
                       <li><a href="{% url "favorite" %}" style="display: flex; align-items: center; justify-content: left; gap: 10px;"><i class="fa-solid fa-star"></i> Favorite</a></li>
                       <li><a href="{% url "setting" %}" style="display: flex; align-items: center; justify-content: left; gap: 10px;"><i class="fa-solid fa-gear"></i> Setting</a></li>
-                      <li><a href="{% url "notification" %}" style="display: flex; align-items: center; justify-content: left; gap: 10px;"><i class="fas fa-envelope"></i> Notification</a></li>
+                      <li><a href="{% url "notification" %}" style="display: flex; align-items: center; justify-content: left; gap: 10px;"><i class="fas fa-envelope"></i> Notification <span class="notification-count" style="font-weight: 700; font-size: 14px;">(2)</span></a></li>
                       {% if user.is_superuser %}
                       <li><a href="{% url "adminPage" %}" style="display: flex; align-items: center; justify-content: left; gap: 10px; background-color: #f97316; color: #fff; transition: transform 0.3s;"><span style="transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-1px)';" onmouseout="this.style.transform='translateY(0)';"><i class="fa-solid fa-user-tie"></i> Admin</span></a></li>
                       {% endif %}
@@ -376,6 +369,10 @@
             var createClassroomModal = new bootstrap.Modal(document.getElementById('createClassroomModal'));
             createClassroomModal.show();
         {% endif %}
+
+        document.getElementById('createClassroomModal').addEventListener('hidden.bs.modal', function () {
+            document.getElementById('error-create-classroom').style.display = 'none';
+        });
     });
     
     document.getElementById('publicBtn').addEventListener('click', function() {
@@ -444,4 +441,39 @@
         });
         activeButton.classList.add('active');
     }    
+
+    const form = document.getElementById('createClassroomForm');
+    form.addEventListener('submit', function(event) {
+        event.preventDefault();
+            const formData = new FormData(form);
+            const errorsContainer = document.querySelector('.error-signup .message-list-login');
+            const errorCreateClassroom = document.getElementById('error-create-classroom');
+            errorsContainer.innerHTML = '';
+
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'error') {
+                    data.errors.forEach(error => {
+                        errorCreateClassroom.style.display = 'block';
+                        const li = document.createElement('li');
+                        li.style.color = '#dc2626';
+                        li.style.marginBottom = '10px';
+                        li.style.lineHeight = '25px';
+                        li.style.display = 'list-item';
+                        li.textContent = error;
+                        errorsContainer.appendChild(li);
+                    });
+                } else if (data.status === 'success') {
+                    window.location.href = data.redirect_url;
+                }
+            })
+        .catch(error => console.error('Error:', error));
+    });
 </script>

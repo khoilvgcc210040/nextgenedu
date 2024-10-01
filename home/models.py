@@ -28,6 +28,7 @@ class CustomUser(AbstractUser):
     notify_sections = models.BooleanField(default=True)
     terms_accepted = models.BooleanField(default=False)
     username_changed = models.BooleanField(default=False)
+    reset_days = models.IntegerField(default=0)
 
     def __str__(self):
         return f"{self.username} - {self.grade}"
@@ -129,6 +130,7 @@ class Submission(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     open_date = models.DateTimeField()
     close_date = models.DateTimeField()
+    duration = models.DurationField(null=True, blank=True)
 
     def is_open(self):
         now = timezone.now()
@@ -170,6 +172,7 @@ class Participant(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='participants')
     classroom = models.ForeignKey(Classroom, on_delete=models.CASCADE, related_name='participants')
     date_joined = models.DateTimeField(auto_now_add=True)
+    role = models.CharField(max_length=10, choices=[('student', 'Student'), ('co_teacher', 'Co-Teacher'), ('teacher', 'Teacher')], default='student')
 
     def __str__(self):
         return self.user.username
@@ -301,3 +304,33 @@ class Contact(models.Model):
     email = models.TextField(max_length=60)
     subject = models.TextField(max_length=30)
     message = models.TextField(max_length=255)
+
+
+class CoTeacherRequest(models.Model):
+    requester = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='co_teacher_requests')
+    classroom = models.ForeignKey(Classroom, on_delete=models.CASCADE, related_name='co_teacher_requests')
+    message = models.TextField()
+    status = models.CharField(max_length=10, choices=[('pending', 'Pending'), ('accepted', 'Accepted'), ('rejected', 'Rejected')], default='pending')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Request by {self.requester.username} for {self.classroom.name}"
+    
+class Chatbot(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    message = models.TextField()
+    response = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username}: {self.message[:50]}"
+    
+class NotificationSystem(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    title = models.CharField(max_length=200, default="Notification")
+    text = models.TextField()
+    type = models.CharField(max_length=50, null=True, blank=True)  # Thêm dòng này
+    created_at = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f"Notification by {self.user.username}"

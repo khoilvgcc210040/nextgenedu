@@ -5,111 +5,158 @@
 <head>
     <meta charset="UTF-8">
 
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>{{ submission.title }}</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+
     <link href="{% static 'assets/css/main.css' %}" rel="stylesheet">
+
     <link href="{% static 'assets/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
     <style>
+
         /* General Styles */
         body {
+
 
             font-family: 'Roboto', sans-serif;
 
             background-color: #f0f2f5;
 
+
             margin: 0;
 
             padding: 0;
+
 
         }
 
 
         .container {
 
+
             max-width: 800px;
+
 
             margin: 20px auto;
             padding: 20px;
 
             background-color: #fff;
 
+
             border-radius: 10px;
+
 
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
 
+
         .title {
 
+
             font-weight: 700;
+
             font-size: 2.5rem;
+
             text-align: center;
+
             margin-bottom: 20px;
+
             color: #333;
+
         }
 
         /* Progress Bar */
 
         .progress {
 
+
             height: 20px;
             background-color: #e9ecef;
+
             border-radius: 10px;
+
 
             overflow: hidden;
 
+
             margin-bottom: 20px;
 
+
         }
+
 
 
         .progress-bar {
             height: 100%;
 
+
             background-color: var(--accent-color);
 
+
             transition: width 0.6s ease;
+
 
         }
 
 
+
         /* Timer Styles */
 
+
         .timer {
+
             text-align: center;
+
             font-size: 1.5rem;
+
             margin-top: 10px;
+
             margin-bottom: 20px;
             color: #333;
+
 
         }
 
         /* Card Styles */
 
+
         .card {
+
             border: none;
+
             border-radius: 10px;
             box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+
             margin-bottom: 20px;
         }
 
+
         .question-card {
+
             background-color: #ffffff;
             padding: 20px;
+
         }
 
 
+
         /* Answer Button Styles */
+
         .answer-group {
             display: flex;
 
+
             flex-wrap: wrap;
             justify-content: space-between;
+
         }
 
 
         .answer-button {
+
 
             background-color: #ffffff;
 
@@ -117,28 +164,40 @@
 
             padding: 15px;
 
+
             border-radius: 10px;
+
 
             font-size: 1.2rem;
 
+
             width: 48%;
+
 
             text-align: center;
 
+
             box-sizing: border-box;
+
             margin-bottom: 10px;
+
 
             cursor: pointer;
             transition: all 0.3s ease;
 
+
         }
+
 
 
         .answer-button:hover {
             background-color: var(--accent-color);
+
             color: #fff;
 
+
             transform: scale(1.05);
+
             border-color: var(--accent-color);
 
         }
@@ -146,170 +205,291 @@
 
         .answer-button input[type="radio"] {
             display: none;
+
         }
 
         .answer-button.active {
+
             background-color: var(--accent-color);
+
             color: #fff;
+
 
             border-color: var(--accent-color);
 
+
         }
+
 
         /* Buttons */
 
+
         .btn-primary {
 
+
             background-color: var(--accent-color);
+
             border: none;
 
+
             padding: 10px 20px;
+
             border-radius: 5px;
+
 
             color: #ffffff;
 
             cursor: pointer;
+
             margin-top: 20px;
+
             display: block;
+
             width: 100%;
 
             box-sizing: border-box;
             text-align: center;
 
+
             transition: background-color 0.3s ease;
+
 
         }
 
 
         .btn-primary:hover {
 
+
             background-color: #f97316;
+
 
         }
 
+
         /* From Uiverse.io by mrhyddenn */ 
+
         .loader {
             position: relative;
+
             transform: scale(2);
             border-radius: 50%;
+
             border: 1px solid;
+
             width: 30px;
+
             height: 30px;
+
             color: var(--accent-color);
+
         }
 
         .loader::after {
             position: absolute;
+
             width: 0px;
             height: 10px;
+
             display: block;
+
             border-left: 1px solid var(--accent-color);
+
             content: '';
+
             left: 14px;
+
             border-radius: 1px;
+
             top: 4px;
             animation-duration: 1s;
+
         }
 
+
         .loader::before {
+
             position: absolute;
+
             width: 0px;
+
             height: 10px;
             display: block;
+
             border-left: 1px solid var(--accent-color);
+
             content: '';
+
             left: 14px;
+
             border-radius: 1px;
+
             top: 4px;
+
             animation-duration: 40s;
         }
 
+
         .loader::before,.loader::after {
+
             transform-origin: bottom;
+
             animation-name: dial;
+
             animation-iteration-count: infinite;
+
             animation-timing-function: linear;
+
         }
+
 
         @keyframes dial {
+
         0% {
             transform: rotate(0deg);
+
         }
 
+
         100% {
+
             transform: rotate(360deg);
+
         }
+
         }
 
 
     </style>
 
     <script language='javascript' type='text/javascript'>
+
         document.addEventListener('DOMContentLoaded', function() {
             function DisableBackButton() {
                 window.history.forward()
             }
-            DisableBackButton();
+
+            {% comment %} DisableBackButton(); {% endcomment %}
+
             window.onload = DisableBackButton;
+
             window.onpageshow = function(evt) { if (evt.persisted) DisableBackButton() }
+
             window.onunload = function() { void (0) }
+
         });
+
     </script>
+
 </head>
 <body>
+
     <div class="container mt-4">
         <div class="d-flex justify-content-end">
-            <a href="{% url 'exit_quiz' submission.id %}"><i class="fa-regular fa-circle-xmark fa-2xl" style="color: var(--accent-color);" onmouseover="this.style.color='#b91c1c'" onmouseout="this.style.color='var(--accent-color)'"></i></a>
+
+            <button type="button" class="btn btn-link p-0" style="color: var(--accent-color);" data-bs-toggle="modal" data-bs-target="#exitModal">
+
+                <i class="fa-regular fa-circle-xmark fa-2xl" onmouseover="this.style.color='#b91c1c'" onmouseout="this.style.color='var(--accent-color)';"></i>
+            </button>
         </div>
 
         <h1 class="title">{{ submission.title }}</h1>
 
         <div class="progress mt-4 mb-4">
             <div class="progress-bar" role="progressbar" id="progress-bar"></div>
+
         </div>
 
         <div class="d-flex justify-content-between">
             <span style="font-size: 18px; font-weight: 500; padding: 5px 15px; background-color: var(--accent-color); color: white; border-radius: 5px;">{{ answered_questions }}</span>
+
             <div class="loader"></div>
+
             <span style="font-size: 18px; font-weight: 500; padding: 5px 15px; background-color: var(--accent-color); color: white; border-radius: 5px;">{{ total_questions }}</span>
+
         </div>
 
 
         <!-- Timer -->
         <div class="timer">
+
             <span id="timer">00:00:00</span>
 
         </div>
 
         <div class="card mt-4 question-card">
+
             <div class="card-body">
+
                 <h4 class="card-title" style="font-size: 14px; border:  2px solid var(--accent-color); padding: 5px; border-radius: 5px; width: fit-content; background-color: var(--accent-color); color: white;">Question {{ answered_questions }}</h4>
+
 
                 <p class="card-text" style="font-weight: 500; font-size: 20px; margin-top: 10px;">{{ current_question.text }}</p>
 
                 <hr style="color: var(--accent-color); border: 2px solid var(--accent-color);">
+
                 <h5 class="card-subtitle mb-2 text-muted" style="font-size: 14px;">Select the correct answer:</h5>
 
-                <form method="post" action="{% url 'submit_answer' submission.id current_question.id %}">
+
+                <form method="post" action="{% url 'submit_answer' submission.id current_question.id %}" id="answerForm">
                     {% csrf_token %}
                     <input type="hidden" name="elapsed_time" id="elapsed_time" value="0">
                 
                     <div class="answer-group">
                         {% for answer in current_question.answers.all %}
-                        <label class="answer-button {% if answered and answer.id == current_question.selected_answer.id %}active{% endif %}" for="answer{{ answer.id }}">
-                            <input type="radio" name="selected_answer" id="answer{{ answer.id }}" value="{{ answer.id }}" {% if answered and answer.id == current_question.selected_answer.id %}checked{% endif %} required>
+                        <label class="answer-button {% if answered and answer.id == selected_answer %}active{% endif %}" for="answer{{ answer.id }}">
+                            <input type="radio" name="selected_answer" id="answer{{ answer.id }}" value="{{ answer.id }}" {% if answered and answer.id == selected_answer %}checked{% endif %} required>
                             {{ forloop.counter }}. {{ answer.text }}
                         </label>
                         {% endfor %}
                     </div>
                     <hr style="color: var(--accent-color); border: 2px solid var(--accent-color);">
-                    <div class="d-flex {% if previous_question %}justify-content-between {% else %} justify-content-center {% endif %}  mt-4">
+                
+                    <div class="d-flex {% if previous_question %}justify-content-between {% else %} justify-content-center {% endif %} mt-4">
                         {% if previous_question %}
-                            <button onclick="window.location.href='{% url 'take_quiz' submission.id previous_question.id %}?previous=true'" class="btn btn-secondary" style="width: 48%;">Previous Question</button>
+                        <a href="{% url 'take_quiz' submission.id previous_question.id %}?previous=true" class="btn btn-secondary" style="width: 48%;">Previous Question</a>
                         {% endif %}
                         <button type="submit" class="btn btn-primary" style="width: 48%; margin: 0;">Next Question</button>
                     </div>
                 </form>
+
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <!-- Exit Confirmation Modal -->
+
+    <div class="modal fade" id="exitModal" tabindex="-1" aria-labelledby="exitModalLabel" aria-hidden="true">
+
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header" style="background-color: var(--accent-color);">
+
+                    <h5 class="modal-title" id="exitModalLabel" style="color: white;">Confirm Exit</h5>
+
+                    <button type="button" class="btn-close" style="color: white; background-color: white;" data-bs-dismiss="modal" aria-label="Close"></button>
+
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to exit the quiz? Your progress will be saved.
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="margin: 0; padding: 6px 12px;">Cancel</button>
+                    <form method="post" action="{% url 'exit_quiz' submission.id %}" id="exitForm">
+                        {% csrf_token %}
+                        <input type="hidden" name="elapsed_time" id="exit_elapsed_time" value="0">
+
+                        <button type="submit" class="btn btn-danger" style="margin: 0; padding: 6px 12px;">Exit</button>
+
+                    </form>
+
+                </div>
 
             </div>
 
@@ -317,78 +497,128 @@
 
     </div>
 
+    <!-- Time Up Modal -->
+    <div class="modal fade" id="timeUpModal" tabindex="-1" aria-labelledby="timeUpModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger">
+                    <h5 class="modal-title" id="timeUpModalLabel" style="color: white;">Time's Up</h5>
+                    <button type="button" class="btn-close" style="color: white; background-color: white;" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Your time is up. Your score will be saved.
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
     <script>
-        let timerInterval;
-        let elapsedTime = {{ elapsed_time }}; // In seconds
-    
-        // Function to format time
-        function formatTime(seconds) {
-            let hours = Math.floor(seconds / 3600);
-            let minutes = Math.floor((seconds % 3600) / 60);
-            let remainingSeconds = seconds % 60;
-    
-            return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
-        }
-    
-        // Display the initial time immediately
-        document.getElementById('timer').textContent = formatTime(elapsedTime);
-    
-        function startTimer() {
-            let timerElement = document.getElementById('timer');
-            let startTime = Date.now() - elapsedTime * 1000;  // Adjust start time based on previous elapsed time
-    
-            timerInterval = setInterval(() => {
-                elapsedTime = Math.floor((Date.now() - startTime) / 1000); // elapsedTime in seconds
-                timerElement.textContent = formatTime(elapsedTime);
-            }, 1000);
-        }
-    
-        function stopTimer() {
-            clearInterval(timerInterval);
-        }
-    
-        // Initialize progress bar width
-        function updateProgressBar() {
-            const totalQuestions = {{ total_questions }};
-            const answeredQuestions = {{ answered_questions }};
-            const progressBar = document.getElementById('progress-bar');
-            const widthPercentage = (answeredQuestions / totalQuestions) * 100;
-            progressBar.style.width = widthPercentage + '%';
-        }
-    
-        function decrementAnsweredQuestions() {
-            const answeredQuestionsElement = document.querySelector('span[style*="background-color: var(--accent-color);"]');
-            let answeredQuestions = parseInt(answeredQuestionsElement.textContent);
-            if (answeredQuestions > 0) {
-                answeredQuestions -= 1;
-                answeredQuestionsElement.textContent = answeredQuestions;
-                updateProgressBar();
+    let timerInterval;
+    let remainingTime = {{ remaining_time }}; // In seconds
+
+    // Function to format time
+    function formatTime(seconds) {
+        let hours = Math.floor(seconds / 3600);
+        let minutes = Math.floor((seconds % 3600) / 60);
+        let remainingSeconds = seconds % 60;
+
+        return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+    }
+
+    function showTimeUpModal() {
+        const timeUpModal = new bootstrap.Modal(document.getElementById('timeUpModal'));
+        timeUpModal.show();
+        setTimeout(function() {
+            timeUpModal.hide();
+            document.getElementById('exitForm').submit();
+        }, 2000);
+    }
+
+    // Display the initial time immediately
+    document.getElementById('timer').textContent = formatTime(remainingTime);
+
+    function startTimer() {
+        let timerElement = document.getElementById('timer');
+        let endTime = Date.now() + remainingTime * 1000;
+
+        timerInterval = setInterval(() => {
+            remainingTime = Math.floor((endTime - Date.now()) / 1000);
+            if (remainingTime <= 0) {
+                clearInterval(timerInterval);
+                showTimeUpModal();
             }
-        }
-    
-        document.addEventListener("DOMContentLoaded", () => {
-            startTimer();
-            updateProgressBar(); 
-        });
-    
-        // Maintain selected answer's active state
-        document.querySelectorAll('.answer-button input[type="radio"]').forEach(radio => {
-            radio.addEventListener('change', function() {
-                document.querySelectorAll('.answer-button').forEach(label => {
-                    label.classList.remove('active');
-                });
-                this.parentElement.classList.add('active');
+
+            timerElement.textContent = formatTime(remainingTime);
+
+            // Gửi yêu cầu AJAX để lưu thời gian còn lại
+            saveRemainingTime(remainingTime);
+        }, 1000);
+    }
+
+    function stopTimer() {
+        clearInterval(timerInterval);
+    }
+
+    function saveRemainingTime(remainingTime) {
+        fetch("{% url 'save_remaining_time' %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: new URLSearchParams({
+                'submission_id': '{{ submission.id }}',
+                'remaining_time': remainingTime
+            })
+        }).then(response => response.json())
+          .then(data => {
+              if (data.status !== 'success') {
+                  console.error('Failed to save remaining time:', data.message);
+              }
+          })
+          .catch(error => {
+              console.error('Error saving remaining time:', error);
+          });
+    }
+
+    // Initialize progress bar width
+    function updateProgressBar() {
+        const totalQuestions = {{ total_questions }};
+        const answeredQuestions = {{ answered_questions }};
+        const progressBar = document.getElementById('progress-bar');
+
+        const widthPercentage = (answeredQuestions / totalQuestions) * 100;
+        progressBar.style.width = widthPercentage + '%';
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        startTimer();
+        updateProgressBar();
+    });
+
+    // Maintain selected answer's active state
+    document.querySelectorAll('.answer-button input[type="radio"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            document.querySelectorAll('.answer-button').forEach(label => {
+                label.classList.remove('active');
             });
+            this.parentElement.classList.add('active');
         });
-    
-        
-    
-        // Stop the timer on form submit and store elapsed time
-        document.querySelector('form').addEventListener('submit', function() {
-            document.getElementById('elapsed_time').value = elapsedTime; // Store time in seconds
-            stopTimer();
-        });
-    </script>
+    });
+
+    // Stop the timer on form submit and store elapsed time
+    document.getElementById('answerForm').addEventListener('submit', function() {
+        document.getElementById('elapsed_time').value = remainingTime; // Store remaining time in seconds
+        stopTimer();
+    });
+
+    document.getElementById('exitForm').addEventListener('submit', function() {
+        document.getElementById('exit_elapsed_time').value = remainingTime; // Store remaining time in seconds
+        stopTimer();
+    });
+</script>
     
     
     

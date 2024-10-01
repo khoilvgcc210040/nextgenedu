@@ -1185,7 +1185,7 @@
                         <th>Ranking</th>
                         <th>Username</th>
                         <th>Test</th>
-                        <th>Time</th>
+                        <th>Time R</th>
                         <th>Score</th>
                     </tr>
                 </thead>
@@ -1620,10 +1620,43 @@
                             <i class="fa-solid fa-gear fa-xl" style="transition: transform 0.3s;"></i>
                         </button>
                         <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#shareClassroomModal">Share Classroom</a></li>
                             <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#confirmLeaveModal">Leave the classroom</a></li>
                         </ul>
                     </div>
                     {% endif %}
+                    <div class="modal fade" id="shareClassroomModal" tabindex="-1" aria-labelledby="shareClassroomModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content" style="border: 5px solid var(--accent-color); border-radius: 15px;">
+                                <div class="modal-header d-flex justify-content-between align-items-center" style="background-color: var(--accent-color);">
+                                    <h5 class="modal-title" id="shareClassroomModalLabel" style="color: #fff;">Share Classroom</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" style="background-color: #fff; border: none;" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body" style="border-bottom: 2px solid var(--accent-color);">
+                                    <div class="input-group mb-3">
+                                        <input type="text" class="form-control" id="invitationLink" value="{{ request.scheme }}://{{ request.get_host }}{% url 'access_join_classroom' classroom.link %}" readonly>
+                                        <button class="btn" style="background-color: var(--accent-color); color: #fff;" onclick="copyClassroomLink()">Copy Link</button>
+                                    </div>
+                                    <div id="copySuccess" class="text-success" style="display: none;">Link copied to clipboard!</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <script>
+                        function copyClassroomLink() {
+                            var copyText = document.getElementById("invitationLink");
+                            copyText.select();
+                            copyText.setSelectionRange(0, 99999); 
+                            document.execCommand("copy");
+                    
+                            var copySuccess = document.getElementById("copySuccess");
+                            copySuccess.style.display = "block";
+                            setTimeout(function() {
+                                copySuccess.style.display = "none";
+                            }, 2000);
+                        }
+                    </script>
                     <button class="btn-favorite mr-4" style="outline: none;">
                         <i class="fa-regular fa-star fa-xl {% if is_favorite %}favorite{% endif %}"></i>
                     </button>
@@ -2261,7 +2294,7 @@
                     <div class="d-flex justify-content-start">
                         {% if submission.questions.first %}
                             {% if submission.is_open %}
-                                <a href="{% url 'take_quiz' submission.id submission.questions.first.id %}" class="btn-doc" style="outline: none; padding: 5px 10px;">Get started</a>
+                                <a href="{% url 'take_quiz' submission.id submission.questions.first.id %}" class="btn-doc" style="outline: none; padding: 5px 10px;" onclick="saveStatusPage()">Get started</a>
                             {% elif submission.not_open_yet %}
                                 <button class="btn-doc" style="outline: none; padding: 5px 10px;" disabled>Quiz not open yet. Starts at {{ submission.open_date }}</button>
                             {% elif submission.closed %}
@@ -2740,6 +2773,16 @@
             memberIdToDelete = memberId;
             const deleteModal = new bootstrap.Modal(document.getElementById('deleteMemberModal'));
             deleteModal.show();
+        }
+
+        function saveStatusPage() {
+            const rightSidebarExpanded = document.querySelector('.right-sidebar').classList.contains('expanded');
+            const activeSectionId = document.querySelector('.content-section.active')?.id;
+            const activeLeftSidebarId = document.querySelector('.nav-link.active')?.dataset.content;
+            localStorage.setItem('rightSidebarExpanded', rightSidebarExpanded);
+            localStorage.setItem('activeSectionId', activeSectionId);
+            localStorage.setItem('activeLeftSidebarId', activeLeftSidebarId);
+            return true;
         }
     </script>
     <script>

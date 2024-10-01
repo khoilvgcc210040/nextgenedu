@@ -64,7 +64,7 @@
         background-color: #fff;
     }
 
-    .members-list, .sections-list {
+    .members-list, .sections-list, .co-teacher-list {
         flex: 3;
         margin-left: 60px;
     }
@@ -196,7 +196,22 @@
         border: 2px solid var(--accent-color);
       }
 
+      .card-body-create-section-submission input[type="number"] {
+        padding: 5px;
+        width: 100%;
+        border-radius: 5px;
+        cursor: pointer;
+        background-color: #fff;
+        color: #000;
+        border: 2px solid var(--accent-color);
+      }
+
       .card-body-create-section-submission input[type="text"]::placeholder {
+        color: #000;
+        opacity: 1;
+      }
+
+      .card-body-create-section-submission input[type="number"]::placeholder {
         color: #000;
         opacity: 1;
       }
@@ -448,190 +463,377 @@
 
     <div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="createModalLabel" aria-hidden="true">
         <div class="modal-dialog">
+
             <div class="modal-content d-flex justify-content-center align-items-center bg-transparent border-0">
+
                 <div class="card p-4" style="max-width: 500px; width: 100%; border: 5px solid var(--accent-color)">
+
                     <div class="card-body-create-section-submission">
+
                         <h5 id="modalTitle" class="card-title text-center mb-4 font-weight-bold" style="color: #fff; background-color: #f97316; padding: 10px; margin: 20px 0; border-radius: 5px 0 5px 0;"></h5>
+
                         <div id="error-message" class="text-danger mb-3 text-center" style="display: none;"></div>
+
                         <form method="POST" action="{% url 'create_section_submission' %}" id="createForm">
+
                             {% csrf_token %}
                             <input type="hidden" id="actionType" name="action_type">
+
                             <input type="hidden" name="classroom_id" value="{{ classroom.id }}">
+
                             <div class="mb-3">
+
                                 <label for="open_date">Section type:</label>
                                 <select class="dropdown" id="sectionType" name="section_type">
+
                                     <option value="new">Create a new section</option>
+
                                     <option value="sub">Create a subsection</option>
                                     <option value="submission">Create a submission</option>
+
                                 </select>
+
                             </div>
+
                             <div class="mb-3" id="parentSectionContainer" style="display: none;">
+
                                 <label for="open_date">Parent section:</label>
+
                                 <select class="dropdown" id="parentSection" name="parent_section">
+
                                     <option value="">Choose a parent section</option>
+
                                     {% for section in sections %}
                                         {% if not section.parent_section %}
+
                                             <option value="{{ section.id }}">{{ section.title }}</option>
                                         {% endif %}
+
                                     {% endfor %}
+
                                 </select>
+
                             </div>                            
+
                             <div id="submissionFields" style="display: none;">
+
                                 <div class="row">
+
                                     <div class="col-md-6">
                                         <label for="open_date">Open date:</label>
+
                                         <input type="datetime-local" class="modal-input mb-3" name="open_date" placeholder="Open date">
+
                                     </div>
+
                                     <div class="col-md-6">
+
                                         <label for="close_date">Close date:</label>
+
                                         <input type="datetime-local" class="modal-input mb-3" name="close_date" placeholder="Close date">
+
                                     </div>
+
                                 </div>
                                 <label for="open_date">Submissions type:</label>
+
                                 <select class="dropdown mb-3" name="submission_type">
+
                                     <option value="">Choose a submission type</option>
+
                                     <option value="assignment">Assignment</option>
+
                                     <option value="question_test">Question Test</option>
+
                                 </select>
+                                <div id="durationContainer" style="display: none;">
+                                    <label for="duration">Duration (in minutes):</label>
+                                    <input type="number" min="1" class="modal-input mb-3" name="duration" placeholder="Duration in minutes">
+
+                                </div>
                             </div>
+
                             <label for="open_date" id="sectionNameLabel">Section name:</label>
+
                             <input type="text" name="title" class="modal-input mb-3" placeholder="Name of the section... (max 20 characters)" maxlength="20">
+
                             <label for="open_date" id="sectionDescriptionLabel">Section description:</label>
                             <textarea name="description" class="mb-4" id="sectionDescription" placeholder="Description of the section (you should describe about 50-60 words)..."></textarea>
+
                             <button type="submit" class="submit-modal btn btn-dark w-100 border-0" style="background-color: var(--accent-color); overflow: hidden; transition: all 0.3s ease;">
+
                                 <span class="btn-text">Create a section</span>
+
                             </button>
+
                         </form>                    
+
                     </div>
+
                 </div>                
+
             </div>
+
         </div>
+
     </div>
 
+
     <script>
+
         document.getElementById('createForm').addEventListener('submit', function(event) {
+
             event.preventDefault();
+
             const actionType = document.getElementById('actionType').value;
+
             const sectionType = document.getElementById('sectionType').value;
+
             const title = document.querySelector('input[name="title"]').value;
+
             const description = document.getElementById('sectionDescription').value;
+
             const parentSection = document.getElementById('parentSection').value;
+
             const openDate = document.querySelector('input[name="open_date"]').value;
             const closeDate = document.querySelector('input[name="close_date"]').value;
+
             const submissionType = document.querySelector('select[name="submission_type"]').value;
+
+            const duration = document.querySelector('input[name="duration"]').value; // Updated selector
+
             let errorMessage = '';
 
+
             if (actionType === 'section') {
+
                 if (sectionType === 'new' && (!title || !description)) {
                     errorMessage = 'Section name and description are required.';
+
                 } else if (sectionType === 'sub' && (!parentSection || !title || !description)) {
                     errorMessage = 'Parent section, section name, and description are required.';
+
                 }
             } else if (actionType === 'submission') {
+
                 const now = new Date();
+
                 const openDateTime = new Date(openDate);
+
                 const closeDateTime = new Date(closeDate);
 
-                if (!title || !description || !openDate || !closeDate || !submissionType) {
-                    errorMessage = 'All fields are required for submission.';
+
+                if (submissionType === 'question_test') {
+
+                    if (!title || !description || !openDate || !closeDate || !duration) {
+
+                        errorMessage = 'All fields are required for submission.';
+
+                    }
+
+                    if (duration < 1) {
+                        errorMessage = 'Duration must be at least 1 minute.';
+
+                    }
+                } else {
+                    if (!title || !description || !openDate || !closeDate || !submissionType) {
+
+                        errorMessage = 'All fields are required for submission.';
+                    }
+
                 }
+
                 if (closeDateTime < now || openDateTime < now) {
+
                     errorMessage = 'Open date and close date must be current or future date.';
+
                 }
+
                 if (closeDateTime <= openDateTime) {
                     errorMessage = 'Close date must be after open date.';
                     document.getElementById('error-message').innerText = errorMessage;
+
                     document.getElementById('error-message').style.display = 'block';
+
                     return;
+
                 }
+
                 if ((closeDateTime - openDateTime) < (24 * 60 * 60 * 1000)) {
                     errorMessage = 'The time gap between open date and close date must be at least 1 day.';
+
                 }
 
+                
+
                 document.getElementById('sectionNameLabel').innerText = 'Submission name:';
+
                 document.getElementById('sectionDescriptionLabel').innerText = 'Submission description:';
+
             }
 
+
             if (errorMessage) {
+
                 document.getElementById('error-message').innerText = errorMessage;
                 document.getElementById('error-message').style.display = 'block';
+
             } else {
+
                 const form = event.target;
+
                 const formData = new FormData(form);
 
+                document.getElementById('loadingSpinner').style.display = 'block';
+
                 fetch(form.action, {
+
                     method: 'POST',
+
                     body: formData,
+
                     headers: {
                         'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+
                     }
+
                 })
+
                 .then(response => response.json())
                 .then(data => {
+
                     if (data.status === 'success') {
                         const successModal = new bootstrap.Modal(document.getElementById('successModal'));
                         document.getElementById('successMessage').innerText = data.message;
-                        document.getElementById('loadingSpinner').style.display = 'block';
                         successModal.show();
                         setTimeout(function() {
+
                             document.getElementById('loadingSpinner').style.display = 'none';
+
                             successModal.hide();
+
                             location.reload(); 
+
                         }, 1000);
+
                     } else {
+
                         {% comment %} alert(data.message); {% endcomment %}
+
                     }
                 })
+
                 .catch(error => {
+
                     console.error('Error:', error);
+
                     {% comment %} alert('An error occurred. Please try again.'); {% endcomment %}
+
                 });
+
             }
+
         });
 
+
         document.querySelectorAll('#createModal, #sectionType, input[name="title"], textarea[name="description"], #parentSection, input[name="open_date"], input[name="close_date"], select[name="submission_type"]').forEach(element => {
+
             element.addEventListener('input', function() {
                 document.getElementById('error-message').style.display = 'none';
             });
         });
 
+
         document.getElementById('createModal').addEventListener('hidden.bs.modal', function () {
+
             document.getElementById('error-message').style.display = 'none';
+
         });
 
-        document.getElementById('createForm').addEventListener('submit', function(event) {
-            const actionType = document.getElementById('actionType').value;
-            localStorage.setItem('contentState', actionType === 'section' ? 'sections-content' : (actionType === 'submission' ? 'submissions-content' : 'members-content'));
-        });
+        
 
-        document.getElementById('confirmDeleteSubmissionBtn').addEventListener('click', function(event) {
-            localStorage.setItem('contentState', 'submissions-content');
-        });
-
-        document.getElementById('confirmDeleteMemberBtn').addEventListener('click', function(event) {
-            localStorage.setItem('contentState', 'members-content');
-        });
-
-        document.getElementById('confirmBlockMemberBtn').addEventListener('click', function(event) {
-            localStorage.setItem('contentState', 'members-content');
-        });
-    
+        // Khôi phục trạng thái trang từ localStorage khi trang được tải lại
         document.addEventListener('DOMContentLoaded', function() {
+
             const previousState = localStorage.getItem('contentState');
+
             if (previousState) {
+
                 document.querySelectorAll('.classroom-content').forEach(content => content.classList.add('hidden'));
+
                 document.getElementById(previousState).classList.remove('hidden');
+
                 document.querySelectorAll('.classroom-navigation button').forEach(button => button.classList.remove('active'));
+
                 if (previousState === 'sections-content') {
+
                     document.getElementById('sections-btn').classList.add('active');
+
                 } else if (previousState === 'submissions-content') {
+
                     document.getElementById('submissions-btn').classList.add('active');
+
                 } else if (previousState === 'members-content') {
+
                     document.getElementById('members-btn').classList.add('active');
+                } else if (previousState === 'co-teacher-content') {
+
+                    document.getElementById('co-teacher-btn').classList.add('active');
+
                 }
+
                 localStorage.removeItem('contentState');
+
             }
+
+            // Lưu trạng thái trang vào localStorage khi submit form
+
+            document.getElementById('createForm').addEventListener('submit', function(event) {
+
+                const actionType = document.getElementById('actionType').value;
+                localStorage.setItem('contentState', actionType === 'section' ? 'sections-content' : (actionType === 'submission' ? 'submissions-content' : 'members-content'));
+
+            });
+
+            // Lưu trạng thái trang vào localStorage khi xóa submission
+
+            document.getElementById('confirmDeleteSubmissionBtn').addEventListener('click', function(event) {
+
+                localStorage.setItem('contentState', 'submissions-content');
+
+            });
+
+            // Lưu trạng thái trang vào localStorage khi xóa member
+            document.getElementById('confirmDeleteMemberBtn').addEventListener('click', function(event) {
+
+                localStorage.setItem('contentState', 'members-content');
+
+            });
+
+
+            // Lưu trạng thái trang vào localStorage khi block member
+            document.getElementById('confirmBlockMemberBtn').addEventListener('click', function(event) {
+
+                localStorage.setItem('contentState', 'members-content');
+
+            });
+
+
+            // Lưu trạng thái trang vào localStorage khi xử lý yêu cầu co-teacher
+
+            document.getElementById('acceptCoTeacherRequestBtn').addEventListener('click', function(event) {
+
+                localStorage.setItem('contentState', 'co-teacher-content');
+
+            });
+
+            document.getElementById('rejectCoTeacherRequestBtn').addEventListener('click', function(event) {
+
+                localStorage.setItem('contentState', 'co-teacher-content');
+            });
+
         });
+
     </script>
     <main>
         <div class="classroom-header">
@@ -642,17 +844,6 @@
                     </svg>
                     <span>Back</span>
                 </button>
-
-                <script>
-                    document.addEventListener('DOMContentLoaded', function () {
-                        const backLink = document.getElementById('back-link');
-                        backLink.addEventListener('click', function(event) {
-                            event.preventDefault();
-                            const referrer = document.referrer;
-                            window.location.href = referrer;
-                        });
-                    });
-                </script>
             </div> 
             <div class="d-flex align-items-center justify-content-around mb-3">
                 <div class="d-flex align-items-center">
@@ -677,6 +868,7 @@
                 <button id="sections-btn" class="active">Sections</button>
                 <button id="submissions-btn">Submissions</button>
                 <button id="members-btn">Members</button>
+                <button id="co-teacher-btn">Co-Teachers</button>
             </div>
             
         </div>
@@ -818,6 +1010,52 @@
             </div>
         </div>
 
+        <div id="co-teacher-content" class="classroom-content hidden">
+            <div class="co-teacher-list">
+                {% for request in co_teacher_requests %}
+                <div class="section-card">
+                    <span class="username text-uppercase">{{ request.requester.username }}</span>
+                    <span class="date-joined">Requested on: {{ request.created_at|date:"d/m/Y" }}</span>
+                    <span class="status">Status: {{ request.status }}</span> <!-- Thêm trạng thái -->
+                    <div class="section-options">
+                        <button class="btn btn-success" id="acceptCoTeacherRequestBtn" onclick="handleCoTeacherRequest({{ request.id }}, 'accept')">Accept</button>
+                        <button class="btn btn-danger" id="rejectCoTeacherRequestBtn" onclick="handleCoTeacherRequest({{ request.id }}, 'reject')">Reject</button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="invitation-details">
+                <div class="invitation-link">
+                    <label style="font-weight: 700; font-size: 18px; margin-bottom: 10px;">INVITATION LINK</label><br>
+                    <input type="text" id="invitationLink1" value="{{ request.scheme }}://{{ request.get_host }}{% url 'access_join_classroom' classroom.link %}" readonly>
+                    <button class="copy-btn" onclick="copyInvitationLink()">Copy</button>
+                </div>
+                <div class="classroom-details">
+                    <label style="font-weight: 700; font-size: 18px; margin-bottom: 10px;">CLASSROOM DETAILS</label><br>
+                    <div class="detail-item">
+                        <span class="detail-icon">📚</span>
+                        <span style="font-weight: 500;">Number of sections: {{ parent_sections }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-icon">📕</span>
+                        <span style="font-weight: 500;">Number of subsections: {{ child_sections }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-icon">📝</span>
+                        <span style="font-weight: 500;">Number of assignments: {{ assignments.count }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-icon">❓</span>
+                        <span style="font-weight: 500;">Number of question tests: {{ question_tests.count }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-icon">👥</span>
+                        <span style="font-weight: 500;">Number of participants: {{ num_participants }}</span>
+                    </div>
+                </div>               
+            </div>
+        </div>
+
         <div id="submissions-content" class="classroom-content hidden">
             <div class="sections-list">
                 <div class="d-flex justify-content-end">
@@ -904,16 +1142,19 @@
     const sectionsBtn = document.getElementById('sections-btn');
     const membersBtn = document.getElementById('members-btn');
     const submissionsBtn = document.getElementById('submissions-btn');
+    const coTeacherBtn = document.getElementById('co-teacher-btn');
 
     const sectionsContent = document.getElementById('sections-content');
     const membersContent = document.getElementById('members-content');
     const submissionsContent = document.getElementById('submissions-content');
+    const coTeacherContent = document.getElementById('co-teacher-content');
 
     // Hàm để ẩn tất cả nội dung
     function hideAllContents() {
         sectionsContent.classList.add('hidden');
         membersContent.classList.add('hidden');
         submissionsContent.classList.add('hidden');
+        coTeacherContent.classList.add('hidden');
     }
 
     // Hàm để xóa class 'active' từ tất cả các nút
@@ -921,6 +1162,7 @@
         sectionsBtn.classList.remove('active');
         membersBtn.classList.remove('active');
         submissionsBtn.classList.remove('active');
+        coTeacherBtn.classList.remove('active');
     }
 
     // Gán sự kiện click cho từng nút
@@ -945,20 +1187,40 @@
         submissionsBtn.classList.add('active');
     });
 
+    coTeacherBtn.addEventListener('click', function() {
+        hideAllContents();
+        removeActiveClass();
+        coTeacherContent.classList.remove('hidden');
+        coTeacherBtn.classList.add('active');
+    }); 
+
 
     document.getElementById('sectionType').addEventListener('change', function() {
         var parentSectionContainer = document.getElementById('parentSectionContainer');
         var submissionFields = document.getElementById('submissionFields');
-
+        var durationContainer = document.getElementById('durationContainer');
+        
         if (this.value === 'sub') {
             parentSectionContainer.style.display = 'block';
             submissionFields.style.display = 'none';
+            durationContainer.style.display = 'none';
         } else if (this.value === 'submission') {
             parentSectionContainer.style.display = 'block';
             submissionFields.style.display = 'block';
+            durationContainer.style.display = 'none'; // Hide initially
         } else {
             parentSectionContainer.style.display = 'none';
             submissionFields.style.display = 'none';
+            durationContainer.style.display = 'none';
+        }
+    });
+
+    document.querySelector('select[name="submission_type"]').addEventListener('change', function() {
+        var durationContainer = document.getElementById('durationContainer');
+        if (this.value === 'question_test') {
+            durationContainer.style.display = 'block';
+        } else {
+            durationContainer.style.display = 'none';
         }
     });
 
@@ -1172,4 +1434,33 @@
             sectionTypeSelect.dispatchEvent(new Event('change'));
         });
     });
+
+    function handleCoTeacherRequest(requestId, action) {
+        
+        fetch(`/handle_co_teacher_request/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({ request_id: requestId, action: action })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+                document.getElementById('successMessage').innerText = data.message;
+                document.getElementById('loadingSpinner').style.display = 'block';
+                successModal.show();
+                setTimeout(function() {
+                    document.getElementById('loadingSpinner').style.display = 'none';
+                    successModal.hide();
+                    location.reload();
+                }, 1000);
+            } else {
+                alert('Failed to process request: ' + data.message);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
 </script>
