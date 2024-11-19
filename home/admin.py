@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from .models import NotificationSystem, Chatbot, CoTeacherRequest, ForumPost, ForumComment, AnsweredQuestion, BlockedParticipant, FavoriteClassroom, ChatMessage, Comment, CustomUser, Subjects, Classroom, AcademicYear, Section, Submission, StudentFile, Participant, Question, Answer, SubsectionFile, SubmissionFile, QuizResult
 
+
 class CustomUserAdmin(UserAdmin):
     model = CustomUser
     list_display = ('username', 'email', 'first_name', 'last_name', 'subject', 'grade', 'role', 'is_staff')
@@ -35,3 +36,4 @@ admin.site.register(ForumComment)
 admin.site.register(CoTeacherRequest)
 admin.site.register(Chatbot)
 admin.site.register(NotificationSystem)
+
