@@ -13,9 +13,12 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 import os
 from pathlib import Path
 from dotenv import load_dotenv
+from decouple import config
 
 
 load_dotenv()
+
+DJANGO_SETTINGS_MODULE = config('DJANGO_SETTINGS_MODULE', default='nextgenedu.settings')
 
 
 GOOGLE_OAUTH_CLIENT_ID = os.environ.get('GOOGLE_OAUTH_CLIENT_ID')

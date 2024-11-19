@@ -291,20 +291,11 @@ class ForumComment(models.Model):
     def __str__(self):
         return f"Comment by {self.user.username} on {self.post.title}"
 
-class NotificationSystem(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    text = models.TextField()
-    created_at = models.DateTimeField(default=timezone.now)
-
-    def __str__(self):
-        return f"Notification by {self.user.username}"
-
 class Contact(models.Model):
     name = models.TextField(max_length=50)
     email = models.TextField(max_length=60)
     subject = models.TextField(max_length=30)
     message = models.TextField(max_length=255)
-
 
 class CoTeacherRequest(models.Model):
     requester = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='co_teacher_requests')
@@ -326,11 +317,19 @@ class Chatbot(models.Model):
         return f"{self.user.username}: {self.message[:50]}"
     
 class NotificationSystem(models.Model):
+    NOTIFICATION_TYPE_CHOICES = [
+        ('message', 'Message'),
+        ('comment', 'Comment'),
+        ('new_reg', 'New Registration'),
+        ('content', 'Content'),
+    ]
+
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     title = models.CharField(max_length=200, default="Notification")
     text = models.TextField()
-    type = models.CharField(max_length=50, null=True, blank=True)  # Thêm dòng này
+    type = models.CharField(max_length=50, choices=NOTIFICATION_TYPE_CHOICES, default='message')
     created_at = models.DateTimeField(default=timezone.now)
+    is_read = models.BooleanField(default=False)
 
     def __str__(self):
         return f"Notification by {self.user.username}"

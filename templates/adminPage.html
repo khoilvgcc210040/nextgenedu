@@ -106,22 +106,6 @@
         .navbar .navbar-nav .header-nav-link {
             color: var(--accent-color) !important;
         }
-        
-        .btn-edit:hover{
-            text-decoration: underline;
-            cursor: pointer;
-        }
-
-        .btn-delete {
-            background-color: var(--accent-color);
-            padding: 7px 14px;
-            border-radius: 10px;
-            transition: background-color 0.1s ease-in-out;
-        }
-
-        .btn-delete:hover {
-            background-color: #b91c1c;
-        }
 
         .toggle-switch {
             position: relative;
@@ -224,11 +208,14 @@
                 <a id="subject-link" class="nav-link" href="#">Subject</a>
             </li>
             <li class="nav-item">
-                <a id="subsectionfile-link" class="nav-link" href="#">SubsectionFile</a>
+                <a id="subsectionfile-link" class="nav-link" href="#">Subsection File</a>
             </li>
             <li class="nav-item">
-                <a id="submissionfile-link" class="nav-link" href="#">SubmissionFile</a>
+                <a id="submissionfile-link" class="nav-link" href="#">Submission File</a>
             </li>
+            <li class="nav-item">
+                <a id="create-notification-link" class="nav-link" href="#">Create Notification</a>
+            </li>            
         </ul>
     </div>
     
@@ -297,164 +284,165 @@
                             {% endif %}
                         </td>
                         <td>
-                            <button class="btn btn-edit" data-bs-toggle="modal" data-bs-target="#editAccountModal" data-bs-username="{{ account.username }}" data-bs-email="{{ account.email }}" data-bs-role="{{ account.role }}" data-bs-subject="{{ account.subject.name }}" data-bs-grade="{{ account.grade }}" data-bs-id="{{ account.id }}">Edit</button>
-                            <button class="btn btn-delete" onclick="deleteAccount({{ account.id }})">Delete</button>
+                            <button class="btn btn-edit" style="border: 2px solid #000;" data-bs-toggle="modal" data-bs-target="#editAccountModal" data-bs-username="{{ account.username }}" data-bs-email="{{ account.email }}" data-bs-role="{{ account.role }}" data-bs-subject="{{ account.subject.name }}" data-bs-grade="{{ account.grade }}" data-bs-id="{{ account.id }}">Edit</button>
+                            <button class="btn btn-delete" style="border: 2px solid #000;" onclick="showDeleteModal({{ account.id }})">Delete</button>
+                            <!-- Include the delete confirmation modal -->
+                            <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header" style="background-color: var(--accent-color, #6f42c1); color: #fff;">
+                                            <h5 class="modal-title" id="deleteModalLabel" style="font-size: 18px; font-weight: 500; color: #fff;">Confirm Delete</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="background-color: #fff; border: none;"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            Are you sure you want to delete this account?
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                            <button type="button" class="btn btn-danger" id="confirmDelete" onclick="confirmDelete()">Delete</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <script>
+                                let accountIdToDelete = null;
+
+                                function showDeleteModal(accountId) {
+                                    accountIdToDelete = accountId;
+                                    const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+                                    deleteModal.show();
+                                }
+
+                                
+
+                                function confirmDelete(event) {
+                                    
+                                    const successMessage = document.getElementById('successMessage');
+                                    const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+                                    const loadingSpinner = document.getElementById('loadingSpinner');
+
+                                    if (accountIdToDelete) {
+                                        loadingSpinner.style.display = 'block';
+                                        fetch(`/delete-account-admin/${accountIdToDelete}/`, {
+                                            method: 'POST',
+                                            headers: {
+                                                'X-CSRFToken': '{{ csrf_token }}',
+                                                'Content-Type': 'application/json'
+                                            }
+                                        })
+                                        .then(response => response.json())
+                                        .then(data => {
+                                            loadingSpinner.style.display = 'none';
+                                            if (data.status === 'success') {
+                                                successMessage.textContent = 'Account deleted successfully.';
+                                                successModal.show();
+                                                setTimeout(() => {
+                                                    const activeTab = document.querySelector('.nav-link.active').id.replace('-link', '-content');
+                                                    localStorage.setItem('contentState', activeTab);
+                                                    location.reload(); // Reload the page to reflect changes
+                                                }, 1000);
+                                            } else {
+                                                successMessage.textContent = 'Failed to delete account.';
+                                                successModal.show();
+                                            }
+                                        })
+                                        .catch(error => {
+                                            console.error('Error deleting account:', error);
+                                        });
+                                    }
+                                }
+                            </script>
+
+                            <style>
+                                .btn-edit, .btn-delete {
+                                    transition: all 0.3s ease-in-out;
+                                }
+                                .btn-edit:hover, .btn-delete:hover {
+                                    transform: translateY(-5%);
+                                }
+
+                                .btn-edit:hover {
+                                    background-color: var(--accent-color);
+                                    color: #fff;
+                                }
+
+                                .btn-delete:hover {
+                                    background-color: #b91c1c;
+                                    color: #fff;
+                                }
+
+                                .btn-add-account {
+                                    transition: all 0.3s ease-in-out;
+                                }
+
+                                .btn-add-account:hover {
+                                    transform: translateY(-5%);
+                                }
+                            </style>
+                        
                         </td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAccountModal">Add New</button>
+            <button class="btn btn-add-account" style="background-color: var(--accent-color); color: #fff;" data-bs-toggle="modal" data-bs-target="#addAccountModal">Add New</button>
         </div>
 
         <!-- Modal for Editing Account -->
-        <div class="modal fade" id="editAccountModal" tabindex="-1" aria-labelledby="editAccountModalLabel" aria-hidden="true">
+        <div class="modal fade" id="editAccountModal" tabindex="-1" aria-labelledby="editAccountModalLabel" aria-hidden="true" style="display: none; z-index: 10000;">
             <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="editAccountModalLabel">Edit Account</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="modal-content" style="border: 5px solid var(--accent-color); border-radius: 15px;">
+                    <div class="modal-header d-flex justify-content-between align-items-center" style="background-color: var(--accent-color);">
+                        <h5 class="modal-title" id="editAccountModalLabel" style="color: #fff;">Edit Account</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="background-color: #fff; border: none;"></button>
                     </div>
-                    <div class="modal-body">
-                        <form id="editAccountForm" method="post" action="{% url 'update_account' %}">
-                            {% csrf_token %}
-                            <input type="hidden" id="editAccountId" name="id" value="{{ user.id }}">
-                            
+                    <form id="editAccountForm" method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" id="editAccountId" name="id">
+                        <div class="modal-body" style="border-bottom: 2px solid var(--accent-color);">
                             <div class="mb-3">
                                 <label for="editUsername" class="form-label">Username</label>
-                                <input type="text" class="form-control" id="editUsername" name="username" value="{{ user.username }}">
+                                <input type="text" class="form-control" id="editUsername" name="usernameUpdate" placeholder="username123">
                             </div>
-                            
                             <div class="mb-3">
                                 <label for="editEmail" class="form-label">Email</label>
-                                <input type="email" class="form-control" id="editEmail" name="email" value="{{ user.email }}">
+                                <input type="email" class="form-control" id="editEmail" name="emailUpdate" placeholder="user@example.com">
                             </div>
-                            
                             <div class="mb-3">
                                 <label for="editRole" class="form-label">Role</label>
-                                <select class="form-control" id="editRole" name="role">
-                                    <option value="teacher" {% if user.role == 'teacher' %}selected{% endif %}>Teacher</option>
-                                    <option value="student" {% if user.role == 'student' %}selected{% endif %}>Student</option>
-                                    <option value="admin" {% if user.role == 'admin' %}selected{% endif %}>Admin</option>
+                                <select id="editRole" name="roleUpdate" class="form-control" onchange="toggleEditAccountFields()">
+                                    <option value="student">Student</option>
+                                    <option value="teacher">Teacher</option>
+                                    <option value="admin">Admin</option>
                                 </select>
                             </div>
-                            
-                            <div class="mb-3" id="subjectField" style="display: {% if user.role == 'teacher' %}block{% else %}none{% endif %};">
+                            <div class="mb-3" id="editGradeContainer" style="display: none;">
+                                <label for="editGrade" class="form-label">Grade</label>
+                                <select id="editGrade" name="gradeUpdate" class="form-control">
+                                    <option value="10">10</option>
+                                    <option value="11">11</option>
+                                    <option value="12">12</option>
+                                </select>
+                            </div>
+                            <div class="mb-3" id="editSubjectContainer" style="display: none;">
                                 <label for="editSubject" class="form-label">Subject</label>
-                                <select class="form-control" id="editSubject" name="subject">
+                                <select id="editSubject" name="subjectUpdate" class="form-control">
                                     {% for subject in subjects %}
-                                        <option value="{{ subject.id }}" {% if user.subject and user.subject.id == subject.id %}selected{% endif %}>{{ subject.name }} - Grade {{ subject.grade }}</option>
+                                    <option value="{{ subject.id }}">{{ subject.name }} - Grade {{ subject.grade }}</option>
                                     {% endfor %}
                                 </select>
                             </div>
-                            
-                            <div class="mb-3" id="gradeField" style="display: {% if user.role == 'student' %}block{% else %}none{% endif %};">
-                                <label for="editGrade" class="form-label">Grade</label>
-                                <select class="form-control" id="editGrade" name="grade">
-                                    {% if user.grade %}
-                                        <option value="{{ user.grade }}" selected>{{ user.grade }}</option>
-                                    {% else %}
-                                        <option value="10" selected>10</option>
-                                        <option value="11">11</option>
-                                        <option value="12">12</option>
-                                    {% endif %}
-                                </select>
-                            </div>
-                            
-                            <button type="submit" class="btn btn-primary">Save changes</button>
-                        </form>
-                    </div>
+                        </div>
+                        <div class="modal-footer d-flex justify-content-end">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn" style="background-color: var(--accent-color); color: #fff;">Save changes</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
-
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                const roleField = document.getElementById('editRole');
-                const subjectField = document.getElementById('subjectField');
-                const gradeField = document.getElementById('gradeField');
-    
-                function updateFields(role) {
-                    if (role === 'teacher') {
-                        gradeField.style.display = 'none';
-                        subjectField.style.display = 'block';
-                    } else if (role === 'student') {
-                        subjectField.style.display = 'none';
-                        gradeField.style.display = 'block';
-                    } else {
-                        subjectField.style.display = 'none';
-                        gradeField.style.display = 'none';
-                    }
-                }
-
-                roleField.addEventListener('change', function() {
-                    updateFields(this.value);
-                });
-    
-                // Gọi hàm updateFields khi modal được mở
-                const editAccountModal = document.getElementById('editAccountModal');
-                editAccountModal.addEventListener('show.bs.modal', function (event) {
-                    const button = event.relatedTarget;
-                    const role = button.getAttribute('data-bs-role');
-                    updateFields(role);
-                });
-
-                // Modal for editing Account
-                editAccountModal.addEventListener('show.bs.modal', function (event) {
-                    const button = event.relatedTarget;
-                    const id = button.getAttribute('data-bs-id');
-
-                    // Lấy các giá trị từ phần tử trong modal
-                    const usernameInput = editAccountModal.querySelector('#editUsername');
-                    const emailInput = editAccountModal.querySelector('#editEmail');
-                    const roleInput = editAccountModal.querySelector('#editRole');
-                    const subjectInput = editAccountModal.querySelector('#editSubject');
-                    const gradeInput = editAccountModal.querySelector('#editGrade');
-                    const accountIdInput = editAccountModal.querySelector('#editAccountId');
-
-                    // Gán giá trị đã được render từ view vào các trường trong modal
-                    accountIdInput.value = id;  // ID đã được gán vào trường ẩn
-                    usernameInput.value = button.getAttribute('data-bs-username');
-                    emailInput.value = button.getAttribute('data-bs-email');
-                    roleInput.value = button.getAttribute('data-bs-role');
-                    gradeInput.value = button.getAttribute('data-bs-grade');
-
-                    // Gán giá trị cho select option của subject
-                    const subjectValue = button.getAttribute('data-bs-subject');
-                    const subjectOptions = subjectInput.options;
-                    for (let i = 0; i < subjectOptions.length; i++) {
-                        if (subjectOptions[i].text === subjectValue) {
-                            subjectOptions[i].selected = true;
-                            break;
-                        }
-                    }
-                });
-
-                // Xử lý submit form với JSONResponse
-                const editAccountForm = document.getElementById('editAccountForm');
-                editAccountForm.addEventListener('submit', function(event) {
-                    event.preventDefault();
-
-                    const formData = new FormData(editAccountForm);
-
-                    fetch('/update-account/', {
-                        method: 'POST',
-                        body: formData,
-                        headers: {
-                            'X-CSRFToken': '{{ csrf_token }}',
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.status === 'success') {
-                            location.reload();
-                        } else {
-                            alert('Failed to update account.');
-                        }
-                    });
-                });
-            });
-        </script>
+        
 
         <div id="subject-content" class="content-section pb-lg-5">
             <div class="text-center">
@@ -551,7 +539,121 @@
             </table>
             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addSubmissionFileModal">Add New</button>
         </div>
+
+        <div id="create-notification-content" class="content-section pb-lg-5">
+            <div class="text-center">
+                <h1 style="font-weight: 700; color: var(--accent-color);" class="text-truncate">CREATE NOTIFICATION</h1>
+            </div>
+            <hr style="border: 1px solid #000;">
+        
+            <!-- Form to create a notification -->
+            <form id="createNotificationForm" method="post" action="{% url 'create_notification' %}">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="notificationUser" class="form-label fw-bold" style="color: var(--accent-color);">User</label>
+                    <select id="notificationUser" name="user" class="form-control" style="color: var(--accent-color); border: 2px solid var(--accent-color);">
+                        <option value="all">All</option>
+                        {% for user in users %}
+                            {% if user != request.user %}
+                                <option value="{{ user.id }}">{{ user.username }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+        
+                <div class="mb-3">
+                    <label for="notificationType" class="form-label fw-bold" style="color: var(--accent-color);">Notification Type</label>
+                    <select id="notificationType" name="type" class="form-control" style="color: var(--accent-color); border: 2px solid var(--accent-color);">
+                        {% for type, label in notification_types %}
+                            <option value="{{ type }}">{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+        
+                <div class="mb-3">
+                    <label for="notificationTitle" class="form-label fw-bold" style="color: var(--accent-color);">Title</label>
+                    <input type="text" id="notificationTitle" name="title" class="form-control" placeholder="Enter a title (optional)" style="color: var(--accent-color); border: 2px solid var(--accent-color);" maxlength="50"/>
+                </div>
+        
+                <div class="mb-3">
+                    <label for="notificationText" class="form-label fw-bold" style="color: var(--accent-color);">Content</label>
+                    <div id="textError" class="text-danger mb-1 mt-1" style="display: none;">Please enter content.</div>
+                    <textarea id="notificationText" name="text" class="form-control" placeholder="Enter your content here..." style="color: var(--accent-color); border: 2px solid var(--accent-color);"></textarea>
+                </div>
+        
+                <button type="submit" class="btn-notification" style="background-color: var(--accent-color); color: #fff;">Send Notification</button>
+                <style>
+                    .btn-notification {
+                        padding: 10px 20px;
+                        border-radius: 5px;
+                        transition: transform 0.3s ease, color 0.3s ease;
+                    }
+                    .btn-notification:hover {
+                        transform: translateY(-3px);
+                        color: #fff;
+                    }
+                </style>
+            </form>
+        </div>
+    
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const createNotificationForm = document.getElementById('createNotificationForm');
+                const textArea = document.getElementById('notificationText');
+                const textError = document.getElementById('textError');
+        
+                createNotificationForm.addEventListener('submit', function(event) {
+                    event.preventDefault();  // Ngăn chặn form submit mặc định
+        
+                    // Kiểm tra nội dung text area
+                    if (!textArea.value.trim()) {
+                        textError.style.display = 'block';
+                        return;  // Dừng lại nếu nội dung trống
+                    } else {
+                        textError.style.display = 'none';
+                    }
+        
+                    const formData = new FormData(createNotificationForm);
+                    const url = createNotificationForm.action;
+                    const loadingSpinner = document.getElementById('loadingSpinner');
+                    const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+                    const successMessage = document.getElementById('successMessage');
+        
+                    loadingSpinner.style.display = 'block';
+        
+                    fetch(url, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            successMessage.innerText = data.message;
+                            successModal.show();
+                            setTimeout(() => {
+                                successModal.hide();
+                                loadingSpinner.style.display = 'none';
+                                createNotificationForm.reset();
+                            }, 2000);
+                        } else {
+                            alert(data.message);
+                        }
+                    })
+                    .catch(error => {
+                        loadingSpinner.style.display = 'none';  // Ẩn loading spinner nếu có lỗi
+                        console.error('Error:', error);
+                        {% comment %} alert('An error occurred, please try again.'); {% endcomment %}
+                    });
+                });
+            });
+        </script>
+              
     </div>
+
+    
 
     <!-- Modal for editing Statistical Analysis -->
     <div class="modal fade" id="editStatisticalModal" tabindex="-1" aria-labelledby="editStatisticalModalLabel" aria-hidden="true">
@@ -667,27 +769,136 @@
         </div>
     </div>
 
+    <div class="modal fade" id="otpModal" tabindex="-1" aria-labelledby="otpModalLabel" aria-hidden="true" style="display: none; z-index: 10001;">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border: 5px solid var(--accent-color); border-radius: 15px;">
+                <div class="modal-header" style="background-color: var(--accent-color); color: white;">
+                    <h5 class="modal-title" id="otpModalLabel" style="color: white;">OTP Verification</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="background-color: white;"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <p class="mb-3">Enter the OTP sent to your email</p>
+                    <div id="otp-message" class="alert alert-danger d-none" style="background-color: transparent; border: none; font-weight: 800;" role="alert"></div>
+                    <div id="otp-inputs" class="d-flex justify-content-center gap-2 mb-3">
+                        <input type="text" class="form-control otp-input text-center" maxlength="1">
+                        <input type="text" class="form-control otp-input text-center" maxlength="1">
+                        <input type="text" class="form-control otp-input text-center" maxlength="1">
+                        <input type="text" class="form-control otp-input text-center" maxlength="1">
+                        <input type="text" class="form-control otp-input text-center" maxlength="1">
+                        <input type="text" class="form-control otp-input text-center" maxlength="1">
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mt-2">
+                        <button id="resend-otp" class="btn btn-link resend-otp p-0">Resend Code</button>
+                        <span id="timer" class="fw-bold">02:00</span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn" style="background-color: var(--accent-color); color: white;" id="verify-otp">Verify</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .otp-input {
+            width: 50px;
+            height: 50px;
+            font-size: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin: 0 5px;
+            font-weight: bold;
+        }
+
+        .resend-otp {
+            color: var(--accent-color);
+            text-decoration: none;
+            font-weight: bold;
+        }
+    </style>
+
     <!-- Modal for adding new Account -->
-    <div class="modal fade" id="addAccountModal" tabindex="-1" aria-labelledby="addAccountModalLabel" aria-hidden="true">
+    <div class="modal fade" id="addAccountModal" tabindex="-1" aria-labelledby="addAccountModalLabel" aria-hidden="true" style="display: none; z-index: 10000;">
         <div class="modal-dialog">
             <div class="modal-content" style="border: 5px solid var(--accent-color); border-radius: 15px;">
                 <div class="modal-header d-flex justify-content-between align-items-center" style="background-color: var(--accent-color);">
                     <h5 class="modal-title" id="addAccountModalLabel" style="color: #fff;">Add New Account</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" style="background-color: #fff; border: none;" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="background-color: #fff; border: none;"></button>
                 </div>
-                <form id="addAccountForm" method="POST" action="#">
+                <form id="addAccountForm" method="POST">
                     {% csrf_token %}
                     <div class="modal-body" style="border-bottom: 2px solid var(--accent-color);">
-                        <!-- Form fields here -->
+                        <div class="mb-3">
+                            <label for="newEmail" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="newEmail" name="emailAdd" placeholder="user@example.com">
+                        </div>
+                        <div class="mb-3">
+                            <label for="newUsername" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="newUsername" name="usernameAdd" placeholder="username123">
+                        </div>
+                        <div class="mb-3">
+                            <label for="newDateOfBirth" class="form-label">Date of Birth</label>
+                            <div class="d-flex gap-2">
+                                <select id="day" name="day">
+                                    {% for i in days %}
+                                    <option value="{{ i }}">{{ i }}</option>
+                                    {% endfor %}
+                                </select>
+                                
+                                <select id="month" name="month">
+                                    {% for i, month_name in months.items %}
+                                    <option value="{{ i }}">{{ month_name }}</option>
+                                    {% endfor %}
+                                </select>
+                                
+                                <select id="year" name="year">
+                                    {% for y in years %}
+                                    <option value="{{ y }}">{{ y }}</option>
+                                    {% endfor %}
+                                </select>                                
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="newRole" class="form-label">Role</label>
+                            <select id="newRole" name="role" class="form-control" onchange="toggleNewAccountFields()">
+                                <option value="student">Student</option>
+                                <option value="teacher">Teacher</option>
+                            </select>
+                        </div>
+                        <div class="mb-3" id="newGradeContainer" style="display: none;">
+                            <label for="newGrade" class="form-label">Grade</label>
+                            <select id="newGrade" name="grade" class="form-control">
+                                <option value="10">10</option>
+                                <option value="11">11</option>
+                                <option value="12">12</option>
+                            </select>
+                        </div>
+                        <div class="mb-3" id="newSubjectContainer" style="display: none;">
+                            <label for="newSubject" class="form-label">Subject</label>
+                            <select id="newSubject" name="subject" class="form-control">
+                                {% for subject in subjects %}
+                                <option value="{{ subject.id }}">{{ subject.name }} - Grade {{ subject.grade }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="newPassword" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="newPassword" name="passwordAdd" placeholder="Password">
+                        </div>
+                        <div class="mb-3">
+                            <label for="confirmNewPassword" class="form-label">Confirm Password</label>
+                            <input type="password" class="form-control" id="confirmNewPassword" name="confirm-passwordAdd" placeholder="Confirm Password">
+                        </div>
                     </div>
                     <div class="modal-footer d-flex justify-content-end">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn" style="background-color: var(--accent-color); color: #fff;">Save changes</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="opacity: 1;" onmouseover="this.style.opacity=0.7;" onmouseout="this.style.opacity=1;">Close</button>
+                        <button type="submit" class="btn" style="background-color: var(--accent-color); color: #fff; opacity: 1;" onmouseover="this.style.opacity=0.7;" onmouseout="this.style.opacity=1;">Add Account</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
+
 
     <!-- Modal for adding new Subject -->
     <div class="modal fade" id="addSubjectModal" tabindex="-1" aria-labelledby="addSubjectModalLabel" aria-hidden="true">
@@ -755,6 +966,28 @@
         </div>
     </div>
 
+    <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-sm" style="position: fixed; bottom: 10px; left: 10px;">
+            <div class="modal-content" style="border: 2px solid var(--accent-color);">
+                <div class="modal-body" style="background-color: var(--accent-color); border-radius: 5px;">
+                    <p id="successMessage" class="text-center m-0" style="color: #fff;"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="loadingSpinner" class="spinner-border" role="status" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 99999; animation: spin 1s linear infinite; color: var(--accent-color) !important;">
+        <span class="visually-hidden" style="font-size: 0.8em;">Loading...</span>
+    </div>
+    <style>
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+    
+    
+
     <div id="preloader">
         <div></div>
         <div></div>
@@ -769,6 +1002,309 @@
     <script src="https://kit.fontawesome.com/a076d05399.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            // Elements for adding accounts
+            const newRoleSelect = document.getElementById('newRole');
+            const newGradeContainer = document.getElementById('newGradeContainer');
+            const newSubjectContainer = document.getElementById('newSubjectContainer');
+            const addAccountModal = new bootstrap.Modal(document.getElementById('addAccountModal'));
+    
+            // Elements for editing accounts
+            const editRoleSelect = document.getElementById('editRole');
+            const editGradeContainer = document.getElementById('editGradeContainer');
+            const editSubjectContainer = document.getElementById('editSubjectContainer');
+            const editAccountModal = new bootstrap.Modal(document.getElementById('editAccountModal'));
+    
+            // Common OTP modal
+            const otpModal = new bootstrap.Modal(document.getElementById('otpModal'));
+            const otpInputs = document.querySelectorAll('.otp-input');
+            const otpMessage = document.getElementById('otp-message');
+            const timerElement = document.getElementById('timer');
+            let otpTimer;
+            let isOtpExpired = false;
+    
+            // Function to toggle fields based on role selection (used in both add and edit)
+            function toggleAccountFields(roleSelect, gradeContainer, subjectContainer) {
+                const selectedRole = roleSelect.value;
+                if (selectedRole === 'teacher') {
+                    gradeContainer.style.display = 'none';
+                    subjectContainer.style.display = 'block';
+                } else if (selectedRole === 'student') {
+                    subjectContainer.style.display = 'none';
+                    gradeContainer.style.display = 'block';
+                } else {
+                    subjectContainer.style.display = 'none';
+                    gradeContainer.style.display = 'none';
+                }
+            }
+    
+            // Initialize toggle for add and edit forms
+            function initializeRoleToggles() {
+                toggleAccountFields(newRoleSelect, newGradeContainer, newSubjectContainer);
+                newRoleSelect.addEventListener('change', () => toggleAccountFields(newRoleSelect, newGradeContainer, newSubjectContainer));
+    
+                toggleAccountFields(editRoleSelect, editGradeContainer, editSubjectContainer);
+                editRoleSelect.addEventListener('change', () => toggleAccountFields(editRoleSelect, editGradeContainer, editSubjectContainer));
+            }
+            initializeRoleToggles();
+    
+            // Pre-fill data in editAccountModal when shown
+            const editAccountModalElement = document.getElementById('editAccountModal');
+            editAccountModalElement.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                const id = button.getAttribute('data-bs-id');
+                const username = button.getAttribute('data-bs-username');
+                const email = button.getAttribute('data-bs-email');
+                const role = button.getAttribute('data-bs-role');
+                const grade = button.getAttribute('data-bs-grade');
+                const subject = button.getAttribute('data-bs-subject');
+    
+                document.getElementById('editAccountId').value = id;
+                document.getElementById('editUsername').value = username;
+                document.getElementById('editEmail').value = email;
+                document.getElementById('editRole').value = role;
+                document.getElementById('editGrade').value = grade;
+                const editSubjectInput = document.getElementById('editSubject');
+                Array.from(editSubjectInput.options).forEach(option => {
+                    if (option.value === subject) {
+                        option.selected = true;
+                    }
+                });
+    
+                toggleAccountFields(editRoleSelect, editGradeContainer, editSubjectContainer);
+            });
+    
+            // Common function for handling OTP timer
+            function startOtpTimer() {
+                clearInterval(otpTimer);
+                isOtpExpired = false;
+                let timeLeft = 120;
+                timerElement.textContent = '02:00';
+                otpTimer = setInterval(() => {
+                    timeLeft--;
+                    const minutes = Math.floor(timeLeft / 60);
+                    const seconds = timeLeft % 60;
+                    timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                    if (timeLeft <= 0) {
+                        clearInterval(otpTimer);
+                        isOtpExpired = true;
+                        otpMessage.className = 'alert alert-danger';
+                        otpMessage.classList.remove('d-none');
+                        otpMessage.textContent = 'OTP expired. Please request a new one.';
+                    }
+                }, 1000);
+            }
+    
+            // Function to reset OTP inputs and message
+            function resetOtpInputs() {
+                otpInputs.forEach(input => input.value = '');
+                otpMessage.classList.add('d-none');
+            }
+    
+            otpInputs.forEach((input, index) => {
+                input.addEventListener('input', function () {
+                    if (input.value.length === 1 && index < otpInputs.length - 1) {
+                        otpInputs[index + 1].focus();
+                    }
+                });
+    
+                input.addEventListener('keydown', function (event) {
+                    if (event.key === 'Backspace' && input.value === '' && index > 0) {
+                        otpInputs[index - 1].focus();
+                    }
+                });
+            });
+    
+            // Form submission for adding an account with OTP handling
+            const addAccountForm = document.getElementById('addAccountForm');
+            addAccountForm.addEventListener('submit', function (event) {
+                event.preventDefault();
+    
+                const formData = new FormData(addAccountForm);
+                const jsonData = {};
+                formData.forEach((value, key) => {
+                    jsonData[key] = value;
+                });
+    
+                loadingSpinner.style.display = 'block';
+    
+                fetch('/create-account-admin/', {
+                    method: 'POST',
+                    body: JSON.stringify(jsonData),
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'otp_required') {
+                        loadingSpinner.style.display = 'none';
+                        addAccountModal.hide();
+                        otpModal.show();
+                        startOtpTimer();
+                    } else if (data.status === 'error') {
+                        loadingSpinner.style.display = 'none';
+                        handleFormErrors(data.errors);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An unexpected error occurred.');
+                });
+            });
+
+            const successMessage = document.getElementById('successMessage');
+            const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+    
+            // Form submission for editing an account with OTP handling
+            const editAccountForm = document.getElementById('editAccountForm');
+            editAccountForm.addEventListener('submit', function (event) {
+                event.preventDefault();
+    
+                const formData = new FormData(editAccountForm);
+                const jsonData = {};
+                formData.forEach((value, key) => {
+                    jsonData[key] = value;
+                });
+    
+                loadingSpinner.style.display = 'block';
+    
+                fetch('/update-account/', {
+                    method: 'POST',
+                    body: JSON.stringify(jsonData),
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'otp_required') {
+                        loadingSpinner.style.display = 'none';
+                        editAccountModal.hide();
+                        otpModal.show();
+                        startOtpTimer();
+                    } else if (data.status === 'success') {
+                        loadingSpinner.style.display = 'none';
+                        successModal.show();
+                        successMessage.textContent = data.message;
+                        setTimeout(() => {
+                            // Lưu trạng thái tab hiện tại trước khi tải lại
+                            const activeTab = document.querySelector('.nav-link.active').id.replace('-link', '-content');
+                            localStorage.setItem('contentState', activeTab);
+                            location.reload();
+                        }, 2000);   
+                    } else if (data.status === 'error') {
+                        loadingSpinner.style.display = 'none';
+                        handleFormErrors(data.errors);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An unexpected error occurred.');
+                });
+            });
+    
+            // OTP verification logic for combined verification
+            document.getElementById('verify-otp').addEventListener('click', function () {
+                event.preventDefault();
+                const otp = Array.from(otpInputs).map(input => input.value).join('');
+                fetch('/verify-otp-admin-combined/', {
+                    method: 'POST',
+                    body: JSON.stringify({ otp: otp }),
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        otpMessage.className = 'alert alert-success';
+                        otpMessage.classList.remove('d-none');
+                        otpMessage.textContent = data.message;
+                        setTimeout(() => {
+                            const activeTab = document.querySelector('.nav-link.active').id.replace('-link', '-content');
+                            localStorage.setItem('contentState', activeTab);
+                            location.reload();
+                        }, 2000);
+                    } else {
+                        otpMessage.className = 'alert alert-danger';
+                        otpMessage.classList.remove('d-none');
+                        otpMessage.textContent = data.message;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    otpMessage.className = 'alert alert-danger';
+                    otpMessage.classList.remove('d-none');
+                    otpMessage.textContent = 'An error occurred. Please try again.';
+                });
+            });
+    
+            // Resend OTP logic for combined functionality
+            document.getElementById('resend-otp').addEventListener('click', function () {
+                loadingSpinner.style.display = 'block';
+                fetch('/resend-otp-admin-combined/', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        loadingSpinner.style.display = 'none';
+                        resetOtpInputs();
+                        startOtpTimer();
+                        otpMessage.className = 'alert alert-info';
+                        otpMessage.classList.remove('d-none');
+                        otpMessage.textContent = 'A new OTP has been sent to your email.';
+                    } else {
+                        loadingSpinner.style.display = 'none';
+                        otpMessage.className = 'alert alert-danger';
+                        otpMessage.classList.remove('d-none');
+                        otpMessage.textContent = data.message;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    loadingSpinner.style.display = 'none';
+                    otpMessage.className = 'alert alert-danger';
+                    otpMessage.classList.remove('d-none');
+                    otpMessage.textContent = 'An error occurred. Please try again.';
+                });
+            });
+    
+            // Common close button logic for OTP modal
+            document.querySelectorAll('.btn-close').forEach(button => {
+                button.addEventListener('click', function () {
+                    otpModal.hide();
+                });
+            });
+    
+            document.getElementById('otpModal').addEventListener('hidden.bs.modal', function () {
+                resetOtpInputs();
+                otpMessage.classList.add('d-none');
+            });
+    
+            // Function to handle form errors
+            function handleFormErrors(errors) {
+                document.querySelectorAll('.error-message').forEach(el => el.remove());
+                for (const [field, message] of Object.entries(errors)) {
+                    const input = document.querySelector(`[name="${field}"]`);
+                    if (input) {
+                        const errorSpan = document.createElement('span');
+                        errorSpan.className = 'error-message text-danger';
+                        errorSpan.textContent = message;
+                        input.parentNode.appendChild(errorSpan);
+                    }
+                }
+            }
+        });
+    </script>    
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
             const navLinks = document.querySelectorAll('.nav-link');
             navLinks.forEach(link => {
                 link.addEventListener('click', function(event) {
@@ -780,35 +1316,6 @@
                     this.classList.add('active');
                     const contentId = this.id.replace('-link', '-content');
                     document.getElementById(contentId).classList.add('active');
-                });
-            });
-
-            const addForms = document.querySelectorAll('form');
-            addForms.forEach(form => {
-                form.addEventListener('submit', function(event) {
-                    event.preventDefault();
-                    const formData = new FormData(this);
-                    const url = this.action;
-
-                    fetch(url, {
-                        method: 'POST',
-                        body: formData,
-                        headers: {
-                            'X-CSRFToken': formData.get('csrfmiddlewaretoken')
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.status === 'success') {
-                            alert(data.message);
-                            location.reload();
-                        } else {
-                            alert('Failed to save changes');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                    });
                 });
             });
 
@@ -861,9 +1368,8 @@
             // Modal for adding new Account
             const addAccountModal = document.getElementById('addAccountModal');
             addAccountModal.addEventListener('show.bs.modal', function (event) {
-                const modalBody = addAccountModal.querySelector('.modal-body');
-                modalBody.innerHTML = '<p>Loading...</p>';
-            });  
+                // No additional content loading required since the modal form is already in place.
+            });
 
             // Modal for adding new Subject
             const addSubjectModal = document.getElementById('addSubjectModal');
@@ -890,6 +1396,32 @@
             
             
             
+        });
+    </script>
+
+    <script>
+        // Kiểm tra và đặt lại trạng thái content-section từ localStorage
+        const previousState = localStorage.getItem('contentState');
+        if (previousState) {
+            document.querySelectorAll('.content-section').forEach(section => section.classList.remove('active'));
+            document.getElementById(previousState).classList.add('active');
+            localStorage.removeItem('contentState');
+        }
+    
+        // Lưu trạng thái content khi chuyển tab
+        const navLinks = document.querySelectorAll('.nav-link');
+        navLinks.forEach(link => {
+            link.addEventListener('click', function(event) {
+                event.preventDefault();
+    
+                document.querySelectorAll('.content-section').forEach(section => section.classList.remove('active'));
+                document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+    
+                this.classList.add('active');
+                const contentId = this.id.replace('-link', '-content');
+                document.getElementById(contentId).classList.add('active');
+                localStorage.setItem('contentState', contentId);
+            });
         });
     </script>
 </body>

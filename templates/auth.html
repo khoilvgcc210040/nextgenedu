@@ -258,7 +258,7 @@
                 </div>
                 <div class="modal-footer d-flex justify-content-between" style="padding: 1rem 1rem 0rem 1rem;">
                     <div></div>
-                    <button type="button" class="btn" style="background-color: var(--accent-color); color: white;" id="verify-otp">Verify</button>
+                    <button type="button" class="btn" style="background-color: var(--accent-color); color: white; opacity: 1;" id="verify-otp" onmouseover="this.style.opacity=0.8;" onmouseout="this.style.opacity=1;">Verify</button>
                 </div>
             </div>
         </div>
@@ -765,9 +765,9 @@
                         }
                     })
                     .catch(error => {
-
+                        hideLoading();
                         console.log("error")
-                        alert("Error")
+                        alert("Errors")
                     });
             });
         

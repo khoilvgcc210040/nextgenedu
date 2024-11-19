@@ -183,8 +183,27 @@
     .submit-modal:hover {
         opacity: 0.8;
     }
+
+    .btn-view-notification{
+        transition: transform 0.3s;
+    }
+
+    .btn-view-notification:hover{
+        transform: scale(1.05);
+    }
 </style>
 <body>
+    <div class="modal" id="successModalHeader" tabindex="-1" aria-labelledby="successModalHeaderLabel" aria-hidden="true" data-bs-backdrop="false" data-bs-keyboard="false">
+        <div class="modal-dialog modal-sm" style="position: fixed; bottom: 10px; left: 10px; pointer-events: none;">
+            <div class="modal-content" style="border: 2px solid #F97316; pointer-events: auto;">
+                <div class="modal-body" style="background-color: #F97316; border-radius: 5px; display: flex; align-items: center; justify-content: center;">
+                    <p id="successMessageHeader" class="text-left m-0 text-truncate" style="color: #fff;"></p>
+                    <a href="{% url 'notification' %}" class="btn btn-sm btn-view-notification" style="margin-left: 10px; margin-top: 1px; color: #fff; text-align: left; font-weight: 700; text-decoration: underline; padding: 0; ">View</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="modal fade" id="createClassroomModal" tabindex="-1" aria-labelledby="createClassroomModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content d-flex justify-content-center align-items-center bg-transparent border-0">
@@ -244,7 +263,7 @@
         <div class="branding d-flex align-items-cente">
           <div class="container position-relative d-flex align-items-center justify-content-between">
             <a href="{% url "home" %}" class="logo d-flex align-items-center">
-              <h1 class="sitename" style="color: var(--accent-color);">NextGenEdu™️</h1>
+              <h1 class="sitename" style="color: var(--accent-color);">NextGenEdu™</h1>
             </a>
 
             <form method="GET" action="{% url 'searchPage' %}" class="InputContainer">
@@ -302,7 +321,7 @@
                       <li><a href="{% url "achivement" %}" style="display: flex; align-items: center; justify-content: left; gap: 10px;"><i class="fa-solid fa-trophy"></i> Achievement</a></li>
                       <li><a href="{% url "favorite" %}" style="display: flex; align-items: center; justify-content: left; gap: 10px;"><i class="fa-solid fa-star"></i> Favorite</a></li>
                       <li><a href="{% url "setting" %}" style="display: flex; align-items: center; justify-content: left; gap: 10px;"><i class="fa-solid fa-gear"></i> Setting</a></li>
-                      <li><a href="{% url "notification" %}" style="display: flex; align-items: center; justify-content: left; gap: 10px;"><i class="fas fa-envelope"></i> Notification <span class="notification-count" style="font-weight: 700; font-size: 14px;">(2)</span></a></li>
+                      <li><a href="{% url "notification" %}" style="display: flex; align-items: center; justify-content: left; gap: 10px;"><i class="fas fa-envelope"></i> Notification <span class="notification-count" style="font-weight: 700; font-size: 14px; color: orange;"></span></a></li>
                       {% if user.is_superuser %}
                       <li><a href="{% url "adminPage" %}" style="display: flex; align-items: center; justify-content: left; gap: 10px; background-color: #f97316; color: #fff; transition: transform 0.3s;"><span style="transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-1px)';" onmouseout="this.style.transform='translateY(0)';"><i class="fa-solid fa-user-tie"></i> Admin</span></a></li>
                       {% endif %}
@@ -347,6 +366,78 @@
       </header>
 </body>
 </html>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const userWebSocket = new WebSocket(
+            'ws://' + window.location.host + '/ws/notifications/'
+        );
+
+        userWebSocket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            if (data.notification) {
+                // Call function to update unread notification count
+                fetchUnreadNotifications();
+
+                // Display success modal with new notification
+                showNotificationModal(`New notification: ${data.notification.title}`);
+            }
+        };
+
+        // Function to fetch and update unread notification count
+        function fetchUnreadNotifications() {
+            fetch('/get-unread-notification-count/')  // Adjust URL as needed for your endpoint
+                .then(response => response.json())
+                .then(data => {
+                    const notificationCountElement = document.querySelector('.notification-count');
+                    if (notificationCountElement) {
+                        if (data.unread_count > 0) {
+                            notificationCountElement.textContent = `(${data.unread_count})`;
+                        } else {
+                            notificationCountElement.textContent = ''; // Clear count if no unread notifications
+                        }
+                    }
+                })
+                .catch(error => console.error('Error fetching unread notifications:', error));
+        }
+
+        // Function to show the modal with a message
+        function showNotificationModal(message) {
+            const successModalHeader = new bootstrap.Modal(document.getElementById('successModalHeader'));
+            const successMessageHeader = document.getElementById('successMessageHeader');
+            successMessageHeader.textContent = message;
+
+            // Thêm hiệu ứng hiển thị từ dưới lên
+            const modalElementHeader = document.getElementById('successModalHeader');
+            modalElementHeader.style.transform = 'translateY(100%)';
+            modalElementHeader.style.opacity = '0';
+            successModalHeader.show();
+
+            setTimeout(() => {
+                modalElementHeader.style.transition = 'transform 0.5s ease, opacity 0.5s ease';
+                modalElementHeader.style.transform = 'translateY(0)';
+                modalElementHeader.style.opacity = '1';
+            }, 10); // Thời gian ngắn để đảm bảo hiệu ứng diễn ra
+
+            // Thêm hiệu ứng biến mất mượt mà
+            setTimeout(() => {
+                modalElementHeader.style.transition = 'transform 0.5s ease, opacity 0.5s ease';
+                modalElementHeader.style.transform = 'translateX(100%)'; // Chạy ngang phải
+                modalElementHeader.style.opacity = '0';
+
+                // Ẩn modal sau khi hiệu ứng hoàn tất
+                setTimeout(() => {
+                    successModalHeader.hide();
+                    modalElementHeader.style.transform = 'translateY(0)'; // Đặt lại vị trí cho modal
+                    modalElementHeader.style.opacity = '1'; // Đặt lại độ mờ cho modal
+                }, 500);
+            }, 3000);
+        }
+
+        // Call fetchUnreadNotifications() on page load to initialize the count
+        fetchUnreadNotifications();
+    });
+</script>
+
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         const messageListItems = document.querySelectorAll('.message-list-signup li');

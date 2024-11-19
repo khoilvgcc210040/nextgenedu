@@ -193,7 +193,7 @@
 
                             <input type="text" name="score" id="scoreInput" class="modal-input mb-3" placeholder="Enter points..." value="">
 
-                            <textarea name="feedback" id="feedbackInput" class="modal-input mb-3" placeholder="Enter feedback..."></textarea>
+                            <textarea name="feedback" id="feedbackInput" class="modal-input mb-3" placeholder="Enter feedback...">{{ student_file.feedback if student_file.feedback != 'None' else '' }}</textarea>
                             <input type="submit" style="background-color: var(--accent-color); color: #fff; border: none; border-radius: 5px; padding: 10px 20px; font-size: 14px; font-weight: 500; cursor: pointer; transition: transform 0.2s; width: 100%;" value="Submit">
 
                         </form>                    

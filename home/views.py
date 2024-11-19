@@ -1,4 +1,4 @@
-from datetime import date, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 import json
 import math
 from django.conf import settings
@@ -206,9 +206,9 @@ def authPage(request):
             username = request.POST.get('username')
             password = request.POST.get('password')
             confirmPassword = request.POST.get('confirm-password')
-            day = int(request.POST.get('day'))
-            month = int(request.POST.get('month'))
-            year = int(request.POST.get('year'))
+            day = int(request.POST.get('day')) if request.POST.get('day') else None
+            month = int(request.POST.get('month')) if request.POST.get('month') else None
+            year = int(request.POST.get('year')) if request.POST.get('year') else None
             role = request.POST.get('role')
             terms = request.POST.get('terms') == 'on'
             subject = None
@@ -238,6 +238,10 @@ def authPage(request):
 
             if CustomUser.objects.filter(username=username).exists():
                 messages.info(request, '❌ This username is already taken. Please choose a different username.', extra_tags='signup')
+                errors = True
+
+            if len(password) < 8:
+                messages.info(request, '❌ Password must be at least 8 characters long.', extra_tags='signup')
                 errors = True
 
             if password != confirmPassword:
@@ -1682,16 +1686,33 @@ def delete_assignment(request, assignment_id):
         return JsonResponse({'success': True})
     return JsonResponse({'success': False})
 
+def delete_account_admin(request, account_id):
+    if request.method == 'POST':
+        account = get_object_or_404(CustomUser, id=account_id)
+        account.delete()
+        return JsonResponse({'status': 'success'})
+    return JsonResponse({'status': 'failed'}, status=400)
+
 @login_required
 def adminPage(request):
     if not request.user.is_superuser:
         return redirect('home')
-    statistical_data = []  # Thêm dữ liệu thống kê nếu có
+    
+    # Data for select options in the form
+    days = list(range(1, 32))
+    months = {
+        1: 'January', 2: 'February', 3: 'March', 4: 'April', 5: 'May', 6: 'June',
+        7: 'July', 8: 'August', 9: 'September', 10: 'October', 11: 'November', 12: 'December'
+    }
+    years = list(range(1900, datetime.now().year + 1))  # Generates years from 1900 to current year
+
+    # Context data
+    statistical_data = []  # Add statistical data if applicable
     accounts = CustomUser.objects.all()
     subjects = Subjects.objects.all()
     subsection_files = SubsectionFile.objects.all()
     submission_files = SubmissionFile.objects.all()
-    users = CustomUser.objects.all()  # Thêm dòng này
+    users = CustomUser.objects.all()
 
     context = {
         'statistical_data': statistical_data,
@@ -1699,34 +1720,220 @@ def adminPage(request):
         'subjects': subjects,
         'subsection_files': subsection_files,
         'submission_files': submission_files,
-        'users': users,  # Thêm dòng này
+        'users': users,
+        'notification_types': NotificationSystem.NOTIFICATION_TYPE_CHOICES,
+        'days': days,  # Added list of days
+        'months': months,  # Added dictionary of months
+        'years': years,  # Added list of years
     }
     return render(request, 'adminPage.html', context)
 
+@csrf_exempt
+def create_account_admin(request):
+    if request.method == 'POST':
+        if 'update_account_data' in request.session:
+            del request.session['update_account_data']
+        data = json.loads(request.body)
+        email = data.get('emailAdd')
+        username = data.get('usernameAdd')
+        day = data.get('day')
+        month = data.get('month')
+        year = data.get('year')
+        role = data.get('role')
+        grade = data.get('grade') if role == 'student' else None
+        subject_id = data.get('subject') if role == 'teacher' else None
+        password = data.get('passwordAdd')
+        confirm_password = data.get('confirm-passwordAdd')
+
+        errors = {}
+        if not email:
+            errors['emailAdd'] = 'Email is required.'
+        elif CustomUser.objects.filter(email=email).exists():
+            errors['emailAdd'] = 'Email is already in use.'
+
+        if not username:
+            errors['usernameAdd'] = 'Username is required.'
+        elif CustomUser.objects.filter(username=username).exists():
+            errors['usernameAdd'] = 'Username is already in use.'
+
+        if not day or not month or not year:
+            errors['date_of_birth'] = 'Date of birth is required.'
+        else:
+            try:
+                date_of_birth = date(int(year), int(month), int(day))
+            except ValueError:
+                errors['date_of_birth'] = 'Invalid date of birth.'
+
+        if not password:
+            errors['passwordAdd'] = 'Password is required.'
+        elif len(password) < 8:
+            errors['passwordAdd'] = 'Password must be at least 8 characters long.'
+
+        if password != confirm_password:
+            errors['confirm-passwordAdd'] = 'Passwords do not match.'
+
+        if errors:
+            return JsonResponse({'status': 'error', 'errors': errors})
+
+        # Store account data in session and send OTP
+        otp = send_otp(email)
+        request.session['otp'] = otp
+        request.session['otp_expiry'] = (datetime.now() + timedelta(minutes=2)).isoformat()
+        request.session['add_account_admin_data'] = {
+            'username': username,
+            'email': email,
+            'password': password,
+            'year': year,
+            'month': month,
+            'day': day,
+            'role': role,
+            'grade': grade,
+            'subject': subject_id,
+        }
+
+        return JsonResponse({'status': 'otp_required', 'message': 'OTP has been sent to the provided email.'})
+
+
 def update_account(request):
     if request.method == 'POST':
-        account_id = request.POST.get('id')
+        if 'add_account_admin_data' in request.session:
+            del request.session['add_account_admin_data']
+        data = json.loads(request.body)
+        account_id = data.get('id')
         account = get_object_or_404(CustomUser, id=account_id)
-        
-        account.username = request.POST.get('username')
-        account.email = request.POST.get('email')
-        account.role = request.POST.get('role')
-        
+
+        new_username = data.get('usernameUpdate')
+        new_email = data.get('emailUpdate')
+        role = data.get('roleUpdate')
+        grade = data.get('gradeUpdate') if role == 'student' else None
+        subject_id = data.get('subjectUpdate') if role == 'teacher' else None
+
+        errors = {}
+
+        # Check for email changes and uniqueness
+        if new_email != account.email and CustomUser.objects.filter(email=new_email).exists():
+            errors['emailUpdate'] = 'Email is already in use.'
+
+        # Check for username changes and uniqueness
+        if new_username != account.username and CustomUser.objects.filter(username=new_username).exists():
+            errors['usernameUpdate'] = 'Username is already in use.'
+
+        if new_email == account.email and new_username == account.username:
+            errors['emailUpdate'] = 'No changes made.'
+            errors['usernameUpdate'] = 'No changes made.'
+    
+        if errors:
+            return JsonResponse({'status': 'error', 'errors': errors})
+
+        # Update account fields with new data
+        account.username = new_username
+        account.role = role
+
         if account.role == 'teacher':
-            subject_id = request.POST.get('subject')
             account.subject = Subjects.objects.get(id=subject_id) if subject_id else None
             account.grade = None
         elif account.role == 'student':
-            account.grade = request.POST.get('grade')
+            account.grade = grade
             account.subject = None
         else:
             account.subject = None
             account.grade = None
-        
-        account.save()
-        
-        return JsonResponse({'status': 'success'})
-    return JsonResponse({'status': 'failed'})
+
+        # Send OTP only if the email has changed
+        if new_email != account.email:
+            otp = send_otp(new_email)
+            request.session['otp'] = otp
+            request.session['otp_expiry'] = (datetime.now() + timedelta(minutes=2)).isoformat()
+            request.session['update_account_data'] = {
+                'id': account_id,
+                'username': new_username,
+                'email': new_email,
+                'role': role,
+                'grade': grade,
+                'subject': subject_id,
+            }
+            return JsonResponse({'status': 'otp_required', 'message': 'OTP has been sent to the provided email.'})
+        else:
+            account.email = new_email
+            account.save()
+            return JsonResponse({'status': 'success', 'message': 'Account updated successfully.'})
+    
+def verify_otp_admin_combined(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        otp = data.get('otp')
+        otp_expiry = request.session.get('otp_expiry')
+
+        if not otp_expiry or datetime.now() > datetime.fromisoformat(otp_expiry):
+            return JsonResponse({'status': 'error', 'message': 'OTP has expired. Please request a new one.'})
+
+        if otp == request.session.get('otp'):
+            # Determine if the OTP was for account creation or update
+            if 'add_account_admin_data' in request.session:
+                # Create new account
+                account_data = request.session.get('add_account_admin_data', {})
+                user = CustomUser.objects.create_user(
+                    username=account_data['username'],
+                    email=account_data['email'],
+                    password=account_data['password'],
+                    date_of_birth=date(
+                        int(account_data['year']),
+                        int(account_data['month']),
+                        int(account_data['day'])
+                    ),
+                    role=account_data['role'],
+                    grade=account_data['grade'],
+                    terms_accepted=True,  # Assuming terms are accepted
+                    subject=Subjects.objects.get(id=account_data['subject']) if account_data['subject'] else None
+                )
+                # Clean up session data
+                del request.session['add_account_admin_data']
+
+            elif 'update_account_data' in request.session:
+                # Update existing account
+                account_data = request.session.get('update_account_data', {})
+                account = get_object_or_404(CustomUser, id=account_data['id'])
+
+                # Update account fields with new data
+                account.username = account_data['username']
+                account.email = account_data['email']
+                account.role = account_data['role']
+
+                if account.role == 'teacher':
+                    subject_id = account_data['subject']
+                    account.subject = Subjects.objects.get(id=subject_id) if subject_id else None
+                    account.grade = None
+                elif account.role == 'student':
+                    account.grade = account_data['grade']
+                    account.subject = None
+                else:
+                    account.subject = None
+                    account.grade = None
+
+                account.save()
+                # Clean up session data
+                del request.session['update_account_data']
+
+            # Clear shared OTP session data
+            del request.session['otp']
+            del request.session['otp_expiry']
+
+            return JsonResponse({'status': 'success', 'message': 'Operation completed successfully.'})
+        else:
+            return JsonResponse({'status': 'error', 'message': 'Invalid OTP. Please try again.'})
+
+def resend_otp_admin_combined(request):
+    if request.method == 'POST':
+        # Determine if we need to resend for add or update
+        account_data = request.session.get('add_account_admin_data') or request.session.get('update_account_data')
+        if account_data and 'email' in account_data:
+            email = account_data['email']
+            otp = send_otp(email)
+            request.session['otp'] = otp
+            request.session['otp_expiry'] = (datetime.now() + timedelta(minutes=2)).isoformat()
+            return JsonResponse({'status': 'success', 'message': 'A new OTP has been sent.'})
+        return JsonResponse({'status': 'error', 'message': 'No email found. Please try again.'})
+
 
 from django.db.models import Sum, Max, Avg
 from django.contrib.auth.decorators import login_required
@@ -1888,9 +2095,6 @@ def create_post(request, classroom_id):
     return render(request, 'create_post.html', {'classroom_id': classroom_id})
 
 def manage_posts(request, classroom_id):
-    """
-    View để hiển thị trang quản lý bài post của một lớp học cụ thể.
-    """
     classroom = get_object_or_404(Classroom, id=classroom_id)
     posts = ForumPost.objects.filter(classroom=classroom, user=request.user)
     return render(request, 'manage_posts.html', {'posts': posts, 'classroom_id': classroom_id, 'classroom': classroom})
@@ -1898,10 +2102,6 @@ def manage_posts(request, classroom_id):
 from django.views.decorators.http import require_POST
 @require_POST
 def edit_post(request, post_id):
-    """
-    View để xử lý cập nhật bài post.
-    Trả về JsonResponse để hiển thị thông báo thành công hoặc lỗi.
-    """
     post = get_object_or_404(ForumPost, id=post_id, user=request.user)
     title = request.POST.get('title')
     content = request.POST.get('content')
@@ -1921,10 +2121,6 @@ def edit_post(request, post_id):
 
 @require_POST
 def delete_post(request, post_id):
-    """
-    View để xử lý xóa bài post.
-    Trả về JsonResponse để hiển thị thông báo thành công hoặc lỗi.
-    """
     post = get_object_or_404(ForumPost, id=post_id, user=request.user)
     post.delete()
     # Trả về JSONResponse để xử lý modal thông báo thành công
@@ -1960,7 +2156,6 @@ def reject_post(request, post_id):
         post.is_approved = False
         post.save()
         
-        # Gửi mail thông báo
         subject = 'Your post has been rejected'
         message = f'Hi {post.user.username},\n\nYour post titled "{post.title}" has been rejected for the following reason:\n\n{reason}\n\nBest regards,\nYour Classroom Team'
         recipient_list = [post.user.email]
@@ -1985,31 +2180,111 @@ def toggle_like(request, post_id):
     return JsonResponse({'status': 'success', 'likes': post.likes, 'message': message})
 
 def notification(request):
-    return render(request, 'notification.html')
+    user_notifications = NotificationSystem.objects.filter(user=request.user).order_by('-created_at')
+    return render(request, 'notification.html', {'notifications': user_notifications})
 
-@login_required
-def send_notification(request):
+@csrf_exempt
+def delete_notification(request, notification_id):
     if request.method == 'POST':
-        title = request.POST.get('title')
-        content = request.POST.get('content')
-        type = request.POST.get('type')
-        user_ids = request.POST.getlist('users')
-
-        if not title or not content:
-            return JsonResponse({'status': 'error', 'message': 'Title and content are required.'})
-
-        if 'all' in user_ids:
-            users = CustomUser.objects.all()
-        else:
-            users = CustomUser.objects.filter(id__in=user_ids)
-
-        for user in users:
-            NotificationSystem.objects.create(user=user, text=content, type=type)
-
-        return JsonResponse({'status': 'success', 'message': 'Notification sent successfully.'})
-
+        notification = get_object_or_404(NotificationSystem, id=notification_id)
+        notification.delete()
+        return JsonResponse({'status': 'success', 'message': 'Notification deleted successfully.'})
     return JsonResponse({'status': 'error', 'message': 'Invalid request method.'})
-    
+
+def mark_notification_as_read(request, notification_id):
+    if request.method == 'POST':
+        try:
+            notification = NotificationSystem.objects.get(id=notification_id, user=request.user)
+            notification.is_read = True
+            notification.save()
+            return JsonResponse({'status': 'success'})
+        except NotificationSystem.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Notification not found'})
+    return JsonResponse({'status': 'error', 'message': 'Invalid request'})
+
+def get_unread_notification_count(request):
+    if request.user.is_authenticated:
+        unread_count = NotificationSystem.objects.filter(user=request.user, is_read=False).count()
+        return JsonResponse({'unread_count': unread_count})
+    return JsonResponse({'unread_count': 0})
+
+@csrf_exempt
+def delete_all_notifications(request):
+    if request.method == 'POST':
+        NotificationSystem.objects.filter(user=request.user).delete()
+        return JsonResponse({'success': True})
+    return JsonResponse({'success': False, 'error': 'Invalid request method.'})
+
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+def create_notification(request):
+    if request.method == 'POST':
+        user_id = request.POST.get('user')
+        notification_type = request.POST.get('type')
+        title = request.POST.get('title', 'Notification')
+        text = request.POST.get('text')
+
+        if not text:
+            return JsonResponse({'status': 'error', 'message': 'Please enter the notification content.'})
+
+        channel_layer = get_channel_layer()
+
+        if user_id == 'all':
+            users = CustomUser.objects.exclude(id=request.user.id)
+            for user in users:
+                notification = NotificationSystem.objects.create(
+                    user=user,
+                    title=title if title else 'Notification',
+                    text=text,
+                    type=notification_type
+                )
+
+                async_to_sync(channel_layer.group_send)(
+                    f'notifications_{user.username}',
+                    {
+                        'type': 'send_notification',
+                        'notification': {
+                            'id': notification.id,
+                            'title': notification.title if notification.title else 'Notification',
+                            'text': notification.text,
+                            'type': notification.get_type_display(),
+                            'created_at': (notification.created_at + timedelta(hours=7)).strftime("%H:%M %p · %d/%m/%Y"),
+                            'is_read': notification.is_read
+                        }
+                    }
+                )
+            return JsonResponse({'status': 'success', 'message': 'Notification sent to all users.'})
+        else:
+            user = CustomUser.objects.filter(id=user_id).exclude(id=request.user.id).first()
+            if user:
+                notification = NotificationSystem.objects.create(
+                    user=user,
+                    title=title if title else 'Notification',
+                    text=text,
+                    type=notification_type
+                )
+
+                async_to_sync(channel_layer.group_send)(
+                    f'notifications_{user.username}',
+                    {
+                        'type': 'send_notification',
+                        'notification': {
+                            'id': notification.id,
+                            'title': notification.title if notification.title else 'Notification',
+                            'text': notification.text,
+                            'type': notification.get_type_display(),
+                            'created_at': (notification.created_at + timedelta(hours=7)).strftime("%H:%M %p · %d/%m/%Y"),
+                            'is_read': notification.is_read
+                        }
+                    }
+                )
+                return JsonResponse({'status': 'success', 'message': 'Notification sent.'})
+            else:
+                return JsonResponse({'status': 'error', 'message': 'Invalid user.'})
+    else:
+        users = CustomUser.objects.all().exclude(id=request.user.id)
+        return render(request, 'create_notification.html', {'users': users})
+
 
 
 
