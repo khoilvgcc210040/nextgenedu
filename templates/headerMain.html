@@ -536,35 +536,38 @@
     const form = document.getElementById('createClassroomForm');
     form.addEventListener('submit', function(event) {
         event.preventDefault();
-            const formData = new FormData(form);
-            const errorsContainer = document.querySelector('.error-signup .message-list-login');
-            const errorCreateClassroom = document.getElementById('error-create-classroom');
-            errorsContainer.innerHTML = '';
+        const formData = new FormData(form);
+        const errorsContainer = document.querySelector('.error-signup .message-list-login');
+        const errorCreateClassroom = document.getElementById('error-create-classroom');
+        errorsContainer.innerHTML = '';
 
-            fetch(form.action, {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-CSRFToken': formData.get('csrfmiddlewaretoken')
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'error') {
-                    data.errors.forEach(error => {
-                        errorCreateClassroom.style.display = 'block';
-                        const li = document.createElement('li');
-                        li.style.color = '#dc2626';
-                        li.style.marginBottom = '10px';
-                        li.style.lineHeight = '25px';
-                        li.style.display = 'list-item';
-                        li.textContent = error;
-                        errorsContainer.appendChild(li);
-                    });
-                } else if (data.status === 'success') {
-                    window.location.href = data.redirect_url;
-                }
-            })
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'error') {
+                data.errors.forEach((error, index) => {
+                    errorCreateClassroom.style.display = 'block';
+                    const li = document.createElement('li');
+                    li.style.color = '#dc2626';
+                    li.style.marginBottom = '10px';
+                    li.style.lineHeight = '25px';
+                    li.style.display = 'list-item';
+                    li.textContent = error;
+                    if (index === data.errors.length - 1) {
+                        li.style.marginBottom = '0';
+                    }
+                    errorsContainer.appendChild(li);
+                });
+            } else if (data.status === 'success') {
+                window.location.href = data.redirect_url;
+            }
+        })
         .catch(error => console.error('Error:', error));
     });
 </script>

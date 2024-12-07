@@ -38,6 +38,7 @@ vectorizer = joblib.load(os.path.join(settings.BASE_DIR, 'vectorizer.pkl'))
 label_encoder = joblib.load(os.path.join(settings.BASE_DIR, 'label_encoder.pkl'))
 User = get_user_model()
 
+@csrf_exempt
 def get_chatgpt_response(question):
     try:
         openai.api_key = os.getenv('OPENAI_API_KEY')
@@ -52,30 +53,11 @@ def get_chatgpt_response(question):
     except RateLimitError:
         return "Sorry, we're experiencing high traffic right now. Please try again later."
 
-
-def classify(request):
-    if request.method == 'POST':
-        import json
-        data = json.loads(request.body)
-        user_message = data.get('message')
-
-        X_new = vectorizer.transform([user_message])
-
-        predicted_label = model.predict(X_new)[0]
-        label_text = label_encoder.inverse_transform([predicted_label])[0]
-
-        if label_text == "education":
-            response_message = get_chatgpt_response(user_message)
-        else:
-            response_message = "Sorry, I can only help with educational questions."
-
-        return JsonResponse({'response': response_message})
-    else:
-        return JsonResponse({'error': 'Invalid request method'}, status=400)
-
 from django.utils import timezone
 from datetime import timedelta
+
 @login_required
+@csrf_exempt
 def chatbot(request):
     if request.method == 'POST':
         data = json.loads(request.body)
@@ -114,7 +96,6 @@ def chatbot(request):
 
         return JsonResponse({'response': response_message})
 
-    # Xóa các tin nhắn cũ khi người dùng tải trang
     reset_days = request.user.reset_days
     if reset_days:
         reset_date = timezone.now() - timedelta(days=int(reset_days))
@@ -123,6 +104,7 @@ def chatbot(request):
     chat_messages = Chatbot.objects.filter(user=request.user).order_by('timestamp')
     return render(request, 'chatbot.html', {'chat_messages': chat_messages, 'reset_days': reset_days})
 
+@csrf_exempt
 def home(request):
     if 'login_email' in request.session:
         del request.session['login_email']
@@ -142,17 +124,20 @@ def home(request):
     return render(request, 'home.html', context)
 
 from django.utils.crypto import get_random_string
+
+@csrf_exempt
 def send_otp(email):
     otp = get_random_string(length=6, allowed_chars='0123456789')
     send_mail(
-        'Your OTP Code',
-        f'Your OTP code is {otp}',
-        'your-email@example.com',  # Replace with your email
+        'OTP Code Notification',
+        f'Dear User,\n\nYour OTP code is: {otp}\nThis code is valid for a limited time only. Please enter it promptly to complete your verification process.\n\nBest regards,\nNextGenEdu Team',
+        'nextgenedu03.info@gmail.com',
         [email],
         fail_silently=False,
     )
     return otp
 
+@csrf_exempt
 def verify_otp(request):
     if request.method == 'POST':
         data = json.loads(request.body)
@@ -187,14 +172,20 @@ def verify_otp(request):
             return JsonResponse({'success': True, 'redirect_url': reverse('home')})
         else:
             return JsonResponse({'success': False})
+    else:
+        return redirect('/auth/?form=signup')
 
+@csrf_exempt
 def resend_otp(request):
     if request.method == 'POST':
         email = request.session.get('signup_data', {}).get('email')
         otp = send_otp(email)
         request.session['otp'] = otp
         return JsonResponse({'success': True})
-
+    else:
+        return redirect('/auth/?form=signup')
+    
+@csrf_exempt
 def authPage(request):
     if request.method == 'POST':
         form_type = request.POST.get('form', 'signup')
@@ -284,13 +275,12 @@ def authPage(request):
                 return JsonResponse({'success': True}) 
 
         elif form_type == 'login':
-            email = request.POST.get('email')
+            email = request.POST.get('email').lower()
             password = request.POST.get('login-password')
 
             user = authenticate(request, email=email, password=password)
 
             if user is not None:
-                # Lấy backend đầu tiên từ danh sách các backend
                 backend = get_backends()[0]
                 user.backend = f'{backend.__module__}.{backend.__class__.__name__}'
                 login(request, user)
@@ -338,8 +328,8 @@ def authPage(request):
 
 from google.oauth2 import id_token
 from google.auth.transport import requests
-import os
 
+@csrf_exempt
 def generate_unique_username(base_username):
     username = base_username
     counter = 1
@@ -350,47 +340,43 @@ def generate_unique_username(base_username):
 
 @csrf_exempt
 def auth_receiver(request):
-    token = request.POST['credential']
+    if request.method == 'POST':
+        token = request.POST['credential']
 
-    print(token)
+        try:
+            user_data = id_token.verify_oauth2_token(
+                token, requests.Request(), os.environ['GOOGLE_OAUTH_CLIENT_ID']
+            )
+        except ValueError:
+            return HttpResponse(status=403)
 
-    try:
-        user_data = id_token.verify_oauth2_token(
-            token, requests.Request(), os.environ['GOOGLE_OAUTH_CLIENT_ID']
-        )
-    except ValueError:
-        return HttpResponse(status=403)
+        email = user_data.get('email')
+        base_username = user_data.get('name')
 
-    email = user_data.get('email')
-    base_username = user_data.get('name')
+        try:
+            user = CustomUser.objects.get(email=email)
+            login(request, user, backend='home.backends.EmailBackend')
+            next_url = request.session.pop('next', None)
+            if next_url:
+                return redirect(next_url)
+            return redirect('home')
+        except CustomUser.DoesNotExist:
+            if User.objects.filter(username=base_username).exists():
+                username = generate_unique_username(base_username)
+            else:
+                username = base_username
 
-    # Kiểm tra xem người dùng đã tồn tại trong database chưa
-    try:
-        user = CustomUser.objects.get(email=email)
-        # Nếu người dùng đã tồn tại, đăng nhập ngay lập tức
-        login(request, user, backend='home.backends.EmailBackend')
-        next_url = request.session.pop('next', None)
-        if next_url:
-            return redirect(next_url)
-        return redirect('home')
-    except CustomUser.DoesNotExist:
-        # Nếu người dùng chưa tồn tại, kiểm tra xem username của gg account này có tồn tại trong database hay không
-        if User.objects.filter(username=base_username).exists():
-            # Nếu có trùng nhau thì mới tạo username duy nhất
-            username = generate_unique_username(base_username)
-        else:
-            # Nếu không thì vẫn lưu username gg account đến session google_user_data
-            username = base_username
-
-        password = get_random_string(length=12)
-        # Lưu thông tin vào session và chuyển hướng đến trang hoàn thành hồ sơ
-        request.session['google_user_data'] = {
-            'email': email,
-            'username': username,
-            'password': password,
-        }
-        return redirect('complete_profile')
+            password = get_random_string(length=12)
+            request.session['google_user_data'] = {
+                'email': email,
+                'username': username,
+                'password': password,
+            }
+            return redirect('complete_profile')
+    else:
+        return redirect('/auth/?form=login')    
     
+@csrf_exempt
 def complete_profile(request):
     google_user_data = request.session.get('google_user_data')
     if not google_user_data:
@@ -401,14 +387,19 @@ def complete_profile(request):
         username = google_user_data['username']
         
         role = request.POST.get('role')
-        grade = request.POST.get('grade')
-        subject_id = request.POST.get('subject')
         password = google_user_data['password']
         day = int(request.POST.get('day'))
         month = int(request.POST.get('month'))
         year = int(request.POST.get('year'))
 
-        # Tạo người dùng mới với thông tin đầy đủ
+        if role == 'teacher':
+            subject_id = request.POST.get('subject')
+            if subject_id:
+                subject = Subjects.objects.get(id=subject_id)
+                grade = subject.grade
+        elif role == 'student':
+            grade = request.POST.get('grade')
+
         user = CustomUser.objects.create_user(
             username=username,
             email=email,
@@ -416,12 +407,11 @@ def complete_profile(request):
             date_of_birth=date(year, month, day),
             terms_accepted=True,
             role=role,
-            grade=grade if role == 'student' else None,
-            subject=Subjects.objects.get(id=subject_id) if role == 'teacher' else None
+            grade=grade,
+            subject=subject if role == 'teacher' else None
         )
         user.save()
 
-        # Gửi email chứa thông tin người dùng và mật khẩu ngẫu nhiên
         subject = "Complete Your Profile - NextGenEdu"
         message = f"""
 Hi {username},
@@ -440,9 +430,6 @@ NextGenEdu Team
         email = EmailMessage(subject, message, to=[email])
         email.send()
 
-
-
-        # Đăng nhập người dùng sau khi hoàn tất hồ sơ
         login(request, user, backend='home.backends.EmailBackend')
         next_url = request.session.pop('next', None)
         if next_url:
@@ -453,15 +440,19 @@ NextGenEdu Team
         context = {'subjects': subjects}
         return render(request, 'complete_profile.html', context)
 
-    
+@login_required
+@csrf_exempt
 def logoutPage(request):
     logout(request)
     return redirect('home')
 
+@csrf_exempt
 def subjects(request):
-    subjects = Subjects.objects.all() 
+    subjects = Subjects.objects.all()
+    for sub in subjects:
+        sub.classroom_count = Classroom.objects.filter(subject=sub).count()
     context = {
-        'subjects' : subjects
+        'subjects': subjects
     }
     return render(request, 'subjects.html', context)
 
@@ -469,7 +460,11 @@ import logging
 logger = logging.getLogger(__name__)
 from django.core.mail import EmailMessage
 
+@csrf_exempt
 def forgot_password(request):
+    if request.user.is_authenticated:
+        return redirect('home')
+    
     if request.method == 'POST':
         email = request.POST.get('email')
         associated_users = CustomUser.objects.filter(email=email)
@@ -494,7 +489,7 @@ def forgot_password(request):
                     'NextGenEdu <nextgenedu03.info@gmail.com>',
                     [user.email],
                 )
-                email.content_subtype = "html"  # This is the key line that allows HTML rendering
+                email.content_subtype = "html"
                 email.send()
             return render(request, 'check_your_email.html')
         else:
@@ -502,7 +497,7 @@ def forgot_password(request):
             return redirect('forgot_password')
     return render(request, 'forgot_password.html')
 
-
+@csrf_exempt
 def reset_password(request, uidb64=None, token=None):
     if uidb64 is not None and token is not None:
         try:
@@ -515,29 +510,39 @@ def reset_password(request, uidb64=None, token=None):
             if request.method == 'POST':
                 new_password = request.POST.get('new_password')
                 confirm_password = request.POST.get('confirm_password')
-                
-                if new_password == confirm_password:
+
+                if not new_password or not confirm_password:
+                    messages.error(request, 'Please enter your new password and confirm it.')
+                    return redirect(request.path)
+                elif len(new_password) < 8:
+                    messages.error(request, 'Password must be at least 8 characters long.')
+                    return redirect(request.path)   
+                elif new_password == confirm_password:
                     user.set_password(new_password)
                     user.save()
-                    messages.success(request, 'Your password has been successfully changed.')
                     return redirect('/auth/?form=login')
                 else:
                     messages.error(request, 'Passwords do not match. Please try again.')
                     return redirect(request.path)
             return render(request, 'reset_password.html')
         else:
+            storage = messages.get_messages(request)
+            storage.used = True
             messages.error(request, 'The reset link is invalid or has expired.')
             return redirect('forgot_password')
     else:
+        storage = messages.get_messages(request)
+        storage.used = True
         messages.error(request, 'Invalid request.')
         return redirect('forgot_password')
 
 from django.core.exceptions import ValidationError
 
+@login_required
+@csrf_exempt
 def create_classroom(request):
     if request.method == "POST":
         errors = []
-
         name = request.POST.get('name', '').strip()
         description = request.POST.get('description', '').strip()
         school = request.POST.get('school', '').strip()
@@ -551,6 +556,8 @@ def create_classroom(request):
             errors.append('School name is required.')
         if not description:
             errors.append('Description is required.')
+        if not status:
+            errors.append('Status is required.')
         if status == 'private' and len(password) < 6:
             errors.append('Password must be at least 6 characters long if the classroom is private.')
 
@@ -591,26 +598,22 @@ def create_classroom(request):
 
         except IntegrityError:
             return JsonResponse({'status': 'error', 'errors': ['Classroom with this name already exists for this teacher.']})
+    return redirect('home')
 
-    return JsonResponse({'status': 'error', 'errors': ['Invalid request method.']})
-
+@csrf_exempt
 def access_join_classroom(request, link):
     classroom = get_object_or_404(Classroom, link=link)
     user = request.user
 
-    # Kiểm tra nếu người dùng đã tham gia classroom
     if user.is_authenticated and Participant.objects.filter(user=user, classroom=classroom).exists():
         return redirect('classroom_detail', id=classroom.id)
 
-    # Nếu classroom là private, yêu cầu password
-    if classroom.status:  # status == True tức là private
+    if classroom.status:
         if not user.is_authenticated:
-            # Người dùng chưa đăng nhập
             request.session['next'] = request.get_full_path()
-            return redirect('/auth/?form=login')  # Điều hướng đến trang đăng nhập
+            return redirect('/auth/?form=login')
         
         if user.role == 'teacher' and user.id != classroom.teacher.id:
-            # Chuyển hướng giáo viên đến trang classrooms và hiển thị modal request
             return redirect(f"{reverse('classrooms', args=[classroom.subject.id, classroom.grade])}?show_request_modal=True&classroom_id={classroom.id}")
         
         if request.method == 'POST':
@@ -619,7 +622,13 @@ def access_join_classroom(request, link):
             if password != '':
                 if password == classroom.password:
                     Participant.objects.create(user=user, classroom=classroom, role='student')
-                    return redirect('classroom_detail', id=classroom.id)
+                    return render(request, 'access_join_classroom.html', {
+                        'classroom': classroom,
+                        'requires_password': True,
+                        'redirect_url': reverse('classroom_detail', args=[classroom.id]),
+                        'success_message': 'You have successfully joined the classroom.',
+                        'show_success_modal': True
+                    })
                 else:
                     messages.error(request, 'Incorrect password. Please try again.')
             else:
@@ -627,46 +636,35 @@ def access_join_classroom(request, link):
     
         return render(request, 'access_join_classroom.html', {
             'classroom': classroom,
-            'requires_password': True
+            'requires_password': True,
+            'show_success_modal': False,
+            'success_message': 'You have successfully joined the classroom.',
         })
 
-    # Nếu classroom là public
     if not user.is_authenticated:
         request.session['next'] = request.get_full_path()
-        return redirect('/auth/?form=login')  # Điều hướng đến trang đăng nhập
+        return redirect('/auth/?form=login')
     
     if user.role == 'teacher' and user.id != classroom.teacher.id:
         return redirect(f"{reverse('classrooms', args=[classroom.subject.id, classroom.grade])}?show_request_modal=True&classroom_id={classroom.id}")
 
     if request.method == 'POST' and user.is_authenticated:
         Participant.objects.create(user=user, classroom=classroom, role='student')
-        return redirect('classroom_detail', id=classroom.id)
+        return render(request, 'access_join_classroom.html', {
+            'classroom': classroom,
+            'requires_password': False,
+            'redirect_url': reverse('classroom_detail', args=[classroom.id]),
+            'success_message': 'You have successfully joined the classroom.',
+            'show_success_modal': True
+        })
 
     return render(request, 'access_join_classroom.html', {
         'classroom': classroom,
-        'requires_password': False
+        'requires_password': False,
+        'show_success_modal': False,
+        'success_message': 'You have successfully joined the classroom.',   
     })
 
-
-def upload_subsection_file(request, subsection_id):
-    subsection = get_object_or_404(Section, id=subsection_id)
-
-    if request.method == 'POST':
-        if 'file' in request.FILES:
-            file = request.FILES['file']
-            subsection_file = SubsectionFile(subsection=subsection, file=file)
-            
-            try:
-                subsection_file.full_clean()
-                subsection_file.save()
-                return redirect('classroom_detail', subsection.classroom.id)  # Chuyển hướng sau khi upload thành công
-            except ValidationError as e:
-                return render(request, 'upload_template.html', {'errors': e.messages})
-
-        else:
-            return render(request, 'upload_template.html', {'errors': ['No file uploaded']})
-
-    return render(request, 'classroom_detail.html')
 
 @csrf_exempt
 def leave_classroom(request, classroom_id):
@@ -722,7 +720,6 @@ def join_classroom(request, classroom_id):
     classroom = get_object_or_404(Classroom, id=classroom_id)
     user = request.user
 
-    # Check if the user is already a participant
     if Participant.objects.filter(user=user, classroom=classroom).exists():
         return redirect('classroom_detail', id=classroom_id)
 
@@ -740,11 +737,9 @@ def enter_password(request, classroom_id):
     if request.method == 'POST':
         entered_password = request.POST.get('password')
         
-        # Kiểm tra input rỗng
         if not entered_password:
             return JsonResponse({'status': 'error', 'message': '❌ Password cannot be empty'})
         
-        # Làm sạch dữ liệu đầu vào để ngăn chặn XSS
         entered_password = bleach.clean(entered_password)
         
         if entered_password == classroom.password:
@@ -760,6 +755,7 @@ def enter_password(request, classroom_id):
     return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=400)
 
 
+@login_required
 @csrf_exempt
 def update_classroom(request, classroom_id):
     if request.method == 'POST':
@@ -781,7 +777,7 @@ def update_classroom(request, classroom_id):
             return JsonResponse({'status': 'success', 'message': 'Classroom updated successfully.'})
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': str(e)})
-    return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=400)
+    return redirect('home')
 
 @csrf_exempt
 def update_allow_chat(request, classroom_id):
@@ -802,6 +798,7 @@ def update_allow_chat(request, classroom_id):
             return JsonResponse({'status': 'failed', 'message': 'Invalid JSON'}, status=400)
     return JsonResponse({'status': 'failed', 'message': 'Invalid request method'}, status=400)
 
+@login_required
 @csrf_exempt
 def delete_classroom(request, classroom_id):
     if request.method == 'POST':
@@ -811,10 +808,14 @@ def delete_classroom(request, classroom_id):
             return redirect('classrooms', classroom.subject.id, classroom.grade)
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': str(e)})
-    return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=400)
+    return redirect('home')
 
 @login_required
+@csrf_exempt
 def classroom_detail(request, id):
+    if not Participant.objects.filter(classroom_id=id, user=request.user).exists():
+        return redirect('home')
+    
     classroom = get_object_or_404(Classroom, id=id)
     sections = Section.objects.filter(classroom=classroom)
     messages = ChatMessage.objects.filter(classroom=classroom).order_by('timestamp')
@@ -834,30 +835,25 @@ def classroom_detail(request, id):
             num_tests = quiz_results.count()
             total_time = sum((result.time_taken for result in quiz_results if result.time_taken), timedelta())
             
-            # Chuyển đổi total_time thành dạng h:m:s
             total_time_hms = str(total_time)
 
             scores_data.append({
                 'user': participant.user,
                 'total_score': total_score,
                 'num_tests': num_tests,
-                'total_time': total_time_hms,  # Convert to minutes
-                'total_time_seconds': total_time.total_seconds()  # Thêm thời gian dưới dạng giây để so sánh
+                'total_time': total_time_hms, 
+                'total_time_seconds': total_time.total_seconds() 
             })
 
-    # Sort by total_score and total_time_seconds for ranking purposes
     scores_data.sort(key=lambda x: (-x['total_score'], -x['total_time_seconds']))
 
-    # Lấy tất cả các submissions trong lớp học
     submissions = Submission.objects.filter(section__classroom=classroom)
 
-    # Lấy kết quả bài kiểm tra của học sinh hiện tại (cho `question_test`)
     quiz_results = {
         quiz_result.submission.id: quiz_result
         for quiz_result in QuizResult.objects.filter(submission__in=submissions.filter(submission_type='question_test'), student=request.user)
     }
 
-    # Lấy StudentFile cho submission loại `assignment` nếu có
     student_files = StudentFile.objects.filter(student=request.user, submission__in=submissions.filter(submission_type='assignment'))
 
     existing_comment = Comment.objects.filter(user=request.user, classroom=classroom).exists()
@@ -883,10 +879,10 @@ def classroom_detail(request, id):
         'classroom': classroom,
         'sections': sections,
         'participants': participants,
-        'scores_data': scores_data,  # Dữ liệu xếp hạng mới
-        'submissions': submissions,  # Tất cả submissions
-        'quiz_results': quiz_results,  # Kết quả của tất cả các bài kiểm tra của học sinh
-        'student_files': student_files,  # Danh sách các StudentFile cho các bài assignment
+        'scores_data': scores_data,
+        'submissions': submissions,
+        'quiz_results': quiz_results,
+        'student_files': student_files,
         'comments': comments,
         'existing_comment': existing_comment,
         'range': range_list, 
@@ -904,7 +900,7 @@ def save_message(request):
         classroom_id = request.POST.get('classroom_id')
         message = request.POST.get('message')
         image = request.FILES.get('image') 
-        file = request.FILES.get('file')  # Lấy file đính kèm (Word, PDF)
+        file = request.FILES.get('file')
         classroom = Classroom.objects.get(id=classroom_id)
 
         chat_message = ChatMessage.objects.create(
@@ -938,17 +934,14 @@ def update_section(request, classroom_id, section_id):
             section.description = request.POST['description']
             section.save()
 
-        # Xử lý upload file
         if 'uploadFile' in request.FILES:
             file = request.FILES['uploadFile']
             SubsectionFile.objects.create(subsection=section, file=file)
 
-        # Xử lý xóa file
         if 'deleteFile' in request.POST and request.POST['deleteFile']:
             file_to_delete = request.POST['deleteFile'].strip()
             subsection_file = SubsectionFile.objects.filter(subsection=section)
             
-            # Tìm file cần xóa
             for file in subsection_file:
                 if file.file.name.endswith(file_to_delete):
                     file.delete()
@@ -961,17 +954,14 @@ def update_submission(request, classroom_id, submission_id):
     submission = get_object_or_404(Submission, id=submission_id)
 
     if request.method == 'POST':
-        # Update description
         if 'description' in request.POST:
             submission.description = request.POST['description']
             submission.save()
 
-        # Handle file upload
         if 'uploadFile' in request.FILES:
             file = request.FILES['uploadFile']
             SubmissionFile.objects.create(submission=submission, file=file)
 
-        # Handle file deletion
         if 'deleteFileSubmission' in request.POST and request.POST['deleteFileSubmission']:
             file_id = request.POST['deleteFileSubmission']
             SubmissionFile.objects.filter(id=file_id).delete()
@@ -990,7 +980,7 @@ def update_classroom_description(request, classroom_id):
 @login_required
 def submit_assignment(request, submission_id):
     submission = get_object_or_404(Submission, id=submission_id)
-    classroom = submission.section.classroom  # Truy xuất lớp học từ bài nộp
+    classroom = submission.section.classroom
     
     if not submission.is_open():
         return redirect('classroom_detail', id=classroom.id)
@@ -1000,7 +990,7 @@ def submit_assignment(request, submission_id):
         StudentFile.objects.create(submission=submission, student=request.user, file=uploaded_file)
         return redirect('classroom_detail', id=classroom.id)
 
-    return render(request, 'submit_assignment.html', {'submission': submission})
+    return redirect('classroom_detail', id=classroom.id)    
 
 @csrf_exempt
 def save_remaining_time(request):
@@ -1017,6 +1007,8 @@ def save_remaining_time(request):
             return JsonResponse({'status': 'error', 'message': 'Quiz result not found'}, status=404)
     return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=400)
 
+@login_required
+@csrf_exempt
 def take_quiz(request, submission_id, question_id):
     submission = get_object_or_404(Submission, id=submission_id)
     question = get_object_or_404(Question, id=question_id)
@@ -1047,7 +1039,7 @@ def take_quiz(request, submission_id, question_id):
 
     return render(request, 'take_quiz.html', {
         'submission': submission,
-        'current_question': question,  # Đảm bảo current_question luôn được cập nhật đúng
+        'current_question': question, 
         'total_questions': total_questions,
         'answered_questions': quiz_result.answered_questions,
         'remaining_time': remaining_time,
@@ -1056,6 +1048,8 @@ def take_quiz(request, submission_id, question_id):
         'selected_answer': selected_answer
     })
 
+@login_required
+@csrf_exempt
 def submit_answer(request, submission_id, question_id):
     submission = get_object_or_404(Submission, id=submission_id)
     question = get_object_or_404(Question, id=question_id)
@@ -1109,10 +1103,8 @@ def quiz_result(request, submission_id):
     submission = get_object_or_404(Submission, id=submission_id)
     classroom = submission.section.classroom
 
-    # Lấy kết quả bài kiểm tra của học sinh hiện tại
     quiz_result = get_object_or_404(QuizResult, submission=submission, student=request.user)
 
-    # Chuyển hướng về trang classroom_detail và truyền các tham số cần thiết qua URL
     return redirect('classroom_detail', id=classroom.id)
 
 def exit_quiz(request, submission_id):
@@ -1130,7 +1122,7 @@ def exit_quiz(request, submission_id):
 def update_file_submission(request, file_id):
     student_file = get_object_or_404(StudentFile, id=file_id, student=request.user)
     submission = student_file.submission
-    classroom = submission.section.classroom  # Truy xuất lớp học từ bài nộp
+    classroom = submission.section.classroom 
 
     if not submission.is_open():
         return redirect('classroom_detail', id=classroom.id)
@@ -1146,7 +1138,7 @@ def update_file_submission(request, file_id):
 def delete_file_submission(request, file_id):
     student_file = get_object_or_404(StudentFile, id=file_id, student=request.user)
     submission = student_file.submission
-    classroom = submission.section.classroom  # Truy xuất lớp học từ bài nộp
+    classroom = submission.section.classroom 
     
     student_file.delete()
     return redirect('classroom_detail', id=classroom.id)
@@ -1195,8 +1187,8 @@ def manage_classroom_detail(request, id):
     }
     return render(request, 'manage_classroom_detail.html', context)
 
-@csrf_exempt
 @login_required
+@csrf_exempt
 def handle_co_teacher_request(request):
     if request.method == 'POST':
         data = json.loads(request.body)
@@ -1206,12 +1198,10 @@ def handle_co_teacher_request(request):
         try:
             co_teacher_request = CoTeacherRequest.objects.get(id=request_id)
             if action == 'accept':
-                # Logic để chấp nhận yêu cầu
                 Participant.objects.create(user=co_teacher_request.requester, classroom=co_teacher_request.classroom, role='co_teacher')
                 co_teacher_request.delete()
                 return JsonResponse({'status': 'success', 'message': 'Request accepted successfully!'})
             elif action == 'reject':
-                # Logic để từ chối yêu cầu
                 co_teacher_request.delete()
                 return JsonResponse({'status': 'success', 'message': 'Request rejected successfully!'})
             else:
@@ -1277,8 +1267,7 @@ def create_section_submission(request):
             if classroom.participants.filter(user__notify_sections=True).exists():
                 notify_participants(classroom, 'submission', title, classroom.participants.filter(user__notify_sections=True))
             return JsonResponse({'status': 'success', 'message': 'Submission created successfully!'})
-
-    return JsonResponse({'status': 'error', 'message': 'Invalid request method.'})
+    return redirect('home')
 
 def notify_participants(classroom, item_type, item_title, participants):
     subject = f'New {item_type} added to {classroom.name}'
@@ -1437,11 +1426,9 @@ def edit_question(request, submission_id, question_id):
         ]
         correct_option = int(request.POST.get('correct_option'))
 
-        # Cập nhật câu hỏi
         question.text = question_text
         question.save()
 
-        # Xóa các đáp án cũ và thêm đáp án mới
         question.answers.all().delete()
         for idx, option_text in enumerate(options, start=1):
             Answer.objects.create(
@@ -1520,6 +1507,7 @@ def marking(request, assignment_id):
 
 from django.contrib.auth import update_session_auth_hash
 import random
+
 @login_required
 def setting(request):
     user = request.user
@@ -1698,16 +1686,14 @@ def adminPage(request):
     if not request.user.is_superuser:
         return redirect('home')
     
-    # Data for select options in the form
     days = list(range(1, 32))
     months = {
         1: 'January', 2: 'February', 3: 'March', 4: 'April', 5: 'May', 6: 'June',
         7: 'July', 8: 'August', 9: 'September', 10: 'October', 11: 'November', 12: 'December'
     }
-    years = list(range(1900, datetime.now().year + 1))  # Generates years from 1900 to current year
+    years = list(range(1900, datetime.now().year + 1))  
 
-    # Context data
-    statistical_data = []  # Add statistical data if applicable
+    statistical_data = [] 
     accounts = CustomUser.objects.all()
     subjects = Subjects.objects.all()
     subsection_files = SubsectionFile.objects.all()
@@ -2035,6 +2021,7 @@ def searchPage(request):
 
 from .models import Chatbot, CoTeacherRequest, ForumComment, ForumPost, NotificationSystem
 from django.core.paginator import Paginator
+
 def forum(request, classroom_id):
     user = request.user
     classroom = get_object_or_404(Classroom, id=classroom_id)
@@ -2138,11 +2125,10 @@ def approve_post(request, post_id):
         post.is_rejected = False
         post.save()
         
-        # Gửi mail thông báo
         subject = 'Your post has been approved'
         message = f'Hi {post.user.username},\n\nYour post titled "{post.title}" has been approved.\n\nBest regards,\nYour Classroom Team'
         recipient_list = [post.user.email]
-        send_mail(subject, message, 'no-reply@classroom.com', recipient_list)
+        send_mail(subject, message, 'nextgenedu03.info@gmail.com', recipient_list)
         
         return JsonResponse({'status': 'success', 'message': 'Post approved successfully.'})
     return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=400)
@@ -2159,7 +2145,7 @@ def reject_post(request, post_id):
         subject = 'Your post has been rejected'
         message = f'Hi {post.user.username},\n\nYour post titled "{post.title}" has been rejected for the following reason:\n\n{reason}\n\nBest regards,\nYour Classroom Team'
         recipient_list = [post.user.email]
-        send_mail(subject, message, 'no-reply@classroom.com', recipient_list)
+        send_mail(subject, message, 'nextgenedu03.info@gmail.com', recipient_list)
         
         return JsonResponse({'status': 'success', 'message': 'Post rejected successfully.'})
     return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=400)

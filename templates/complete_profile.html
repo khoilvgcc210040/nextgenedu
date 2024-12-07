@@ -209,7 +209,7 @@
 
         <div class="container">
             <div class="d-flex justify-content-end">
-                <button class="btn btn-outline-danger" onclick="window.location.href='{% url "home" %}';">
+                <button class="btn btn-outline-danger" onclick="window.location.href='/auth/?form=signup';">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
                         <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
                     </svg>
@@ -271,7 +271,131 @@
 
                     <input type="checkbox" class="form-check-input" id="terms" name="terms">
 
-                    <label class="form-check-label ms-2 mt-1" for="terms">I accept the <a href="" class="text-dark fw-bold">Terms of Service</a> and <a href="" class="text-dark fw-bold">Privacy Policy</a></label>
+                    <label class="form-check-label ms-2 mt-1" style="color: var(--accent-color);" for="terms">
+                        I accept the 
+                        <a href="#" class="fw-bold" style="color: var(--accent-color); text-decoration: underline;" data-bs-toggle="modal" data-bs-target="#termsModal">Terms of Service</a> 
+                        and 
+                        <a href="#" class="fw-bold" style="color: var(--accent-color); text-decoration: underline;" data-bs-toggle="modal" data-bs-target="#privacyModal">Privacy Policy</a>
+                    </label>
+
+                    <!-- Terms of Service Modal -->
+                    <div class="modal fade" id="termsModal" tabindex="-1" aria-labelledby="termsModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content" style="background-color: var(--accent-color); color: #fff;">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="termsModalLabel" style="color: #fff;">Terms of Service</h5>
+                                    <button type="button" class="btn-close" style="background-color: #fff;" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body" style="max-height: 400px; overflow-y: auto; text-align: justify;">
+                                    <h2 style="text-align: center; margin-bottom: 20px; font-weight: 600; color: #fff;">Terms of Service for NextGenEdu</h2>
+                                    <p><strong>Introduction</strong></p>
+                                    <p>Welcome to NextGenEdu! These Terms of Service ("Terms") govern your use of our educational platform and services. By accessing or using our website and services, you agree to comply with these Terms. If you do not agree to these Terms, please do not use our platform.</p>
+                                    
+                                    <p><strong>Account Registration and Usage</strong></p>
+                                    <p>To access the full range of services, you must create an account. By registering, you agree to provide accurate, complete, and up-to-date information. You are responsible for maintaining the confidentiality of your account credentials.</p>
+                                    
+                                    <p><strong>User Responsibilities</strong></p>
+                                    <p>You agree to use NextGenEdu only for lawful purposes and not to upload, post, or share any content that violates intellectual property rights, is harmful, abusive, or unlawful. You are responsible for your own actions while using the platform.</p>
+                                    
+                                    <p><strong>Content Upload and Intellectual Property</strong></p>
+                                    <p>You retain ownership of any content you upload to the platform (such as assignments or documents). However, by uploading content, you grant NextGenEdu a license to use, display, and share that content within the platform. All uploaded educational materials must comply with copyright laws and licensing requirements.</p>
+                                    
+                                    <p><strong>Privacy and Data Usage</strong></p>
+                                    <p>By using our services, you agree that we can collect and use your personal information in accordance with our Privacy Policy. This includes data necessary for providing our educational services, personalizing your experience, and improving the platform’s functionality.</p>
+                                    
+                                    <p><strong>Prohibited Activities</strong></p>
+                                    <p>You must not engage in activities such as:</p>
+                                    <ul>
+                                        <li>Uploading or distributing malware, spyware, or viruses.</li>
+                                        <li>Attempting to interfere with or disrupt the platform’s services or operations.</li>
+                                        <li>Accessing or attempting to access user accounts, data, or system resources without authorization.</li>
+                                    </ul>
+                                    
+                                    <p><strong>Termination and Account Suspension</strong></p>
+                                    <p>NextGenEdu reserves the right to suspend or terminate your account if we detect any violation of these Terms. You may also terminate your account at any time.</p>
+                                    
+                                    <p><strong>Changes to Terms</strong></p>
+                                    <p>NextGenEdu reserves the right to modify or update these Terms. You will be notified of any material changes. Continued use of the platform after changes to these Terms constitutes your acceptance of the new terms.</p>
+                                    
+                                    <p><strong>Limitation of Liability</strong></p>
+                                    <p>NextGenEdu will not be held liable for any indirect, incidental, or consequential damages arising from the use of the platform. We make no guarantees about the accuracy, availability, or performance of the services.</p>
+                                    
+                                    <p><strong>Governing Law</strong></p>
+                                    <p>These Terms are governed by and construed in accordance with the laws of [Your Country/State]. Any disputes arising from these Terms will be resolved in the appropriate courts.</p>
+                                    
+                                    <p><strong>Contact Us</strong></p>
+                                    <p>If you have any questions regarding these Terms of Service, please contact us at nextgenedu03.info@gmail.com.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Privacy Policy Modal -->
+                    <div class="modal fade" id="privacyModal" tabindex="-1" aria-labelledby="privacyModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content" style="background-color: var(--accent-color); color: #fff;">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="privacyModalLabel" style="color: #fff;">Privacy Policy</h5>
+                                    <button type="button" class="btn-close" style="background-color: #fff;" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body" style="max-height: 400px; overflow-y: auto; text-align: justify;">
+                                    <h2 style="text-align: center; margin-bottom: 20px; font-weight: 600; color: #fff;">Privacy Policy for NextGenEdu</h2>
+                                    <p><strong>Introduction</strong></p>
+                                    <p>NextGenEdu values your privacy. This Privacy Policy explains how we collect, use, and protect your personal information when you use our website and services. By using NextGenEdu, you consent to the practices outlined in this policy.</p>
+
+                                    <p><strong>Information We Collect</strong></p>
+                                    <p>We collect the following types of personal data:</p>
+                                    <ul>
+                                        <li><strong>Registration Information:</strong> When you create an account, we collect your name, email address, and other required details.</li>
+                                        <li><strong>Usage Data:</strong> We collect information about how you interact with the platform, such as login history, activity logs, and content viewed.</li>
+                                        <li><strong>Payment Information:</strong> If applicable, we collect payment details for any services or premium content.</li>
+                                        <li><strong>Device Information:</strong> Information about your device, browser, and operating system.</li>
+                                    </ul>
+
+                                    <p><strong>How We Use Your Information</strong></p>
+                                    <p>We use the information collected for the following purposes:</p>
+                                    <ul>
+                                        <li>To create and manage your user account.</li>
+                                        <li>To personalize your learning experience, including recommending relevant content.</li>
+                                        <li>To communicate with you, including sending notifications, reminders, and updates.</li>
+                                        <li>To provide customer support and resolve any issues.</li>
+                                        <li>To improve the functionality and performance of the platform.</li>
+                                    </ul>
+
+                                    <p><strong>Data Sharing</strong></p>
+                                    <p>We do not share your personal information with third parties except in the following cases:</p>
+                                    <ul>
+                                        <li>With service providers who help us deliver our services, subject to confidentiality agreements.</li>
+                                        <li>To comply with legal obligations, protect our rights, or respond to claims or legal processes.</li>
+                                        <li>In connection with business transactions, such as mergers or acquisitions.</li>
+                                    </ul>
+
+                                    <p><strong>Data Security</strong></p>
+                                    <p>We take appropriate measures to secure your personal information, including encryption and secure authentication mechanisms. However, no data transmission over the internet can be guaranteed as 100% secure.</p>
+
+                                    <p><strong>Data Retention</strong></p>
+                                    <p>We will retain your personal information for as long as necessary to provide services and comply with legal obligations. You can request the deletion of your account and data at any time, subject to applicable laws.</p>
+
+                                    <p><strong>Cookies and Tracking Technologies</strong></p>
+                                    <p>We use cookies and other tracking technologies to improve user experience, analyze usage patterns, and personalize content. You can control your cookie preferences through your browser settings.</p>
+
+                                    <p><strong>Your Rights</strong></p>
+                                    <p>Depending on your location, you may have certain rights regarding your personal data, including:</p>
+                                    <ul>
+                                        <li>The right to access, correct, or delete your personal data.</li>
+                                        <li>The right to restrict or object to certain data processing activities.</li>
+                                        <li>The right to withdraw your consent at any time.</li>
+                                    </ul>
+
+                                    <p><strong>Changes to This Privacy Policy</strong></p>
+                                    <p>NextGenEdu may update this Privacy Policy from time to time. We will notify you of significant changes and provide the updated policy on the website.</p>
+
+                                    <p><strong>Contact Us</strong></p>
+                                    <p>If you have any questions or concerns regarding this Privacy Policy, please contact us at nextgenedu03.info@gmail.com.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
                 </div>
 

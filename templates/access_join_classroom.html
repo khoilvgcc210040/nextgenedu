@@ -3,7 +3,11 @@
 <html lang="en">
 <head>
     {% include 'headermain.html' %}
+    <title>Join Classroom</title>
     <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.min.js"></script>
+    <link rel="icon" type="image/x-icon" href="{% static 'school-bag.png' %}">
     <style>
         body {
             margin: 0;
@@ -21,11 +25,6 @@
             text-align: center;
             overflow-y: auto;
             height: 400px;
-            scrollbar-width: none; /* Firefox */
-            -ms-overflow-style: none;  /* Internet Explorer 10+ */
-        }
-        .modal-content::-webkit-scrollbar { 
-            display: none;  /* Safari and Chrome */
         }
         .modal-header, .modal-footer {
             border: none;
@@ -67,6 +66,25 @@
     </style>
 </head>
 <body>
+    <div id="loadingSpinner" class="spinner-border" role="status" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9999; animation: spin 1s linear infinite; color: var(--accent-color) !important;">
+        <span class="visually-hidden" style="font-size: 0.8em;">Loading...</span>
+    </div>
+    <style>
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+
+    <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-sm" style="position: fixed; bottom: 10px; left: 10px;">
+            <div class="modal-content" style="border: 2px solid var(--accent-color); height: 100px !important;">
+                <div class="modal-body" style="background-color: var(--accent-color); border-radius: 5px;">
+                    <p id="successMessage" class="text-left m-0" style="color: #fff;"></p>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header" style="display: flex; justify-content: center; border-radius: 5px 5px 0 0; padding: 0px;">
@@ -123,5 +141,25 @@
         {% endif %}
     </div>
     <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+    <script>
+        function showSuccessModal() {
+            document.getElementById('loadingSpinner').style.display = 'block';
+            const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+            successModal.show();
+            successMessage.innerText = "{{ success_message }}";
+
+            setTimeout(() => {
+                successModal.hide();
+                window.location.href = "{{ redirect_url }}";
+            }, 3000);
+        }
+    </script>
+    {% if show_success_modal %}
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                showSuccessModal();
+            });
+        </script>
+    {% endif %}
 </body>
 </html>

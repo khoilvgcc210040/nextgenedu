@@ -178,6 +178,7 @@
                                             <div class="card-title d-flex jutify-content-center align-items-center">
                                                 <h4>🌐 &nbsp;</h4>
                                                 <a href="{% url 'classroom_detail' participant.classroom.id %}">{{ participant.classroom.name }}</a>
+                                                <img src="{% static 'link.png' %}" alt="Joined" style="width: 20px; height: 20px; margin-left: 10px; cursor: pointer;" title="You have joined this classroom">
                                             </div>
                                             <p class="card-text truncate mt-2" style="width: 900px;">&nbsp;📝{{ participant.classroom.description }}</p>
                                             <div class="classroom-meta text-muted d-flex align-items-center">
@@ -212,6 +213,7 @@
                                             <div class="card-title d-flex jutify-content-center align-items-center">
                                                 <h4>🔓 &nbsp;</h4>
                                                 <a href="{% url 'classroom_detail' participant.classroom.id %}">{{ participant.classroom.name }}</a>
+                                                <img src="{% static 'link.png' %}" alt="Joined" style="width: 20px; height: 20px; margin-left: 10px; cursor: pointer;" title="You have joined this classroom">
                                             </div>
                                             <p class="card-text truncate mt-2" style="width: 900px;">&nbsp;📝{{ participant.classroom.description }}</p>
                                             <div class="classroom-meta text-muted d-flex align-items-center">

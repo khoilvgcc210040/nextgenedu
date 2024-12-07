@@ -245,19 +245,8 @@
                 <a class="nav-link toggle-link" data-content="blocked-content" href="#">Blocked Participants</a>
             </li>
             <li class="nav-item">
-                <a id="back-link" class="btn-back nav-link-back toggle-link" href="#"><i class="fa-solid fa-backward"></i>&nbsp;Back</a>
+                <a id="back-link" class="btn-back nav-link-back toggle-link" onclick="window.location.href=document.referrer;"><i class="fa-solid fa-backward"></i>&nbsp;Back</a>
             </li>
-
-            <script>
-                document.addEventListener('DOMContentLoaded', function () {
-                    const backLink = document.getElementById('back-link');
-                    backLink.addEventListener('click', function(event) {
-                        event.preventDefault();
-                        const referrer = document.referrer;
-                        window.location.href = referrer;
-                    });
-                });
-            </script>
         </ul>
     </div>
     

@@ -291,12 +291,6 @@ class ForumComment(models.Model):
     def __str__(self):
         return f"Comment by {self.user.username} on {self.post.title}"
 
-class Contact(models.Model):
-    name = models.TextField(max_length=50)
-    email = models.TextField(max_length=60)
-    subject = models.TextField(max_length=30)
-    message = models.TextField(max_length=255)
-
 class CoTeacherRequest(models.Model):
     requester = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='co_teacher_requests')
     classroom = models.ForeignKey(Classroom, on_delete=models.CASCADE, related_name='co_teacher_requests')

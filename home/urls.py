@@ -22,7 +22,6 @@ urlpatterns = [
     path('myclassroom/', views.myclassroom, name='myclassroom'),
     path('create_classroom/', views.create_classroom, name='create_classroom'),
     path('create_section_submission/', views.create_section_submission, name='create_section_submission'),
-    path('subsection/<int:subsection_id>/upload/', views.upload_subsection_file, name='upload_subsection_file'),
     path('classroom/<int:classroom_id>/section/<int:section_id>/update/', views.update_section, name='update_section'),
     path('classroom/<int:classroom_id>/update/', views.update_classroom_description, name='update_classroom_description'),
     path('classroom/<int:classroom_id>/submission/<int:submission_id>/update/', views.update_submission, name='update_submission'),
@@ -70,7 +69,6 @@ urlpatterns = [
     path('forum/post/<int:post_id>/reject/', views.reject_post, name='reject_post'),
     path('forum/post/<int:post_id>/comment/', views.add_comment, name='add_comment'),
 
-    path('classify/', views.classify, name='classify'),
     path('chatbot/', views.chatbot, name='chatbot'),
     path('notification/', views.notification, name='notification'),
     path('join/<str:link>/', views.access_join_classroom, name='access_join_classroom'),

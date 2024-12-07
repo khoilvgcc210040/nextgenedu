@@ -1168,7 +1168,7 @@
                     {% for participant in participants %}
                     <tr>
                         <td>{{ participant.user.username }}</td>
-                        <td>{{ participant.user.role }}</td>
+                        <td>{{ participant.role }}</td>
                         {% if request.user.role == 'teacher' %}
                             <td><button class="delete-btn" onclick="deleteMember({{ participant.id }})">🗑️</button></td>
                         {% endif %}
@@ -1185,7 +1185,7 @@
                         <th>Ranking</th>
                         <th>Username</th>
                         <th>Test</th>
-                        <th>Time R</th>
+                        <th>Time</th>
                         <th>Score</th>
                     </tr>
                 </thead>
@@ -1320,28 +1320,27 @@
             });
         
             document.getElementById('imageButton').onclick = function() {
-                imageInput.click(); // Kích hoạt input file để chọn hình ảnh
+                imageInput.click();
             };
 
             document.getElementById('fileButton').onclick = function() {
-                document.getElementById('fileInput').click(); // Kích hoạt input file để chọn file Word, PDF
+                document.getElementById('fileInput').click();
             };
 
             document.getElementById('fileInput').onchange = function() {
                 const file = document.getElementById('fileInput').files[0];
                 if (file) {
-                    document.getElementById('filePreview').textContent = file.name; // Hiển thị tên file
-                    document.getElementById('filePreviewContainer').style.display = 'block'; // Hiển thị container chứa file
+                    document.getElementById('filePreview').textContent = file.name;
+                    document.getElementById('filePreviewContainer').style.display = 'block';
                 }
             };
             
             document.getElementById('removeFileButton').onclick = function() {
-                document.getElementById('fileInput').value = ''; // Xóa giá trị input file
-                document.getElementById('filePreviewContainer').style.display = 'none'; // Ẩn preview
-                document.getElementById('filePreview').textContent = ''; // Xóa tên file hiển thị
+                document.getElementById('fileInput').value = ''; 
+                document.getElementById('filePreviewContainer').style.display = 'none';
+                document.getElementById('filePreview').textContent = '';
             };
         
-            // Khi người dùng chọn hình ảnh, hiển thị hình ảnh nhỏ trên giao diện
             imageInput.onchange = function() {
                 const file = imageInput.files[0];
                 if (file) {
@@ -1353,11 +1352,10 @@
                     reader.readAsDataURL(file);
                 }
             };
-        
-            // Khi người dùng nhấn vào nút xóa ảnh
+            
             removeImageButton.onclick = function() {
-                imageInput.value = ''; // Xóa giá trị input file
-                imagePreviewContainer.style.display = 'none'; // Ẩn preview
+                imageInput.value = '';
+                imagePreviewContainer.style.display = 'none';
             };
         
             document.getElementById('sendButton').onclick = function() {
@@ -1381,7 +1379,7 @@
                 }
 
                 if (document.getElementById('fileInput').files.length > 0) {
-                    formData.append('file', document.getElementById('fileInput').files[0]); // Thêm file đính kèm vào form
+                    formData.append('file', document.getElementById('fileInput').files[0]); 
                 }
         
                 fetch('{% url "save_message" %}', {
@@ -1400,18 +1398,17 @@
                         }));
                     }
         
-                    // Sau khi gửi, reset các giá trị
                     messageInput.value = '';
                     imageInput.value = '';
                     document.getElementById('fileInput').value = '';
                     imagePreviewContainer.style.display = 'none';
-                    filePreviewContainer.style.display = 'none'; // Ẩn file preview sau khi gửi
+                    filePreviewContainer.style.display = 'none';
                     document.getElementById('filePreview').textContent = ''; 
                 });
             };
         
             document.getElementById('chatMessageInput').onkeyup = function(e) {
-                if (e.keyCode === 13) {  // Enter key
+                if (e.keyCode === 13) {
                     document.getElementById('sendButton').click();
                 }
             };
@@ -1426,7 +1423,7 @@
 
                 <div class="chat-header d-flex justify-content-between align-items-center">
 
-                    <h5 class="modal-title" id="chatModalLabel">Name of the classroom</h5>
+                    <h5 class="modal-title" id="chatModalLabel">{{ classroom.name|truncatechars:30 }}</h5>
                     <div class="folder-card">
 
                         <img src="{% static 'folder.png' %}" onclick="openFolderModal()" style="cursor: pointer;" alt="Folder Icon">
@@ -1497,7 +1494,7 @@
                 {% if classroom.allow_chat %}
                     <div class="chat-footer d-flex justify-content-between align-items-center">
                         {% csrf_token %}
-                        <button id="imageButton" class="btn btn-secondary"><i class="fa-solid fa-image"></i></button> <!-- Nút để kích hoạt input file -->
+                        <button id="imageButton" class="btn btn-secondary"><i class="fa-solid fa-image"></i></button>
 
                         <button id="fileButton" class="btn btn-secondary"><i class="fa-solid fa-file"></i></button> 
                         

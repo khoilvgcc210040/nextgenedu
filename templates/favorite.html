@@ -241,7 +241,7 @@
                                                 {% elif user.role == 'teacher' and user.id == classroom.teacher.id %}
                                                     <a href="{% url 'classroom_detail' classroom.id %}">{{ classroom.name }}</a>
                                                 {% endif %}
-                                                <img src="{% static 'link.png' %}" alt="Joined" style="width: 20px; height: 20px; margin-left: 10px;">
+                                                <img src="{% static 'link.png' %}" alt="Joined" style="width: 20px; height: 20px; margin-left: 10px; cursor: pointer;" title="You have joined this classroom">
                                             </div>
                                             <p class="card-text truncate mt-2" style="width: 900px;">&nbsp;📝{{ classroom.description }}</p>
                                             <div class="classroom-meta text-muted d-flex align-items-center">
@@ -310,7 +310,7 @@
                                     <div class="card-body">
                                         <div class="classroom-info">
                                             <div class="card-title d-flex jutify-content-center align-items-center">
-                                                <h4>🔒 &nbsp;</h4>
+                                                <h4>🔓 &nbsp;</h4>
                                                 {% if user.role == 'student' %}
                                                     <a href="#" data-bs-toggle="modal" data-bs-target="#joinModal" data-classroom-id="{{ classroom.id }}">{{ classroom.name }}</a>
                                                 {% elif user.role == 'teacher' and user.id != classroom.teacher.id %}
@@ -322,6 +322,7 @@
                                                 {% elif user.role == 'teacher' and user.id == classroom.teacher.id %}   
                                                     <a href="{% url 'classroom_detail' classroom.id %}">{{ classroom.name }}</a>
                                                 {% endif %}
+                                                <img src="{% static 'link.png' %}" alt="Joined" style="width: 20px; height: 20px; margin-left: 10px; cursor: pointer;" title="You have joined this classroom">
                                             </div>
                                             <p class="card-text truncate mt-2" style="width: 900px;">&nbsp;📝{{ classroom.description }}</p>
                                             <div class="classroom-meta text-muted d-flex align-items-center">
@@ -399,7 +400,7 @@
                         <input type="hidden" id="classroomId" name="classroom_id">
                         <div class="mb-3">
                             <label for="password" class="form-label">Password</label>
-                            <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" required>
+                            <input type="password" class="form-control" id="password" name="password" placeholder="Enter password">
                         </div>
                         <div id="passwordError" class="text-danger mb-3 text-center" style="display: none; border: 1px solid #dc3545; padding: 2px 4px;">Incorrect password</div>
                         <button type="submit" class="submit-modal btn btn-dark w-100 border-0" style="background-color: var(--accent-color); overflow: hidden; transition: all 0.3s ease;">

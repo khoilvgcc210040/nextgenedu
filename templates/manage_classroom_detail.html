@@ -751,94 +751,82 @@
         });
 
         
-
-        // Khôi phục trạng thái trang từ localStorage khi trang được tải lại
         document.addEventListener('DOMContentLoaded', function() {
-
             const previousState = localStorage.getItem('contentState');
-
+            console.log(previousState);
             if (previousState) {
-
                 document.querySelectorAll('.classroom-content').forEach(content => content.classList.add('hidden'));
-
-                document.getElementById(previousState).classList.remove('hidden');
-
-                document.querySelectorAll('.classroom-navigation button').forEach(button => button.classList.remove('active'));
-
-                if (previousState === 'sections-content') {
-
-                    document.getElementById('sections-btn').classList.add('active');
-
-                } else if (previousState === 'submissions-content') {
-
-                    document.getElementById('submissions-btn').classList.add('active');
-
-                } else if (previousState === 'members-content') {
-
-                    document.getElementById('members-btn').classList.add('active');
-                } else if (previousState === 'co-teacher-content') {
-
-                    document.getElementById('co-teacher-btn').classList.add('active');
-
+                const contentToShow = document.getElementById(previousState);
+                if (contentToShow) {
+                    contentToShow.classList.remove('hidden');
                 }
-
+                document.querySelectorAll('.classroom-navigation button').forEach(button => button.classList.remove('active'));
+                if (previousState === 'sections-content') {
+                    const sectionsBtn = document.getElementById('sections-btn');
+                    if (sectionsBtn) sectionsBtn.classList.add('active');
+                } else if (previousState === 'submissions-content') {
+                    const submissionsBtn = document.getElementById('submissions-btn');
+                    if (submissionsBtn) submissionsBtn.classList.add('active');
+                } else if (previousState === 'members-content') {
+                    const membersBtn = document.getElementById('members-btn');
+                    if (membersBtn) membersBtn.classList.add('active');
+                } else if (previousState === 'co-teacher-content') {
+                    const coTeacherBtn = document.getElementById('co-teacher-btn');
+                    if (coTeacherBtn) coTeacherBtn.classList.add('active');
+                }
                 localStorage.removeItem('contentState');
-
             }
-
-            // Lưu trạng thái trang vào localStorage khi submit form
-
-            document.getElementById('createForm').addEventListener('submit', function(event) {
-
-                const actionType = document.getElementById('actionType').value;
-                localStorage.setItem('contentState', actionType === 'section' ? 'sections-content' : (actionType === 'submission' ? 'submissions-content' : 'members-content'));
-
-            });
-
-            // Lưu trạng thái trang vào localStorage khi xóa submission
-
-            document.getElementById('confirmDeleteSubmissionBtn').addEventListener('click', function(event) {
-
-                localStorage.setItem('contentState', 'submissions-content');
-
-            });
-
-            // Lưu trạng thái trang vào localStorage khi xóa member
-            document.getElementById('confirmDeleteMemberBtn').addEventListener('click', function(event) {
-
-                localStorage.setItem('contentState', 'members-content');
-
-            });
-
-
-            // Lưu trạng thái trang vào localStorage khi block member
-            document.getElementById('confirmBlockMemberBtn').addEventListener('click', function(event) {
-
-                localStorage.setItem('contentState', 'members-content');
-
-            });
-
-
-            // Lưu trạng thái trang vào localStorage khi xử lý yêu cầu co-teacher
-
-            document.getElementById('acceptCoTeacherRequestBtn').addEventListener('click', function(event) {
-
-                localStorage.setItem('contentState', 'co-teacher-content');
-
-            });
-
-            document.getElementById('rejectCoTeacherRequestBtn').addEventListener('click', function(event) {
-
-                localStorage.setItem('contentState', 'co-teacher-content');
-            });
-
+        
+            const createForm = document.getElementById('createForm');
+            if (createForm) {
+                createForm.addEventListener('submit', function(event) {
+                    const actionType = document.getElementById('actionType').value;
+                    localStorage.setItem('contentState', actionType === 'section' ? 'sections-content' : (actionType === 'submission' ? 'submissions-content' : 'members-content'));
+                });
+            }
+        
+            const confirmDeleteSubmissionBtn = document.getElementById('confirmDeleteSubmissionBtn');
+            if (confirmDeleteSubmissionBtn) {
+                confirmDeleteSubmissionBtn.addEventListener('click', function(event) {
+                    localStorage.setItem('contentState', 'submissions-content');
+                });
+            }
+        
+            const confirmDeleteMemberBtn = document.getElementById('confirmDeleteMemberBtn');
+            if (confirmDeleteMemberBtn) {
+                confirmDeleteMemberBtn.addEventListener('click', function(event) {
+                    localStorage.setItem('contentState', 'members-content');
+                });
+            }
+        
+            const confirmBlockMemberBtn = document.getElementById('confirmBlockMemberBtn');
+            if (confirmBlockMemberBtn) {
+                confirmBlockMemberBtn.addEventListener('click', function(event) {
+                    localStorage.setItem('contentState', 'members-content');
+                });
+            }
+        
+            const acceptCoTeacherRequestBtn = document.getElementById('acceptCoTeacherRequestBtn');
+            if (acceptCoTeacherRequestBtn) {
+                acceptCoTeacherRequestBtn.addEventListener('click', function(event) {
+                    localStorage.setItem('contentState', 'co-teacher-content');
+                });
+            }
+        
+            const rejectCoTeacherRequestBtn = document.getElementById('rejectCoTeacherRequestBtn');
+            if (rejectCoTeacherRequestBtn) {
+                rejectCoTeacherRequestBtn.addEventListener('click', function(event) {
+                    localStorage.setItem('contentState', 'co-teacher-content');
+                });
+            }
         });
+        
 
     </script>
     <main>
         <div class="classroom-header">
             <div class="mt-4">
-                <button id="back-link" class="btn-back" style="outline: none;">
+                <button id="back-link" class="btn-back" style="outline: none;" onclick="window.location.href=document.referrer;">
                     <svg height="16" width="16" fill="currentColor" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 1024 1024">
                         <path d="M874.690416 495.52477c0 11.2973-9.168824 20.466124-20.466124 20.466124l-604.773963 0 188.083679 188.083679c7.992021 7.992021 7.992021 20.947078 0 28.939099-4.001127 3.990894-9.240455 5.996574-14.46955 5.996574-5.239328 0-10.478655-1.995447-14.479783-5.996574l-223.00912-223.00912c-3.837398-3.837398-5.996574-9.046027-5.996574-14.46955 0-5.433756 2.159176-10.632151 5.996574-14.46955l223.019353-223.029586c7.992021-7.992021 20.957311-7.992021 28.949332 0 7.992021 8.002254 7.992021 20.957311 0 28.949332l-188.073446 188.073446 604.753497 0C865.521592 475.058646 874.690416 484.217237 874.690416 495.52477z"></path>
                     </svg>
@@ -1016,7 +1004,7 @@
                 <div class="section-card">
                     <span class="username text-uppercase">{{ request.requester.username }}</span>
                     <span class="date-joined">Requested on: {{ request.created_at|date:"d/m/Y" }}</span>
-                    <span class="status">Status: {{ request.status }}</span> <!-- Thêm trạng thái -->
+                    <span class="date-joined">Message: {{ request.message }}</span>
                     <div class="section-options">
                         <button class="btn btn-success" id="acceptCoTeacherRequestBtn" onclick="handleCoTeacherRequest({{ request.id }}, 'accept')">Accept</button>
                         <button class="btn btn-danger" id="rejectCoTeacherRequestBtn" onclick="handleCoTeacherRequest({{ request.id }}, 'reject')">Reject</button>

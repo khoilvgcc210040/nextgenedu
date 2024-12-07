@@ -8,7 +8,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
         self.classroom_id = self.scope['url_route']['kwargs']['classroom_id']
         self.room_group_name = f'chat_{self.classroom_id}'
 
-        # Join room group
         await self.channel_layer.group_add(
             self.room_group_name,
             self.channel_name
@@ -17,7 +16,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.accept()
 
     async def disconnect(self, close_code):
-        # Leave room group
         await self.channel_layer.group_discard(
             self.room_group_name,
             self.channel_name
@@ -31,7 +29,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
         file_size = text_data_json['file_size']
         username = self.scope['user'].username
 
-        # Send message to room group
         await self.channel_layer.group_send(
             self.room_group_name,
             {
@@ -50,7 +47,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
         image_url = event['image_url']
         file_url = event['file_url']
         file_size = event['file_size']
-        # Send message to WebSocket
         await self.send(text_data=json.dumps({
             'message': message,
             'username': username,
@@ -62,7 +58,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
 class NotificationConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        # Tạo room name duy nhất cho mỗi người dùng
         self.user = self.scope['user']
         self.room_group_name = f'notifications_{self.user.username}'
         await self.channel_layer.group_add(
@@ -78,12 +73,10 @@ class NotificationConsumer(AsyncWebsocketConsumer):
         )
 
     async def receive(self, text_data):
-        # Không cần xử lý nhận từ phía client cho chức năng này
         pass
 
     async def send_notification(self, event):
         notification = event['notification']
-        # Gửi thông tin tới client
         await self.send(text_data=json.dumps({
             'notification': notification
         }))

@@ -7,6 +7,7 @@
     <title>Classrooms - {{ subject.name }} - Grade {{ grade }}</title>
     {% comment %} <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> {% endcomment %}
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="{% static 'school-bag.png' %}">
 </head>
 <style>
     .btn-back {
@@ -181,7 +182,7 @@
                                                 <div class="card-title d-flex jutify-content-center align-items-center">
                                                     <h4>🌐 &nbsp;</h4>
                                                     <a href="{% url 'classroom_detail' classroom.id %}">{{ classroom.name }}</a>
-                                                    <img src="{% static 'link.png' %}" alt="Joined" style="width: 20px; height: 20px; margin-left: 10px;">
+                                                    <img src="{% static 'link.png' %}" alt="Joined" style="width: 20px; height: 20px; margin-left: 10px; cursor: pointer;" title="You have joined this classroom">
                                                 </div>
                                                 <p class="card-text truncate mt-2" style="width: 900px;">&nbsp;📝{{ classroom.description }}</p>
                                                 <div class="classroom-meta text-muted d-flex align-items-center">
@@ -262,15 +263,8 @@
                                             <div class="classroom-info">
                                                 <div class="card-title d-flex jutify-content-center align-items-center">
                                                     <h4>🔓 &nbsp;</h4>
-                                                    {% if user.role == 'student' %}
-                                                        <a href="{% url 'classroom_detail' classroom.id %}">{{ classroom.name }}</a>
-                                                    {% elif user.role == 'teacher' %}
-                                                        {% if classroom.id in co_teacher_requests %}
-                                                            <a href="#" data-bs-toggle="modal" data-bs-target="#requestSentModal" data-classroom-id="{{ classroom.id }}">{{ classroom.name }}</a>        
-                                                        {% else %}
-                                                            <a href="#" data-bs-toggle="modal" data-bs-target="#requestModal" data-classroom-id="{{ classroom.id }}">{{ classroom.name }}</a>        
-                                                        {% endif %}
-                                                    {% endif %}
+                                                    <a href="{% url 'classroom_detail' classroom.id %}">{{ classroom.name }}</a>
+                                                    <img src="{% static 'link.png' %}" alt="Joined" style="width: 20px; height: 20px; margin-left: 10px; cursor: pointer;" title="You have joined this classroom">
                                                 </div>
                                                 <p class="card-text truncate mt-2" style="width: 900px;">&nbsp;📝{{ classroom.description }}</p>
                                                 <div class="classroom-meta text-muted d-flex align-items-center">
@@ -304,7 +298,7 @@
                                                     <h4>🔒 &nbsp;</h4>
                                                     {% if user.is_authenticated %}
                                                         {% if user.role == 'student' %}
-                                                            <a href="#" data-bs-toggle="modal" data-bs-target="#joinModal" data-classroom-id="{{ classroom.id }}">{{ classroom.name }}</a>
+                                                            <a href="#" data-bs-toggle="modal" data-bs-target="#passwordModal" data-classroom-id="{{ classroom.id }}">{{ classroom.name }}</a>
                                                         {% elif user.role == 'teacher' %}
                                                             {% if classroom.id in co_teacher_requests %}
                                                                 <a href="#" data-bs-toggle="modal" data-bs-target="#requestSentModal" data-classroom-id="{{ classroom.id }}">{{ classroom.name }}</a>        
@@ -393,7 +387,7 @@
                             <input type="hidden" id="classroomId" name="classroom_id">
                             <div class="mb-3">
                                 <label for="requestMessage" class="form-label">Message</label>
-                                <textarea class="form-control" id="requestMessage" name="request_message" placeholder="Enter your request message"></textarea>
+                                <textarea class="form-control" id="requestMessage" name="request_message" placeholder="Enter your request message (maximum 50 words)" maxlength="50"></textarea>
                             </div>
                             <button type="submit" class="submit-modal btn btn-dark w-100 border-0" style="background-color: var(--accent-color); overflow: hidden; transition: all 0.3s ease;">
                                 <span class="btn-text">Send Request ➜</span>
