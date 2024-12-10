@@ -84,12 +84,12 @@ INSTALLED_APPS = [
 
 ASGI_APPLICATION = 'nextgenedu.asgi.application'  # Replace with your project name
 
-# Channel layers configuration (using Redis as the backend)
+
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [os.environ.get("REDIS_URL", "redis://localhost:6379")],
+            "hosts": [os.environ.get("UPSTASH_REDIS_URL", "redis://localhost:6379")],
         },
     },
 }
