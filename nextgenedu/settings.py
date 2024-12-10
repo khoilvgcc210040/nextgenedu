@@ -38,7 +38,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get("SECRET_KEY", "default_secret_key")
 DEBUG = os.environ.get("DEBUG", "True") == "True"
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "localhost").split(",")
+ALLOWED_HOSTS = ['nextgenedu.online', 'www.nextgenedu.online']
+
 
 
 # Quick-start development settings - unsuitable for production
