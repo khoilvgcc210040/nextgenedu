@@ -50,8 +50,6 @@ SECRET_KEY = 'django-insecure-5wthuhms5os8x0bckwv$m*djw8qh&%2+nu8*oq%i=(fo&dw75h
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
