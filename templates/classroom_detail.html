@@ -1368,7 +1368,7 @@
         
             document.querySelector('.btn-toggle-right-messenger').addEventListener('click', function() {
                 const classroomId = {{ classroom.id }};
-                const wsUrl = `ws://${window.location.host}/ws/chat/${classroomId}/`;
+                const wsUrl = `wss://${window.location.host}/ws/chat/${classroomId}/`;
                 
                 if (!chatSocket || chatSocket.readyState === WebSocket.CLOSED) {
                     chatSocket = new WebSocket(wsUrl);
