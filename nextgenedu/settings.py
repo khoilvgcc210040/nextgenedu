@@ -89,16 +89,11 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [
-                {
-                    "address": os.environ.get("REDIS_URL", "redis://localhost:6379"),
-                    "ssl": True,  # Bật xác thực SSL
-                    "ssl_cert_reqs": None,  # Bỏ qua kiểm tra chứng chỉ
-                }
-            ],
+            "hosts": [os.environ.get("REDIS_URL", "redis://localhost:6379")],
         },
     },
 }
+
 
 
 
