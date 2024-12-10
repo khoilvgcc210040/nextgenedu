@@ -2113,6 +2113,7 @@ def searchPage(request):
     private_classrooms = Classroom.objects.filter(status=True, name__icontains=query) | Classroom.objects.filter(status=True, teacher__username__icontains=query)
     
     participant_classrooms = []
+    co_teacher_requests = []
     if request.user.is_authenticated:
         participant_classrooms = Participant.objects.filter(user=request.user).values_list('classroom_id', flat=True)
         co_teacher_requests = CoTeacherRequest.objects.filter(requester=request.user).values_list('classroom_id', flat=True)
