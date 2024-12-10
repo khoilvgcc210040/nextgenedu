@@ -38,7 +38,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get("SECRET_KEY", "default_secret_key")
 DEBUG = os.environ.get("DEBUG", "True") == "True"
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['https://nextgenedu.online', 'https://www.nextgenedu.online', 'nextgenedu-ac7fffbe3b2c.herokuapp.com', 'localhost', '127.0.0.1']
 
 CSRF_TRUSTED_ORIGINS = [
     'https://nextgenedu.online',
