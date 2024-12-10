@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Classroom Detail</title>
+    <title>Classroom Settings</title>
+    <link rel="icon" type="image/x-icon" href="{% static 'school-bag.png' %}">
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.min.js"></script>
@@ -287,7 +288,7 @@
             <div class="description d-flex justify-content-between align-items-center">
                 <div>
                     <p class="m-0" style="font-weight: 700;">Likes</p>
-                    <p class="m-0 pl-3 pt-3">{{ classroom.likes.count|default:"0" }}</p>
+                    <p class="m-0 pl-3 pt-3">{{ classroom.likes|default:"0" }}</p>
                 </div>
             </div>
             <hr style="border: 1px solid #000;">

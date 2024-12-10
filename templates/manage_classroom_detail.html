@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Classroom Page</title>
+    <title>Classroom Management</title>
+    <link rel="icon" type="image/x-icon" href="{% static 'school-bag.png' %}">
 </head>
 <style>
     .classroom-header {
@@ -504,7 +505,7 @@
                                     <option value="">Choose a parent section</option>
 
                                     {% for section in sections %}
-                                        {% if not section.parent_section %}
+                                        {% if not section.parent_section and not forloop.first %}
 
                                             <option value="{{ section.id }}">{{ section.title }}</option>
                                         {% endif %}
@@ -625,7 +626,7 @@
 
                 if (submissionType === 'question_test') {
 
-                    if (!title || !description || !openDate || !closeDate || !duration) {
+                    if (!title || !description || !openDate || !closeDate || !submissionType || !duration || !parentSection) {
 
                         errorMessage = 'All fields are required for submission.';
 
@@ -636,7 +637,7 @@
 
                     }
                 } else {
-                    if (!title || !description || !openDate || !closeDate || !submissionType) {
+                    if (!title || !description || !openDate || !closeDate || !submissionType || !parentSection) {
 
                         errorMessage = 'All fields are required for submission.';
                     }
@@ -949,10 +950,11 @@
         <div id="members-content" class="classroom-content hidden">
             <div class="members-list">
                 {% for participant in participants %}
-                    {% if participant.id and participant.user.role != 'teacher' %}
+                    {% if participant.id and participant.role != 'teacher' %}
                         <div class="section-card">
                             <span class="username text-uppercase">{{ participant.user.username }}</span>
                             <span class="date-joined">Date Joined: {{ participant.date_joined|date:"d/m/Y" }}</span>
+                            <span class="date-joined">Role: {{ participant.role }}</span>
                             <div class="section-options dropdown">
                                 <button class="btn btn-secondary dropdown-section" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
                                     •••
@@ -1424,6 +1426,7 @@
     });
 
     function handleCoTeacherRequest(requestId, action) {
+        document.getElementById('loadingSpinner').style.display = 'block';
         
         fetch(`/handle_co_teacher_request/`, {
             method: 'POST',
@@ -1438,7 +1441,7 @@
             if (data.status === 'success') {
                 const successModal = new bootstrap.Modal(document.getElementById('successModal'));
                 document.getElementById('successMessage').innerText = data.message;
-                document.getElementById('loadingSpinner').style.display = 'block';
+                
                 successModal.show();
                 setTimeout(function() {
                     document.getElementById('loadingSpinner').style.display = 'none';

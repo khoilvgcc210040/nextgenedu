@@ -1,0 +1,3083 @@
+[
+  {
+    "model": "contenttypes.contenttype",
+    "fields": { "app_label": "admin", "model": "logentry" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "fields": { "app_label": "auth", "model": "permission" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "fields": { "app_label": "auth", "model": "group" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "fields": { "app_label": "contenttypes", "model": "contenttype" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "fields": { "app_label": "sessions", "model": "session" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "fields": { "app_label": "home", "model": "customuser" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "fields": { "app_label": "home", "model": "subjects" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "fields": { "app_label": "sites", "model": "site" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "fields": { "app_label": "account", "model": "emailaddress" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "fields": { "app_label": "account", "model": "emailconfirmation" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "fields": { "app_label": "socialaccount", "model": "socialaccount" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "fields": { "app_label": "socialaccount", "model": "socialapp" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "fields": { "app_label": "socialaccount", "model": "socialtoken" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "fields": { "app_label": "home", "model": "classroom" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "fields": { "app_label": "home", "model": "academicyear" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "fields": { "app_label": "home", "model": "section" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "fields": { "app_label": "home", "model": "submission" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "fields": { "app_label": "home", "model": "participant" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "fields": { "app_label": "home", "model": "studentfile" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "fields": { "app_label": "home", "model": "question" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "fields": { "app_label": "home", "model": "answer" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "fields": { "app_label": "home", "model": "subsectionfile" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "fields": { "app_label": "home", "model": "submissionfile" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "fields": { "app_label": "home", "model": "quizresult" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "fields": { "app_label": "home", "model": "comment" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "fields": { "app_label": "home", "model": "chatmessage" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "fields": { "app_label": "home", "model": "favoriteclassroom" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "fields": { "app_label": "home", "model": "answeredquestion" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "fields": { "app_label": "home", "model": "blockedparticipant" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "fields": { "app_label": "home", "model": "forumpost" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "fields": { "app_label": "home", "model": "forumcomment" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "fields": { "app_label": "home", "model": "notificationsystem" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "fields": { "app_label": "home", "model": "contact" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "fields": { "app_label": "django_google_sso", "model": "googlessouser" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "fields": { "app_label": "home", "model": "coteacherrequest" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "fields": { "app_label": "home", "model": "chatbot" }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "1mr0gvmgh9wx52c2l0kdz2xw6ico8ln6",
+    "fields": {
+      "session_data": ".eJxVi8EKwjAQRP8lZylNmt1uPAp-R9jdbknRKhh7Ev-9LfSgp-HNm_m4zMu75KXaK0-DO7voTr-dsN7ssYvynK05sDbXmaf75ZB_j8K1bPNEqF5aRhzilhQDdV5HFLPYBVNiBYNE4CkBSBsw9KMmlKCK2Jv7rjPsMbM:1su3Rd:eicwmaU3RtbEv1w-TbzCGScgFRqEF__rbZoF3-ZIVs4",
+      "expire_date": "2024-10-11T05:23:09.663Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "2l76m5nzkmwc6gppafj22d2mvcdqh9ja",
+    "fields": {
+      "session_data": ".eJxVi0EKwjAQRe-StZQk05iOS8FzhJnkhxStgrEr8e4qdKHL999_T5NkfbS0dtzTXMzB7MnsfkeVfMb1a9ptwbBhH06LzJfjJv-KJr197hpyLbFIRK3qCJaKk8kGKyHAK0EnMCsp29F7T1EyCF4cSDOPbF5vlqszFQ:1tKg2U:sxQoN5BosfvGjgMB8o-Ls8U7NTijwTdDrspT4D9Vzto",
+      "expire_date": "2024-12-23T15:51:14.929Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "2oyaks082h1223yvoq3jul4kqlcai6z8",
+    "fields": {
+      "session_data": ".eJxVi0EOwjAMBP-SM6psJ7gtRyTeETlxrFRQkEh7QvydIvUAx92Zebko61Lj2sozTupOjsEdfs8k-VruX1Ifc-n22brLLNPtvMO_okqrmz4aJTFP0mcADgSJNWvQwUv2ITAdBUEVB6_gidFMZGQFQ91K7N37A2taMmw:1tJVC1:8z3Tn6NTctSictOIZPtmTqwqYGyePwBPLHyxCQ3Po_k",
+      "expire_date": "2024-12-20T10:04:13.099Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "2vqlx4jsmenvz2tegtuzk7hlt1grumkf",
+    "fields": {
+      "session_data": ".eJxVi0EOAiEMRe_C2kwoFiguTTwHKaWEiY4m4qyMd1eTWejy_fff02ReHz2vQ-95ruZg0Ox-t8Jy1utX9Nui04ZjOi08X46b_Cs6j_65N9m7ooLBe7GIoTlIUCxETcIAvjpC8kSE1QaxVGNSkcrRtlg0gHm9ATXjMdc:1sickk:3zdTiYqY8YZwFz4jKfx4kvr77CkMMJfcuspC4fcSoRw",
+      "expire_date": "2024-09-09T16:39:38.675Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "3pht5xvqb4kua8q59dn2bnu0elu7r35e",
+    "fields": {
+      "session_data": ".eJwVjksOwyAMRO_iNaqANmnFqjepXLASWj4RGFVRlLsXdp43byQfkHkDA5Ocp9sMAqpfUtteDhnBHEARfej9d80-eGqW5fW5DHixOXa_VSoJI3VHK6062bDWXy6ukxEd7mDUQ0DMidd-agE7YQGjpbwLKDmMceXmKPH4oL0_ZBlMaiEIWAq6ISjZO6YSKxgujc7zD5EDOr8:1stLnD:C34oCSCKCiuG8i01LzlO7Lmv2s6_YLd3tZuNFs5j1L4",
+      "expire_date": "2024-10-09T06:46:31.730Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "3qven9ef534j3uc3nb2vs378p0iqn4wk",
+    "fields": {
+      "session_data": ".eJxVi0EKwjAQRe-StZRMMplpXAqeI0w6CSlaBdOuxLur0IUu33__PU2SbW1p6-WRZjVHA-bwu2WZLuX2Fe2-lGHHPpwXma-nXf4VTXr73FWIWQCqQ4jF0egtRKsYyNXMo2eYUEExS_U1FMtKiCKWKHINqOb1BiTsMXA:1sh6KW:cohVLuJ_zKckrM16gIctF0faSojAZ0H3nTMBYrCd1Rg",
+      "expire_date": "2024-09-05T11:50:16.719Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "410cowna57tt06gdg575s90511ecqt4z",
+    "fields": {
+      "session_data": "eyJuZXh0IjoiL2pvaW4vT0prNUx4cTc5ZS8ifQ:1tDid8:-bmLZcoZy44TpimIDMq45Sq8IFaMj-obxee7Jand4Rs",
+      "expire_date": "2024-12-04T11:12:18.161Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "4e67xo58w669zxjtcwked0v5495bj5je",
+    "fields": {
+      "session_data": ".eJxVi0EOAiEMRe_C2kwoFiguTTwHKaWEiY4m4qyMd1eTWejy_fff02ReHz2vQ-95ruZg0Ox-t8Jy1utX9Nui04ZjOi08X46b_Cs6j_65N9m7ooLBe7GIoTlIUCxETcIAvjpC8kSE1QaxVGNSkcrRtlg0gHm9ATXjMdc:1sqUML:OmPmBZXizk8FyVNtSrToZNalQBiUQ_yU36p6Ru5x-1k",
+      "expire_date": "2024-10-01T09:18:57.036Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "4fbeldf9kn28i9ggfddc8hlvy7rey4jy",
+    "fields": {
+      "session_data": ".eJxVi0EKwjAQRe-StZQkE5vEpeA5wkxmhhStgrEr8e6t0IUu33__vU3B5dXK0uVZJjYnA94cfkfCepX717THLMOOfbjMON3Ou_wrGva23YkZIlJ1QRPbRBhYgwp564EpuYweI2oenaOglZyopAwCBGM9Rms-K6ABM3Q:1svtTd:gnhtNlHhDs6xiZ-KbOTaLF1KyD9cFN6LNwIksEHX3-M",
+      "expire_date": "2024-10-16T07:08:49.458Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "514v1krunuhzsgsbj1ppyj31d8c9qvnt",
+    "fields": {
+      "session_data": ".eJxVjDsOwjAQRO_iGln4r6Wk5wzWrr3GAWRLcVIh7k4ipYBminlv5i0irkuN6-A5TllchBKn344wPbntID-w3btMvS3zRHJX5EGHvPXMr-vh_h1UHHVbJzYYcnZMSJoDI4DVphSr7bmQUtopA6oQQrAaiYx3zqOGsqUC8OLzBQUSN_8:1sd4cq:Cxr0Lf53XEFfg35M-BokJDoU58yhufeMxKYxX-OgGgE",
+      "expire_date": "2024-08-25T09:12:32.637Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "634mage1q2u0brmkf1df80m9pep4kmv2",
+    "fields": {
+      "session_data": ".eJxVi80KwkAMhN9lz1JM9o94FHyOJekmbNEquO1JfHcr9KCXgW--mZcrvC6trF2fZaru5MAdfjvh8ar3r2iPWYcd-3CZebqdd_n3aNzbNh_Vc641qrCgZmWigN4sYDiaAGAET2DClAOyiE8xJkayLYEoufcHZNsyLQ:1se71i:zBP8eSoLAjk67gYddEn0z3l1sq00IISRcH-6A0zgIu8",
+      "expire_date": "2024-08-28T05:58:30.337Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "6an7ubsjh6r0qyf2crlhnaizjs4xdndl",
+    "fields": {
+      "session_data": "e30:1scoxt:FHl160sc-yK8XtEVKnLSGKC3KZnqrDBJNmVG7SjTkD0",
+      "expire_date": "2024-08-24T16:29:13.345Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "6iahqwki93xvq4v94g7nbp3lkzlfx9w0",
+    "fields": {
+      "session_data": "eyJ1c2VyX2lkIjo2fQ:1skHz7:4mvSICjqgofedydNCOYruJj6cWksw_Als8Flpuk6zAI",
+      "expire_date": "2024-09-14T06:53:21.517Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "6kov80ib1aazr61djus4qlingp7qb2gv",
+    "fields": {
+      "session_data": ".eJxVi80KgzAQhN8l5yJm3fz1WOhzhM1mJdJai9FT6bs3BS8yp2--mY9atre6qmD84K26qEj7VuJeZY1TbsLiuUzED3n9TVlm6Q6s3X2m6Xk75OlRqJY2F8ABGEUTWRgx-ESY0fQB2Y0ZpCVBcJqS5V4T9hAGg-LZMXOApL4_tW013g:1tJqcu:1NiRL-Ko9rizjdFC7whqB0IDf4iLuKONBBKZJ9pTlfA",
+      "expire_date": "2024-12-21T08:57:24.956Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "79shx67fk2a6xajv9yvz47ov7zsqb4mr",
+    "fields": {
+      "session_data": ".eJxVi80KwkAMhN9lz1JM9o94FHyOJekmbNEquO1JfHcr9KCXgW--mZcrvC6trF2fZaru5MAdfjvh8ar3r2iPWYcd-3CZebqdd_n3aNzbNh_Vc641qrCgZmWigN4sYDiaAGAET2DClAOyiE8xJkayLYEoufcHZNsyLQ:1sdJi6:yShTI2gZ8dqEvem2kYiT6PCOYh2ADK2yUEif2fE84aw",
+      "expire_date": "2024-08-26T01:18:58.131Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "7e389lt8exak97tad0ehejtqs98205ug",
+    "fields": {
+      "session_data": ".eJxVi8EKwjAQRP8lZylNmt1uPAp-R9jdbknRKhh7Ev-9LfSgp-HNm_m4zMu75KXaK0-DO7voTr-dsN7ssYvynK05sDbXmaf75ZB_j8K1bPNEqF5aRhzilhQDdV5HFLPYBVNiBYNE4CkBSBsw9KMmlKCK2Jv7rjPsMbM:1suRPb:KEc5DpPpVk7rZbmTG_WB1RT1uYDp4xu4PTEINw9cqDs",
+      "expire_date": "2024-10-12T06:58:39.828Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "7lvwayh0cnmgoc43ut7arxbpyc3ubw3q",
+    "fields": {
+      "session_data": ".eJxVi0EKwjAQRe-StZQkThPHpeA5wkzyQ4pWwbQr8e4qdKHL999_T5NkXVpaOx5pKuZonNn9bir5gttXtPuMYcM-nGeZrqdN_hVNevvcgx8pq5Tqc43Yg-lA0KARRVhGoHrropesbOHJVVeyxhKI2YplmNcbcxYzIA:1smt4B:-Eof8pOL2iNxw2Zm85fIxNkTB85Ey8NiiBdP8CXYQAE",
+      "expire_date": "2024-09-21T10:53:19.630Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "7mh5lg2i3ur0o9elpmclwey36bcm39fk",
+    "fields": {
+      "session_data": ".eJxVi80KwkAMhN9lz1JM9o94FHyOJekmbNEquO1JfHcr9KCXgW--mZcrvC6trF2fZaru5MAdfjvh8ar3r2iPWYcd-3CZebqdd_n3aNzbNh_Vc641qrCgZmWigN4sYDiaAGAET2DClAOyiE8xJkayLYEoufcHZNsyLQ:1sfX9Q:GQUjjIHNoaI7SR180hOWiPluwNTC4N91tcaaS7SekV0",
+      "expire_date": "2024-09-01T04:04:20.798Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "7pi2mxnq8ioo06mh72gjkl845byyc8ck",
+    "fields": {
+      "session_data": ".eJxVi8EKwjAQRP8lZylNmt1uPAp-R9jdbknRKhh7Ev-9LfSgp-HNm_m4zMu75KXaK0-DO7voTr-dsN7ssYvynK05sDbXmaf75ZB_j8K1bPNEqF5aRhzilhQDdV5HFLPYBVNiBYNE4CkBSBsw9KMmlKCK2Jv7rjPsMbM:1suuw0:Y1dC2EMX14cl0WOAXXRmlQtzEv_9OW3wylvAXvi6tO8",
+      "expire_date": "2024-10-13T14:30:04.028Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "8jpbnhuewewbz8js8golxqnsuoroh2ba",
+    "fields": {
+      "session_data": ".eJxVjDsOwjAQRO_iGln4l2gp6TmDtRuvcSDYKHEkJMTdcaQU0Ewx8-a9hce1Jr8uPPsxiJNQ4vDbEQ53ztsQbpivRQ4l13kkuSFyXxd5KYGn887-CRIuqb0HNtiH4JiQNPeMAFabGK22x0hKaacMqEgIvdVIZDrnOtQQWyqArkkzv6qv_HhOWLkpU3mw-HwBbM9AEA:1seqGl:0Evky_n6xFGnfs_s_i97_cOgjgQcYZt_V-qsYi7PfGw",
+      "expire_date": "2024-08-30T06:17:03.164Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "8yq1qaudtzip8vdbxt68u497ybwexiy1",
+    "fields": {
+      "session_data": ".eJxVi0EKwjAQRe-StZQkThPHpeA5wkzyQ4pWwbQr8e4qdKHL999_T5NkXVpaOx5pKuZonNn9bir5gttXtPuMYcM-nGeZrqdN_hVNevvcgx8pq5Tqc43Yg-lA0KARRVhGoHrropesbOHJVVeyxhKI2YplmNcbcxYzIA:1soe5Z:gqzAFIjbGWKAYmid-U4O1cKS0nc9xujNUTsKoxDWl5E",
+      "expire_date": "2024-09-26T07:18:01.426Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "95449v6y49zu65in56ocdt8k5gevik9w",
+    "fields": {
+      "session_data": ".eJxVjDsOwjAQRO_iGln4r6Wk5wzWrr3GAWRLcVIh7k4ipYBminlv5i0irkuN6-A5TllchBKn344wPbntID-w3btMvS3zRHJX5EGHvPXMr-vh_h1UHHVbJzYYcnZMSJoDI4DVphSr7bmQUtopA6oQQrAaiYx3zqOGsqUC8OLzBQUSN_8:1sd4cL:Zf_xIwoKNE8hItdsB_TpyVNudO0e-_Wk4XdY8lKf7Zk",
+      "expire_date": "2024-08-25T09:12:01.960Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "a9m7ns5uzul1fub33po9ckhipsbf9pfn",
+    "fields": {
+      "session_data": ".eJxVi8EKwjAQRP8lZylNmt1uPAp-R9jdbknRKhh7Ev-9LfSgp-HNm_m4zMu75KXaK0-DO7voTr-dsN7ssYvynK05sDbXmaf75ZB_j8K1bPNEqF5aRhzilhQDdV5HFLPYBVNiBYNE4CkBSBsw9KMmlKCK2Jv7rjPsMbM:1tBYdd:C8rhuwLo7FUtYLoIFRwMKUDJLZyJw03aacfgKYYoLek",
+      "expire_date": "2024-11-28T12:07:53.272Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "at5zmljt6qzdl4k8m9z56n3nf6f9slg0",
+    "fields": {
+      "session_data": ".eJytj0sOwjAMRO_idVQlIKBk1Zug0FhpIJ8qcagQ4u64O5BYIXb2vLE184BMM2joj3J36EEARuMDC9cp--CxjSS3g1vFbsyRDa1iSSYie1zDSoOnzi0MZlPrkotloHi15g5a7QXEnGjiUQm4oymgN1L2AkoO649KzWIiPqjtfMGRQKcWggBXjF0NSjIjLLGCptJQQMjOp9N70FvoEtJHzOpdavPJGjKgH_-u1X-vdfi91vP5Agmef3Y:1stLhe:-CHAmTn9Q_yLggTl1IPM08ynOd0CO-4Y2WaZ3TH6TP4",
+      "expire_date": "2024-10-09T06:40:46.009Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "br2ri9jjigh7mx7svcuv9ksu4046rviq",
+    "fields": {
+      "session_data": ".eJxVi80KwkAMhN9lz1JM9o94FHyOJekmbNEquO1JfHcr9KCXgW--mZcrvC6trF2fZaru5MAdfjvh8ar3r2iPWYcd-3CZebqdd_n3aNzbNh_Vc641qrCgZmWigN4sYDiaAGAET2DClAOyiE8xJkayLYEoufcHZNsyLQ:1sgSuf:Qz3HUnNJ5Qz0T7PedhCQ3h_QIbv6JkktJRMCfuBH_cQ",
+      "expire_date": "2024-09-03T17:44:57.412Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "d2oe0fczv2wackcc14hsg9c86rn6obvb",
+    "fields": {
+      "session_data": ".eJxVi0sOwjAMBe_iNarysZOaJRLniJzUUSooSKRdIe4OSF3Act68eUKSbW1p6_pI8wRHIAOH3zFLuejta9p90WHHPpwXma-nXf4VTXr73BVjqL6OwQiV4KNKJhucHbUQs3NsZCKOKMgukxNvgzcctSIrkhp4vQFMjDFW:1tDjIE:lNdj66XzBg7OIyq8ZCcGaqr4XFaC752qmYJkauHUIyM",
+      "expire_date": "2024-12-04T11:54:46.156Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "dg7c7gyoklgdt0dvxc5x8qb4at8lgzx3",
+    "fields": {
+      "session_data": "e30:1sceD7:PyvkEWbRMINoy86Seq0TVoKll68FTNBgQ9ILIqHSc58",
+      "expire_date": "2024-08-24T05:00:13.391Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "f9a14yaq61r9l9l21s645lwawti9xvp6",
+    "fields": {
+      "session_data": ".eJxVi0EOAiEMRe_C2kwoFiguTTwHKaWEiY4m4qyMd1eTWejy_fff02ReHz2vQ-95ruZg0Ox-t8Jy1utX9Nui04ZjOi08X46b_Cs6j_65N9m7ooLBe7GIoTlIUCxETcIAvjpC8kSE1QaxVGNSkcrRtlg0gHm9ATXjMdc:1srYMC:rQu0TrQnKEfzXiNbtwXvGXSqXfyUhAeM3JWI1FgTGfo",
+      "expire_date": "2024-10-04T07:47:12.862Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "g5wi1eufci2xzypx0bv4huj88ccz7sw8",
+    "fields": {
+      "session_data": ".eJxVi0EOAiEMRe_C2kwoFiguTTwHKaWEiY4m4qyMd1eTWejy_fff02ReHz2vQ-95ruZg0Ox-t8Jy1utX9Nui04ZjOi08X46b_Cs6j_65N9m7ooLBe7GIoTlIUCxETcIAvjpC8kSE1QaxVGNSkcrRtlg0gHm9ATXjMdc:1sicE2:B9YqN8s1zpsK9stQqPExb8w-O9WM9Yu8FG13w4XRjts",
+      "expire_date": "2024-09-09T16:05:50.737Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "g9suzgmca4tann5ybyic7m6vwrprk64f",
+    "fields": {
+      "session_data": ".eJxVi0EKwjAQRe-StZQkThPHpeA5wkzyQ4pWwbQr8e4qdKHL999_T5NkXVpaOx5pKuZonNn9bir5gttXtPuMYcM-nGeZrqdN_hVNevvcgx8pq5Tqc43Yg-lA0KARRVhGoHrropesbOHJVVeyxhKI2YplmNcbcxYzIA:1sqUBo:cbFwLDe2g77L09lFeBnwB3Zhka5N9UNowocAqk41zvs",
+      "expire_date": "2024-10-01T09:08:04.607Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "gcordhquetofrook9eyrskenptpaqcl4",
+    "fields": {
+      "session_data": ".eJxVi8EKwjAQRP8lZylNmt1uPAp-R9jdbknRKhh7Ev-9LfSgp-HNm_m4zMu75KXaK0-DO7voTr-dsN7ssYvynK05sDbXmaf75ZB_j8K1bPNEqF5aRhzilhQDdV5HFLPYBVNiBYNE4CkBSBsw9KMmlKCK2Jv7rjPsMbM:1su9u7:QISRbpHXJUPd8773krcXmWs3cZHj4wr2vACu7KLuwxQ",
+      "expire_date": "2024-10-11T12:16:59.261Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "gjg0ettuqv7i2if0ue4wdjilpsvbcp8h",
+    "fields": {
+      "session_data": ".eJytkF9rwjAUxb-K5FnbJE0bKwz2hz0MlTkYY_NF0iRto21Sm7Q4xe--KDrG2ONez7n3d8-5B9BZ2a4EcwxMDkBZCyagdK6xkzBknJtOOxsUxhSVDLipwRCwfeNncExihBKckhiPrBDU8GoLsSW5qNq-i9YbY60WSdHpngWsaa6U0z1utJPaXYGd-F-g7TIP9LCUUAQpRgnEBGKMo8S7smaq8v6mNKqvAi3dbXGSLstne9XLVuVK-mCu7eQQ6CwHE0RxDGEKI-QFVksPmXrI4E3pcjAL_HKjuOta-eOHVRn9nTNk4d1DMTZ8htTy6b6dvozRkifrx_ZZlmS3zfPFQrj3-Xz_MXqdZnTXw325iVc2LW9smoy4P1eoXurV7yjeyFmtqs-rc46mmPtuEJ0ayF1zERBOT8LaKT8sMcUySzhLCBMsT0kOORaUxiKGOJOCEsEhTzk4Hr8AsNu3ng:1sjxkW:-n0BHn5fk2OT51Bf_1TsCDajx1Z3VdgmGCD0X4brJHA",
+      "expire_date": "2024-09-13T09:16:56.487Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "grtvv0byn3afgj6ucxp2g4oasntok6h5",
+    "fields": {
+      "session_data": ".eJxVi8EKwjAQRP8lZylNmt1uPAp-R9jdbknRKhh7Ev-9LfSgp-HNm_m4zMu75KXaK0-DO7voTr-dsN7ssYvynK05sDbXmaf75ZB_j8K1bPNEqF5aRhzilhQDdV5HFLPYBVNiBYNE4CkBSBsw9KMmlKCK2Jv7rjPsMbM:1tBGjB:birDYBiKZqo20agttOQxAGq-f4BTy5OG5-2yrG7y3YE",
+      "expire_date": "2024-11-27T17:00:25.857Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "gt45dwwqyx929uesnhpmmt2hyrxnuhai",
+    "fields": {
+      "session_data": ".eJxVi0EKwjAQRe-StZSZJDNtXAqeI0ySKSlaBdOuxLvbQhe6fP_99zZR1qXGtekrTsWcDbE5_Y5J8k0fu6nPWbsDW3edZbpfDvlXVGl1u_d9CNYSAo4wyACOLLIvmrxHl4tmAGAAp2yJQ8KxQMEAnkhFNLD5fAEmvTEA:1tFtee:XmdJfP2VoGs7zxF3G-yWJncsxIncHqlzlIDY6y5qHLY",
+      "expire_date": "2024-12-10T11:22:52.512Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "hajeg3h67khe7go7gy0hck3aho0elekp",
+    "fields": {
+      "session_data": ".eJxVi8EKwjAQRP8lZylNmt1uPAp-R9jdbknRKhh7Ev-9LfSgp-HNm_m4zMu75KXaK0-DO7voTr-dsN7ssYvynK05sDbXmaf75ZB_j8K1bPNEqF5aRhzilhQDdV5HFLPYBVNiBYNE4CkBSBsw9KMmlKCK2Jv7rjPsMbM:1suTTA:c0ux_e1DoJbUi5gTTgLiMENd3P06WHMm9njje7YCFm0",
+      "expire_date": "2024-10-12T09:10:28.408Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "hih3y27kn78b8pyovv4hk6n92c74fy5m",
+    "fields": {
+      "session_data": ".eJxVi8EKwjAQRP8lZylNmt1uPAp-R9jdbknRKhh7Ev-9LfSgp-HNm_m4zMu75KXaK0-DO7voTr-dsN7ssYvynK05sDbXmaf75ZB_j8K1bPNEqF5aRhzilhQDdV5HFLPYBVNiBYNE4CkBSBsw9KMmlKCK2Jv7rjPsMbM:1suTRc:i5rmkVil64CYCrC8LDFr4wVst78eDy9dT8Feqkfy-Eg",
+      "expire_date": "2024-10-12T09:08:52.899Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "i198t393kk1f8z9zhckkvy0zmr9arbmh",
+    "fields": {
+      "session_data": ".eJxVi0EKwjAQRe8yaynJJJM0LgXPEcZkhhStgrEr8e6t0IUu33__vSHz8mp56fLMU4UjkIXD73jhcpX717THLMOOfTjPPN1Ou_wrGve23WvwITrja1AioaLjqMFVr0KmkOOE6I0VW7hEReSAyhwJSV1KURx8Vl44MhA:1tDN3m:ESKAvoihcw-KZW7-0jAAZIbev0tbWExKF4TL0ig7wAw",
+      "expire_date": "2024-12-03T12:10:22.545Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "igi2j2k1imstafa02houkxjsyvtceftu",
+    "fields": {
+      "session_data": "e30:1tHJvk:HEltNDuEIhtMx_3BDDM5oAszQDzmh0okx-0ftXY_gQY",
+      "expire_date": "2024-12-14T09:38:24.934Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "iy05skka1kpbt6po4iz9sd8z5kxmey97",
+    "fields": {
+      "session_data": "e30:1skHzd:ps8-GhI6sqUlP_8UtrH3NAwVzilgNlv-FyNi44O6Mkw",
+      "expire_date": "2024-09-14T06:53:53.458Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "j4f88yye6prlw77fl13uzmmmx7emqr2w",
+    "fields": {
+      "session_data": ".eJxVi0EOAiEMRe_C2kwoFiguTTwHKaWEiY4m4qyMd1eTWejy_fff02ReHz2vQ-95ruZg0Ox-t8Jy1utX9Nui04ZjOi08X46b_Cs6j_65N9m7ooLBe7GIoTlIUCxETcIAvjpC8kSE1QaxVGNSkcrRtlg0gHm9ATXjMdc:1ssYS3:EJb9FcygzOujyKQcTpUDjzMiBmHpmhfWWLe22TgOBuY",
+      "expire_date": "2024-10-07T02:05:23.148Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "jdoe4evbl26utyqoebrbm9zy1sn1rw5k",
+    "fields": {
+      "session_data": ".eJxVi0EKwjAQRe-StZRMMplpXAqeI0w6CSlaBdOuxLur0IUu33__PU2SbW1p6-WRZjVHA-bwu2WZLuX2Fe2-lGHHPpwXma-nXf4VTXr73FWIWQCqQ4jF0egtRKsYyNXMo2eYUEExS_U1FMtKiCKWKHINqOb1BiTsMXA:1shOMa:6TM4W0Hk2SajLgjCgmsiQg6Ry7udTf4o8XDBvSMyWrE",
+      "expire_date": "2024-09-06T07:05:36.769Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "jkwusn30loj2bf78hpafewbhl3ijze7i",
+    "fields": {
+      "session_data": ".eJxVi0EOwjAMBP-SM6qaNDgxRyTeEdmOrVRQkAg9If4OSD3AcXZ2nq7Q-mhl7Xovc3UHtw9u9zsyyVmvX9Nuiw4b9uG00Hw5bvKvaNTb585e0zQajKGiSczEpBiQIaeq7EExTiJROBEwR4WJzQgROIs3U_d6A4pmM8c:1tDi30:ElnWSt8ZzVU9d3au5dNOweQZxYXmMEIdnax8lV8Wpfs",
+      "expire_date": "2024-12-04T10:34:58.417Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "kp07s3uug69odr5oiej3dj7s5xe5bj9l",
+    "fields": {
+      "session_data": ".eJxVi0sOwjAMBe-SNarycY3DEolzRE5iKxUUJEJXiLu3SF3Act68eZvEy6ulpcszTdWcDKI5_I6Zy1XuX9Mesww79uEy83Q77_KvaNzbdieBXNlmHbUAg0jR4EUD2cgOK4qEyNGzJ5uPTixVduoCIERApdF8VpxYMs4:1tKZvf:Vc3wwwAUKHiAoKdv1qDCeHm-Dx_UO6-pv-Pz2fbxuEA",
+      "expire_date": "2024-12-23T09:19:47.590Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "kwvgogerjr9ly72ply1sqzmx0vjdgiky",
+    "fields": {
+      "session_data": ".eJxVi0EKwjAQRe-StZQkThPHpeA5wkzyQ4pWwbQr8e4qdKHL999_T5NkXVpaOx5pKuZonNn9bir5gttXtPuMYcM-nGeZrqdN_hVNevvcgx8pq5Tqc43Yg-lA0KARRVhGoHrropesbOHJVVeyxhKI2YplmNcbcxYzIA:1skIQn:3RpHlCdxs-yviG7JsnyeEq3zKInK5KXU1hLnwDrHIRo",
+      "expire_date": "2024-09-14T07:21:57.735Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "kxw8sk7ka59pco1wgtq5hskdi757m168",
+    "fields": {
+      "session_data": ".eJxVi8EKwjAQRP8lZylNmt1uPAp-R9jdbknRKhh7Ev-9LfSgp-HNm_m4zMu75KXaK0-DO7voTr-dsN7ssYvynK05sDbXmaf75ZB_j8K1bPNEqF5aRhzilhQDdV5HFLPYBVNiBYNE4CkBSBsw9KMmlKCK2Jv7rjPsMbM:1suOYn:PcYob6hAbkvWY2gG2G7Otx4iP6cFaYFLxAoQLI9H82M",
+      "expire_date": "2024-10-12T03:55:57.998Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "lm2shz1xq9l27bc3r6qfyg304s4zpdiz",
+    "fields": {
+      "session_data": ".eJxVjDsOwjAQBe_iGln-rZ2lpOcM1tpe4wBKpDipEHeHSCmgfTPzXiLStra4dV7iWMRZgBKn3zFRfvC0k3Kn6TbLPE_rMia5K_KgXV7nws_L4f4dNOrtW7MLvto6eEWQvQ1MCbQ3euAMiMagogIYHDk0CQxZ7a3CwNUhO2Al3h_vwDco:1tDien:qI5pEcXYtJ2AH_woSoSYAyEamY6ccHB-b8hzqxXlFg8",
+      "expire_date": "2024-12-04T11:14:01.146Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "lqt4rvudkyekjt5civzpgtb4itaxz4qd",
+    "fields": {
+      "session_data": ".eJxVi8EKwjAQRP8lZylNmt1uPAp-R9jdbknRKhh7Ev-9LfSgp-HNm_m4zMu75KXaK0-DO7voTr-dsN7ssYvynK05sDbXmaf75ZB_j8K1bPNEqF5aRhzilhQDdV5HFLPYBVNiBYNE4CkBSBsw9KMmlKCK2Jv7rjPsMbM:1suoTu:LX2kep4k6tWHkj-EoV7tREHkYbHbjipDTOdxnc_vvZA",
+      "expire_date": "2024-10-13T07:36:38.773Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "mxiiz6n9e66ey6fm3snr800xkbfpnpbj",
+    "fields": {
+      "session_data": ".eJxVi8EKwjAQRP8lZynNJttkPQp-R9gku6RoFYw9if9uhR70NLx5My-TeH22tHZ5pLmao0Ewh98yc7nI7WvafZFhxz6cF56vp13-PRr3ts2tLVPmoDECTVTIqnectVClqgBeII6k2YMEpxiiL3EMWzjKiOi8eX8AZbsxoA:1tGucy:vEFwyhFl4e-KTFd1HIMt-sa-WqZ1MENwKCk2RNbb-4k",
+      "expire_date": "2024-12-13T06:37:20.360Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "n59psb34vuju7pt2wu41p6f3v8yzx26o",
+    "fields": {
+      "session_data": ".eJxVi0EOwjAMBP_iM6pcpw4JRyTeEdmJo1RQkAg9If4OSD3AcXZ2npBkfbS0drunucABPMPud1TJZ7t-TbstNmzYh9Mi8-W4yb-iSW-fe1Sq0RwiUsmVqOI0xoKeikeenLKFzEZqBYnImL0LEuKYlVT23uD1Blc2MfU:1tJqYv:zyz20g05uL7Gwk8mqyoKPWdUJMFUDtgupxbnWqdJVFE",
+      "expire_date": "2024-12-21T08:53:17.898Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "nl4yj3rwpszi8a6xqvcbd9byngcmywvq",
+    "fields": {
+      "session_data": ".eJxVi8EKwjAQRP8lZylNmt1uPAp-R9jdbknRKhh7Ev-9LfSgp-HNm_m4zMu75KXaK0-DO7voTr-dsN7ssYvynK05sDbXmaf75ZB_j8K1bPNEqF5aRhzilhQDdV5HFLPYBVNiBYNE4CkBSBsw9KMmlKCK2Jv7rjPsMbM:1svU0k:OKJ0jJ1FzDr7nAkDWrVwbljohCyCBviNRumWCb78snw",
+      "expire_date": "2024-10-15T03:57:18.405Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "nm7d4qo5cboqk3vvs548c1i6w3ce2uwq",
+    "fields": {
+      "session_data": ".eJxVi0EOAiEMRe_C2kwoFiguTTwHKaWEiY4m4qyMd1eTWejy_fff02ReHz2vQ-95ruZg0Ox-t8Jy1utX9Nui04ZjOi08X46b_Cs6j_65N9m7ooLBe7GIoTlIUCxETcIAvjpC8kSE1QaxVGNSkcrRtlg0gHm9ATXjMdc:1sgkOg:kmC370nl8TVLhmzrK4NqFf5nhuxAW9lzKQ6zTj7BY8c",
+      "expire_date": "2024-09-04T12:25:06.731Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "nwta3kkci2mutoxq5bgv7boi8tt3vj7f",
+    "fields": {
+      "session_data": "eyJfc2Vzc2lvbl9leHBpcnkiOjYwMCwic3NvX3N0YXRlIjoiYTM5b2xWaGc2U05tSUl0ZjhqQ2ZTUTZnUWpHRlA0Iiwic3NvX25leHRfdXJsIjoiL2FkbWluL2xvZ2luIn0:1st4C7:vaTT57axkBsxMbW0kWWrdOmdMXeW-qfFTdIym5T5QiY",
+      "expire_date": "2024-09-24T12:09:03.746Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "ohfxl4wp3rp2x3csj2fwtjfjfm69zj8a",
+    "fields": {
+      "session_data": ".eJxVi0EOAiEMRe_C2kyAFiguTTwHwdKGiY4m4qyMd1eTWejy_fff05S6PnpZh9zL3MzegDO73_FU-SzXr-m3RaYNx3Rc6nw5bPKv6HX0z51T4CTWJxZtmC1m9EQ-eWgKyk4g2kAuMzIGEkLQmDGqRYYWlc3rDVJLMcI:1svECA:gghDtCW6zrfOIEryb3xGXgvQbT9QYPD8KfqGhPH3n7Y",
+      "expire_date": "2024-10-14T11:04:02.446Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "onc199nd0um9r06rm22xxe9pnr525i5a",
+    "fields": {
+      "session_data": ".eJxVi0EKwjAQRe-StRScSZOMS8FzhJnMhBStgmlX4t2r0IUu33__vVzmdWl57fbMk7qTi-7wuwmXq92_oj1mG3bsw2Xm6Xbe5V_RuLfPHSigmJdaUAoTJtSEwQcS46CUEpBWrHosXD1wgMgEYmCxJNA6uvcGXNoy3g:1tD9Kb:01Bl4jeVUOTe1guyoOBXxJFA2rFMml1mPSM0-iz-3ko",
+      "expire_date": "2024-12-02T21:30:49.857Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "ph8ykxaktiolhukebyu9n0h2um8hnolm",
+    "fields": {
+      "session_data": ".eJxVi0EKwjAQRe-StZQkThPHpeA5wkzyQ4pWwbQr8e4qdKHL999_T5NkXVpaOx5pKuZonNn9bir5gttXtPuMYcM-nGeZrqdN_hVNevvcgx8pq5Tqc43Yg-lA0KARRVhGoHrropesbOHJVVeyxhKI2YplmNcbcxYzIA:1sq6ZV:NrGFEDZhcBstBve4pPYnqxDzRZbL1_eniJuKXe-IT30",
+      "expire_date": "2024-09-30T07:54:57.873Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "pl70ytfdsdwcflaswbml1os9lalege6i",
+    "fields": {
+      "session_data": ".eJxVjDsOwjAQRO_iGln4r6Wk5wzWrr3GAWRLcVIh7k4ipYBminlv5i0irkuN6-A5TllchBKn344wPbntID-w3btMvS3zRHJX5EGHvPXMr-vh_h1UHHVbJzYYcnZMSJoDI4DVphSr7bmQUtopA6oQQrAaiYx3zqOGsqUC8OLzBQUSN_8:1sfBDa:7FUjrzsk7R_0s2cBPFP7-nx0XO0AGiwexhRwaWXqlT0",
+      "expire_date": "2024-08-31T04:39:10.248Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "pylmtixkpfkd8uz22bkrajrhyidfmit8",
+    "fields": {
+      "session_data": ".eJxVi0EOAiEMRe_C2kwoFiguTTwHKaWEiY4m4qyMd1eTWejy_fff02ReHz2vQ-95ruZg0Ox-t8Jy1utX9Nui04ZjOi08X46b_Cs6j_65N9m7ooLBe7GIoTlIUCxETcIAvjpC8kSE1QaxVGNSkcrRtlg0gHm9ATXjMdc:1sgkzi:irmSP-B0T_RrN1GOaTDUpscvhJRnyHyXf4IgTuWbccU",
+      "expire_date": "2024-09-04T13:03:22.429Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "pyncoy2sa16g7o9w6mxdrtvc9z0f31tf",
+    "fields": {
+      "session_data": "e30:1skHuL:Ej6Cpm_L3NJxkKwINejJxnhJDTtbnSyfgrzs2_c_5pg",
+      "expire_date": "2024-09-14T06:48:25.582Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "q84qcx01tfp7u2cml2kiwj3hkrz6wfxb",
+    "fields": {
+      "session_data": ".eJxVi0sKAjEQRO_SaxnyJR2XgucInU43GXQUjLMS7-4Is9BNwatX9YJC67OXdcijzA2OEDIcfstKfJHb1_T7ItOOYzovNF9Pu_x7dBp9m3tx6sWHyAmNqsuMgkLWiITGSuK2xJo1YjVIzlpVTi1Wlxo2i_D-AJbhM5s:1tDHIl:sFxToQ_IdB95sFiejUWOu7jSFL2XpAYAfYdeTrCBAl8",
+      "expire_date": "2024-12-03T06:01:27.265Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "qa4k0q7s6z19h0r6tcyfy28gmb87rkv5",
+    "fields": {
+      "session_data": ".eJxVjMEOgyAQRP-Fc0MU2BV6apr0Owisq5CqJFVOTf-9mnjxNJl5M_MVUxnz4nkOeRJ3saVKtWSpQcNjPEJJZRY34UPdkq8rf3zu96K5ZjHQm5cDpDKzPO0qX8fF84SXRQpr2uvOIrWxCYi92dUaZXVLA0ZmoxWTDQQMzkJrHUBsFKpuIIdRESF2LH5_TI4-1w:1svtUt:G-dZrEeNvDzHWrorWeBZbCcT3oiwac7iHXP-79iOP-g",
+      "expire_date": "2024-10-16T07:10:07.918Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "qeowu9p12albeq9nnxvwwa1ysad6nlmk",
+    "fields": {
+      "session_data": ".eJxVi0EOgjAQRe_StSFlmBbGpYnnaGbsTEoUTSysjHcXEha4_O-9_3GJl7mkpeo7jdmdHbjTkQnf7vrcRHlN2uyzNteJx8dll3-PwrWseQviOyWwDmGQliF6jLRB814gk2LAQCaqubcczIR6pCGaimcj9_0BK50yOg:1sfBxX:fOvobcZ1zn9qCqcNDwMpkxIDP3XlbrDok1C6tcZ4k2s",
+      "expire_date": "2024-08-31T05:26:39.601Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "r7w4e68mdcgqz8li268kwd7xc4mdbt7v",
+    "fields": {
+      "session_data": "eyJfc2Vzc2lvbl9leHBpcnkiOjYwMCwic3NvX3N0YXRlIjoiVzFWMEQ2dUp5SmR1eVFIbDlWRWhnZEtoZTNDbDZOIiwic3NvX25leHRfdXJsIjoiL2FkbWluLyJ9:1st4g2:Fi6ucHBzAfTIeCAIFkWkUIAemw08LINmm7q_2dENKVA",
+      "expire_date": "2024-09-24T12:39:58.924Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "r9fs0jfrq30jvbfgffdahfbfu2b8ji57",
+    "fields": {
+      "session_data": ".eJxVi80KwkAMhN9lz1JM9o94FHyOJekmbNEquO1JfHcr9KCXgW--mZcrvC6trF2fZaru5MAdfjvh8ar3r2iPWYcd-3CZebqdd_n3aNzbNh_Vc641qrCgZmWigN4sYDiaAGAET2DClAOyiE8xJkayLYEoufcHZNsyLQ:1sgivR:ugD55pzW0jBHoC_7gbtq1KPsri9oY0y-53baXCeKqPw",
+      "expire_date": "2024-09-04T10:50:49.677Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "ravhirazum1conqk8jj2bab2209f3k7g",
+    "fields": {
+      "session_data": ".eJxVi0EOAiEMRe_C2kwoFiguTTwHKaWEiY4m4qyMd1eTWejy_fff02ReHz2vQ-95ruZg0Ox-t8Jy1utX9Nui04ZjOi08X46b_Cs6j_65N9m7ooLBe7GIoTlIUCxETcIAvjpC8kSE1QaxVGNSkcrRtlg0gHm9ATXjMdc:1ssZ3E:UQTK8pAWSuQQARRQImquGM44TPhj5RxVI4_KXvmj4Bw",
+      "expire_date": "2024-10-07T02:43:48.363Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "rtinmhintkcw0pfgvvsrd14gvjs3g70p",
+    "fields": {
+      "session_data": ".eJxVjE0OwiAYBe_C2hBACuLSvWdovj-kaiAp7cp4d23ShW7fzLyXGmFdyrh2mceJ1VlZdfjdEOghdQN8h3prmlpd5gn1puiddn1tLM_L7v4dFOjlWwc3eELg7ChHOUryJy8YMApDgkEkO2OjA8JkxHmbLRNGDj4lAyaJen8AE0048g:1sjjCS:iugYEia7MRv0cDJJfA57PisZfofgrLRNuaAmoUGMSo4",
+      "expire_date": "2024-09-12T17:44:48.920Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "sj014zdbq41nhv94lw1alibigplu10em",
+    "fields": {
+      "session_data": ".eJxVi0EOAiEMRe_C2kwoFiguTTwHKaWEiY4m4qyMd1eTWejy_fff02ReHz2vQ-95ruZg0Ox-t8Jy1utX9Nui04ZjOi08X46b_Cs6j_65N9m7ooLBe7GIoTlIUCxETcIAvjpC8kSE1QaxVGNSkcrRtlg0gHm9ATXjMdc:1sgQr9:AGjYit_0Af7JI4B8s7NL0ZXZvj-09qRepTsEEdy7PwM",
+      "expire_date": "2024-09-03T15:33:11.408Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "t46ffh4y1bqzywe7i1ogp3rhksn1jkra",
+    "fields": {
+      "session_data": ".eJxVi8EKwjAQRP8lZylNmt1uPAp-R9jdbknRKhh7Ev-9LfSgp-HNm_m4zMu75KXaK0-DO7voTr-dsN7ssYvynK05sDbXmaf75ZB_j8K1bPNEqF5aRhzilhQDdV5HFLPYBVNiBYNE4CkBSBsw9KMmlKCK2Jv7rjPsMbM:1tCCVY:3nTbZRxYxE70spQvVsqUycV4dQU5yEoA-SYV7bqH0bo",
+      "expire_date": "2024-11-30T06:42:12.880Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "us1a9mwhhzc8seu4z0ujiqksz4l5ox0g",
+    "fields": {
+      "session_data": "eyJfc2Vzc2lvbl9leHBpcnkiOjYwMCwic3NvX3N0YXRlIjoiM1k4T1lrY0x5N0s4b2NtVDBaM1R2Y3lUc0JPRHNJIiwic3NvX25leHRfdXJsIjoiL2FkbWluLyJ9:1st4fe:MXZSlG7UwxgRyFUsRYbBzNUMgnnnt5v1L0lD0EBdKJk",
+      "expire_date": "2024-09-24T12:39:34.748Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "uvrtotiwo6ydm6ixg9ad5w4gcnygjnwo",
+    "fields": {
+      "session_data": ".eJxVjMEKwjAQRP8lZynZNYkbj4LfETabDSlaBWNP4r-3hR70OPPezMcknt8tzV1faSzmbMAcfrvMctPHBtpz0mGPfbhOPN4vO_xbNO5t1a11ARlKRO-PSpCl5uAgKvuo4YQEUGOQqpkLWQK_XhMiSCSBjM58Fy_wMck:1stVdJ:Tv9x5hC3dXlxX5vPNp2Sg4b7XUu8v4NUz8dMOj_1aYw",
+      "expire_date": "2024-10-09T17:16:57.020Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "uyz2ks60xltf1ug7a3hhgd31i210skf1",
+    "fields": {
+      "session_data": ".eJxVi0EOwjAMBP_iM6pSl8QJRyTeEdmxo1RQkAg9If4OSD3AcXZ2npB5fbS8drvnWeEAHmH3OwqXs12_pt0WGzbsw2nh-XLc5F_RuLfPnQRF0YK6GolLmIiDctkzk2JireKjSzjqOAlWqY4SRqYUgwXzxcPrDY3pMv0:1tGC70:zAvfRTvRZ3GUxgal18XlOdM2miEYaQkpC-nMmUElMx8",
+      "expire_date": "2024-12-11T07:05:22.621Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "v9061kkrkoljhqsygrx3y7995oztm8rd",
+    "fields": {
+      "session_data": ".eJxVjDsOwjAQRO_iGln4r6Wk5wzWrr3GAWRLcVIh7k4ipYBminlv5i0irkuN6-A5TllchBKn344wPbntID-w3btMvS3zRHJX5EGHvPXMr-vh_h1UHHVbJzYYcnZMSJoDI4DVphSr7bmQUtopA6oQQrAaiYx3zqOGsqUC8OLzBQUSN_8:1sd4LP:--9WRTb0Lq9lbri_PFjWrk3ZIYgexkf1_5VFHjzNGIA",
+      "expire_date": "2024-08-25T08:54:31.483Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "vf1af26ptvfj9a000ejvek6a37tnuak7",
+    "fields": {
+      "session_data": ".eJxVi0sOwjAMBe-SNaqaD3HMEolzRLZrKxUUJEJXiLsDUhewnDdvnq7S-mh17Xqv8-QOLnq3-x2Z5KzXr2m3RYcN-3BaaL4cN_lXNOrtc5_ElMULFhotqBUCi2P2mBhyYgQMRJAJ2GSvHEqGhMYBs48ci7jXG5E9Mto:1tBEQ3:6MBzrSqNvkIBm3mv6yQFe5_b789dDMjtJt4S0clIP38",
+      "expire_date": "2024-11-27T14:32:31.049Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "vnvxm4gc9up3wnc2t85o5ghos6afi2uw",
+    "fields": {
+      "session_data": ".eJxVi8EKwjAQRP8lZylNmt1uPAp-R9jdbknRKhh7Ev-9LfSgp-HNm_m4zMu75KXaK0-DO7voTr-dsN7ssYvynK05sDbXmaf75ZB_j8K1bPNEqF5aRhzilhQDdV5HFLPYBVNiBYNE4CkBSBsw9KMmlKCK2Jv7rjPsMbM:1stVdY:cIzGH0BshkWdKifs06waQtKX6ECgAEZmHbtvvNq6yYI",
+      "expire_date": "2024-10-09T17:17:12.843Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "xp60oikzaufeyy5eql08kcx4xfzk5k3z",
+    "fields": {
+      "session_data": ".eJxVi8EKwjAQRP8lZynJdpt0PQp-R9jdbEnRKhh7Ev_dCj0oc3rzZl4u8_qseW32yHNxRxfRHX5LYb3Y7WvqfbFux9adF56vp13-PSq3us0NsAdFC8wRJqRRGAsOnlDTVMC2CFAKLFF9YPRA_YA2alJVAnHvD2ePMlY:1tKuX4:Uqxqk7wGZpO3L3wLLRmuCq8EAK74EFgLj8brsOogyw0",
+      "expire_date": "2024-12-24T07:19:46.989Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "ymvd4lhwqdbvwjqyu46plc7eo4c33nh6",
+    "fields": {
+      "session_data": ".eJxVi0EOAiEMRe_C2kwoFiguTTwHKaWEiY4m4qyMd1eTWejy_fff02ReHz2vQ-95ruZg0Ox-t8Jy1utX9Nui04ZjOi08X46b_Cs6j_65N9m7ooLBe7GIoTlIUCxETcIAvjpC8kSE1QaxVGNSkcrRtlg0gHm9ATXjMdc:1ssYYn:nMaYBLO_l21h--g-7_GNn9JoafXrzTjLHk49Do-IpL8",
+      "expire_date": "2024-10-07T02:12:21.099Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "zf5vdr329cjs7vltwbt6bw1044rlmxvt",
+    "fields": {
+      "session_data": ".eJxVjEsOwjAMBe-SNYocJw6fJfueobJjlxRQK_WzQtwdKnUB2zcz7-VaXpfarrNNba_u4oI7_G7C5WHDBvTOw230ZRyWqRe_KX6ns29Gted1d_8OKs_1W3chnYE0Js1spB0ipijAYMCmhegYMAcFE7JIXZAodEIpmNEgg7r3B-KLN9U:1sckkX:_R5Sm7-aarrEIWJUu8yMUkk-Vxl7XNLbQwBx27BNJow",
+      "expire_date": "2024-08-24T11:59:09.449Z"
+    }
+  },
+  {
+    "model": "home.subjects",
+    "pk": 1,
+    "fields": {
+      "name": "Mathematics",
+      "grade": 10,
+      "description": "Mathematics involves the study of numbers, quantity, structure, space, and change.",
+      "bg_color": "#7dd3fc"
+    }
+  },
+  {
+    "model": "home.subjects",
+    "pk": 2,
+    "fields": {
+      "name": "Physics",
+      "grade": 10,
+      "description": "Physics is the scientific study of matter, energy, and their interactions in the natural world.",
+      "bg_color": "#14b8a6"
+    }
+  },
+  {
+    "model": "home.subjects",
+    "pk": 3,
+    "fields": {
+      "name": "Chemistry",
+      "grade": 10,
+      "description": "Chemistry is the branch of science that deals with the composition, structure, properties, and reactions of substances.",
+      "bg_color": "#ffc107"
+    }
+  },
+  {
+    "model": "home.subjects",
+    "pk": 4,
+    "fields": {
+      "name": "Biology",
+      "grade": 10,
+      "description": "Biology is the science of life and living organisms, including their structure, function, growth, evolution, distribution, and taxonomy.",
+      "bg_color": "#28a745"
+    }
+  },
+  {
+    "model": "home.subjects",
+    "pk": 5,
+    "fields": {
+      "name": "Literature",
+      "grade": 10,
+      "description": "Literature refers to written works, especially those considered of superior or lasting artistic merit.",
+      "bg_color": "#fb923c"
+    }
+  },
+  {
+    "model": "home.subjects",
+    "pk": 6,
+    "fields": {
+      "name": "History",
+      "grade": 10,
+      "description": "History is the study of past events, particularly human affairs.",
+      "bg_color": "#dc3545"
+    }
+  },
+  {
+    "model": "home.subjects",
+    "pk": 7,
+    "fields": {
+      "name": "Geography",
+      "grade": 10,
+      "description": "Geography is the study of the Earth's physical features, climate, and human populations and their distribution.",
+      "bg_color": "#f9a8d4"
+    }
+  },
+  {
+    "model": "home.subjects",
+    "pk": 8,
+    "fields": {
+      "name": "Foreign Language",
+      "grade": 10,
+      "description": "Foreign Language studies involve learning languages other than one's native language, such as English, French, Chinese, etc.",
+      "bg_color": "#a8a29e"
+    }
+  },
+  {
+    "model": "home.subjects",
+    "pk": 9,
+    "fields": {
+      "name": "Computer Science",
+      "grade": 10,
+      "description": "Computer Science involves the study of computers and computational systems, including their theoretical and practical applications.",
+      "bg_color": "#007bff"
+    }
+  },
+  {
+    "model": "home.subjects",
+    "pk": 10,
+    "fields": {
+      "name": "Civic Education",
+      "grade": 10,
+      "description": "Teaches civic values, citizenship roles, rights, duties, and promotes community participation.",
+      "bg_color": "#a78bfa"
+    }
+  },
+  {
+    "model": "home.subjects",
+    "pk": 11,
+    "fields": {
+      "name": "National Defense Education",
+      "grade": 10,
+      "description": "Educates about national defense, military roles, and fosters patriotism and readiness for national defense.",
+      "bg_color": "#bef264"
+    }
+  },
+  {
+    "model": "home.subjects",
+    "pk": 12,
+    "fields": {
+      "name": "Mathematics",
+      "grade": 11,
+      "description": "Mathematics involves the study of numbers, quantity, structure, space, and change.",
+      "bg_color": "#7dd3fc"
+    }
+  },
+  {
+    "model": "home.subjects",
+    "pk": 13,
+    "fields": {
+      "name": "Physics",
+      "grade": 11,
+      "description": "Physics is the scientific study of matter, energy, and their interactions in the natural world.",
+      "bg_color": "#14b8a6"
+    }
+  },
+  {
+    "model": "home.subjects",
+    "pk": 14,
+    "fields": {
+      "name": "Chemistry",
+      "grade": 11,
+      "description": "Chemistry is the branch of science that deals with the composition, structure, properties, and reactions of substances.",
+      "bg_color": "#ffc107"
+    }
+  },
+  {
+    "model": "home.subjects",
+    "pk": 15,
+    "fields": {
+      "name": "Biology",
+      "grade": 11,
+      "description": "Biology is the science of life and living organisms, including their structure, function, growth, evolution, distribution, and taxonomy.",
+      "bg_color": "#28a745"
+    }
+  },
+  {
+    "model": "home.subjects",
+    "pk": 16,
+    "fields": {
+      "name": "Literature",
+      "grade": 11,
+      "description": "Literature refers to written works, especially those considered of superior or lasting artistic merit.",
+      "bg_color": "#fb923c"
+    }
+  },
+  {
+    "model": "home.subjects",
+    "pk": 17,
+    "fields": {
+      "name": "History",
+      "grade": 11,
+      "description": "History is the study of past events, particularly human affairs.",
+      "bg_color": "#dc3545"
+    }
+  },
+  {
+    "model": "home.subjects",
+    "pk": 18,
+    "fields": {
+      "name": "Geography",
+      "grade": 11,
+      "description": "Geography is the study of the Earth's physical features, climate, and human populations and their distribution.",
+      "bg_color": "#f9a8d4"
+    }
+  },
+  {
+    "model": "home.subjects",
+    "pk": 19,
+    "fields": {
+      "name": "Foreign Language",
+      "grade": 11,
+      "description": "Foreign Language studies involve learning languages other than one's native language, such as English, French, Chinese, etc.",
+      "bg_color": "#a8a29e"
+    }
+  },
+  {
+    "model": "home.subjects",
+    "pk": 20,
+    "fields": {
+      "name": "Computer Science",
+      "grade": 11,
+      "description": "Computer Science involves the study of computers and computational systems, including their theoretical and practical applications.",
+      "bg_color": "#007bff"
+    }
+  },
+  {
+    "model": "home.subjects",
+    "pk": 21,
+    "fields": {
+      "name": "Civic Education",
+      "grade": 11,
+      "description": "Teaches civic values, citizenship roles, rights, duties, and promotes community participation.",
+      "bg_color": "#a78bfa"
+    }
+  },
+  {
+    "model": "home.subjects",
+    "pk": 22,
+    "fields": {
+      "name": "National Defense Education",
+      "grade": 11,
+      "description": "Educates about national defense, military roles, and fosters patriotism and readiness for national defense.",
+      "bg_color": "#bef264"
+    }
+  },
+  {
+    "model": "home.subjects",
+    "pk": 23,
+    "fields": {
+      "name": "Mathematics",
+      "grade": 12,
+      "description": "Mathematics involves the study of numbers, quantity, structure, space, and change.",
+      "bg_color": "#7dd3fc"
+    }
+  },
+  {
+    "model": "home.subjects",
+    "pk": 24,
+    "fields": {
+      "name": "Physics",
+      "grade": 12,
+      "description": "Physics is the scientific study of matter, energy, and their interactions in the natural world.",
+      "bg_color": "#14b8a6"
+    }
+  },
+  {
+    "model": "home.subjects",
+    "pk": 25,
+    "fields": {
+      "name": "Chemistry",
+      "grade": 12,
+      "description": "Chemistry is the branch of science that deals with the composition, structure, properties, and reactions of substances.",
+      "bg_color": "#ffc107"
+    }
+  },
+  {
+    "model": "home.subjects",
+    "pk": 26,
+    "fields": {
+      "name": "Biology",
+      "grade": 12,
+      "description": "Biology is the science of life and living organisms, including their structure, function, growth, evolution, distribution, and taxonomy.",
+      "bg_color": "#28a745"
+    }
+  },
+  {
+    "model": "home.subjects",
+    "pk": 27,
+    "fields": {
+      "name": "Literature",
+      "grade": 12,
+      "description": "Literature refers to written works, especially those considered of superior or lasting artistic merit.",
+      "bg_color": "#fb923c"
+    }
+  },
+  {
+    "model": "home.subjects",
+    "pk": 28,
+    "fields": {
+      "name": "History",
+      "grade": 12,
+      "description": "History is the study of past events, particularly human affairs.",
+      "bg_color": "#dc3545"
+    }
+  },
+  {
+    "model": "home.subjects",
+    "pk": 29,
+    "fields": {
+      "name": "Geography",
+      "grade": 12,
+      "description": "Geography is the study of the Earth's physical features, climate, and human populations and their distribution.",
+      "bg_color": "#f9a8d4"
+    }
+  },
+  {
+    "model": "home.subjects",
+    "pk": 30,
+    "fields": {
+      "name": "Foreign Language",
+      "grade": 12,
+      "description": "Foreign Language studies involve learning languages other than one's native language, such as English, French, Chinese, etc.",
+      "bg_color": "#a8a29e"
+    }
+  },
+  {
+    "model": "home.subjects",
+    "pk": 31,
+    "fields": {
+      "name": "Computer Science",
+      "grade": 12,
+      "description": "Computer Science involves the study of computers and computational systems, including their theoretical and practical applications.",
+      "bg_color": "#007bff"
+    }
+  },
+  {
+    "model": "home.subjects",
+    "pk": 32,
+    "fields": {
+      "name": "Civic Education",
+      "grade": 12,
+      "description": "Teaches civic values, citizenship roles, rights, duties, and promotes community participation.",
+      "bg_color": "#a78bfa"
+    }
+  },
+  {
+    "model": "home.subjects",
+    "pk": 33,
+    "fields": {
+      "name": "National Defense Education",
+      "grade": 12,
+      "description": "Educates about national defense, military roles, and fosters patriotism and readiness for national defense.",
+      "bg_color": "#bef264"
+    }
+  },
+  {
+    "model": "home.academicyear",
+    "pk": 1,
+    "fields": {
+      "open_year": 2024,
+      "close_year": 2025,
+      "created_at": "2024-08-15T06:50:59Z"
+    }
+  },
+  {
+    "model": "home.section",
+    "pk": 82,
+    "fields": {
+      "classroom": 26,
+      "title": "Welcome",
+      "parent_section": null,
+      "description": null,
+      "date_created": "2024-12-07T07:08:13.043Z"
+    }
+  },
+  {
+    "model": "home.section",
+    "pk": 85,
+    "fields": {
+      "classroom": 29,
+      "title": "Welcome",
+      "parent_section": null,
+      "description": null,
+      "date_created": "2024-12-07T08:15:23.647Z"
+    }
+  },
+  {
+    "model": "home.section",
+    "pk": 94,
+    "fields": {
+      "classroom": 26,
+      "title": "Day 1",
+      "parent_section": null,
+      "description": "Good",
+      "date_created": "2024-12-08T05:32:46.372Z"
+    }
+  },
+  {
+    "model": "home.section",
+    "pk": 95,
+    "fields": {
+      "classroom": 26,
+      "title": "Day 2",
+      "parent_section": null,
+      "description": "Good",
+      "date_created": "2024-12-09T09:24:36.496Z"
+    }
+  },
+  {
+    "model": "home.submission",
+    "pk": 66,
+    "fields": {
+      "section": 94,
+      "title": "Ass Day 1",
+      "submission_type": "assignment",
+      "description": "Good",
+      "date_created": "2024-12-08T05:33:15.549Z",
+      "open_date": "2024-12-08T05:35:00Z",
+      "close_date": "2024-12-11T05:40:00Z",
+      "duration": "00:00:00"
+    }
+  },
+  {
+    "model": "home.submission",
+    "pk": 68,
+    "fields": {
+      "section": 94,
+      "title": "Test Day 1",
+      "submission_type": "question_test",
+      "description": "Good",
+      "date_created": "2024-12-09T08:59:00.595Z",
+      "open_date": "2024-12-09T09:00:00Z",
+      "close_date": "2024-12-11T08:00:00Z",
+      "duration": "00:02:00"
+    }
+  },
+  {
+    "model": "home.question",
+    "pk": 36,
+    "fields": {
+      "submission": 68,
+      "text": "Thß║ích Sß║»c K─æa sinh n─âm bao nhi├¬u?",
+      "created_at": "2024-12-09T09:01:05.304Z"
+    }
+  },
+  {
+    "model": "home.answer",
+    "pk": 209,
+    "fields": { "question": 36, "text": "2003", "is_correct": true }
+  },
+  {
+    "model": "home.answer",
+    "pk": 210,
+    "fields": { "question": 36, "text": "2004", "is_correct": false }
+  },
+  {
+    "model": "home.answer",
+    "pk": 211,
+    "fields": { "question": 36, "text": "2005", "is_correct": false }
+  },
+  {
+    "model": "home.answer",
+    "pk": 212,
+    "fields": { "question": 36, "text": "2006", "is_correct": false }
+  },
+  {
+    "model": "home.answeredquestion",
+    "pk": 334,
+    "fields": { "quiz_result": 216, "question": 36, "selected_answer": 209 }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can add log entry",
+      "content_type": ["admin", "logentry"],
+      "codename": "add_logentry"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can change log entry",
+      "content_type": ["admin", "logentry"],
+      "codename": "change_logentry"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can delete log entry",
+      "content_type": ["admin", "logentry"],
+      "codename": "delete_logentry"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can view log entry",
+      "content_type": ["admin", "logentry"],
+      "codename": "view_logentry"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can add permission",
+      "content_type": ["auth", "permission"],
+      "codename": "add_permission"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can change permission",
+      "content_type": ["auth", "permission"],
+      "codename": "change_permission"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can delete permission",
+      "content_type": ["auth", "permission"],
+      "codename": "delete_permission"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can view permission",
+      "content_type": ["auth", "permission"],
+      "codename": "view_permission"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can add group",
+      "content_type": ["auth", "group"],
+      "codename": "add_group"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can change group",
+      "content_type": ["auth", "group"],
+      "codename": "change_group"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can delete group",
+      "content_type": ["auth", "group"],
+      "codename": "delete_group"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can view group",
+      "content_type": ["auth", "group"],
+      "codename": "view_group"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can add content type",
+      "content_type": ["contenttypes", "contenttype"],
+      "codename": "add_contenttype"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can change content type",
+      "content_type": ["contenttypes", "contenttype"],
+      "codename": "change_contenttype"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can delete content type",
+      "content_type": ["contenttypes", "contenttype"],
+      "codename": "delete_contenttype"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can view content type",
+      "content_type": ["contenttypes", "contenttype"],
+      "codename": "view_contenttype"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can add session",
+      "content_type": ["sessions", "session"],
+      "codename": "add_session"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can change session",
+      "content_type": ["sessions", "session"],
+      "codename": "change_session"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can delete session",
+      "content_type": ["sessions", "session"],
+      "codename": "delete_session"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can view session",
+      "content_type": ["sessions", "session"],
+      "codename": "view_session"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can add user",
+      "content_type": ["home", "customuser"],
+      "codename": "add_customuser"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can change user",
+      "content_type": ["home", "customuser"],
+      "codename": "change_customuser"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can delete user",
+      "content_type": ["home", "customuser"],
+      "codename": "delete_customuser"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can view user",
+      "content_type": ["home", "customuser"],
+      "codename": "view_customuser"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can add subjects",
+      "content_type": ["home", "subjects"],
+      "codename": "add_subjects"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can change subjects",
+      "content_type": ["home", "subjects"],
+      "codename": "change_subjects"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can delete subjects",
+      "content_type": ["home", "subjects"],
+      "codename": "delete_subjects"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can view subjects",
+      "content_type": ["home", "subjects"],
+      "codename": "view_subjects"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can add site",
+      "content_type": ["sites", "site"],
+      "codename": "add_site"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can change site",
+      "content_type": ["sites", "site"],
+      "codename": "change_site"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can delete site",
+      "content_type": ["sites", "site"],
+      "codename": "delete_site"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can view site",
+      "content_type": ["sites", "site"],
+      "codename": "view_site"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can add email address",
+      "content_type": ["account", "emailaddress"],
+      "codename": "add_emailaddress"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can change email address",
+      "content_type": ["account", "emailaddress"],
+      "codename": "change_emailaddress"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can delete email address",
+      "content_type": ["account", "emailaddress"],
+      "codename": "delete_emailaddress"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can view email address",
+      "content_type": ["account", "emailaddress"],
+      "codename": "view_emailaddress"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can add email confirmation",
+      "content_type": ["account", "emailconfirmation"],
+      "codename": "add_emailconfirmation"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can change email confirmation",
+      "content_type": ["account", "emailconfirmation"],
+      "codename": "change_emailconfirmation"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can delete email confirmation",
+      "content_type": ["account", "emailconfirmation"],
+      "codename": "delete_emailconfirmation"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can view email confirmation",
+      "content_type": ["account", "emailconfirmation"],
+      "codename": "view_emailconfirmation"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can add social account",
+      "content_type": ["socialaccount", "socialaccount"],
+      "codename": "add_socialaccount"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can change social account",
+      "content_type": ["socialaccount", "socialaccount"],
+      "codename": "change_socialaccount"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can delete social account",
+      "content_type": ["socialaccount", "socialaccount"],
+      "codename": "delete_socialaccount"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can view social account",
+      "content_type": ["socialaccount", "socialaccount"],
+      "codename": "view_socialaccount"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can add social application",
+      "content_type": ["socialaccount", "socialapp"],
+      "codename": "add_socialapp"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can change social application",
+      "content_type": ["socialaccount", "socialapp"],
+      "codename": "change_socialapp"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can delete social application",
+      "content_type": ["socialaccount", "socialapp"],
+      "codename": "delete_socialapp"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can view social application",
+      "content_type": ["socialaccount", "socialapp"],
+      "codename": "view_socialapp"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can add social application token",
+      "content_type": ["socialaccount", "socialtoken"],
+      "codename": "add_socialtoken"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can change social application token",
+      "content_type": ["socialaccount", "socialtoken"],
+      "codename": "change_socialtoken"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can delete social application token",
+      "content_type": ["socialaccount", "socialtoken"],
+      "codename": "delete_socialtoken"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can view social application token",
+      "content_type": ["socialaccount", "socialtoken"],
+      "codename": "view_socialtoken"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can add classroom",
+      "content_type": ["home", "classroom"],
+      "codename": "add_classroom"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can change classroom",
+      "content_type": ["home", "classroom"],
+      "codename": "change_classroom"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can delete classroom",
+      "content_type": ["home", "classroom"],
+      "codename": "delete_classroom"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can view classroom",
+      "content_type": ["home", "classroom"],
+      "codename": "view_classroom"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can add academic year",
+      "content_type": ["home", "academicyear"],
+      "codename": "add_academicyear"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can change academic year",
+      "content_type": ["home", "academicyear"],
+      "codename": "change_academicyear"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can delete academic year",
+      "content_type": ["home", "academicyear"],
+      "codename": "delete_academicyear"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can view academic year",
+      "content_type": ["home", "academicyear"],
+      "codename": "view_academicyear"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can add section",
+      "content_type": ["home", "section"],
+      "codename": "add_section"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can change section",
+      "content_type": ["home", "section"],
+      "codename": "change_section"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can delete section",
+      "content_type": ["home", "section"],
+      "codename": "delete_section"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can view section",
+      "content_type": ["home", "section"],
+      "codename": "view_section"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can add submission",
+      "content_type": ["home", "submission"],
+      "codename": "add_submission"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can change submission",
+      "content_type": ["home", "submission"],
+      "codename": "change_submission"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can delete submission",
+      "content_type": ["home", "submission"],
+      "codename": "delete_submission"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can view submission",
+      "content_type": ["home", "submission"],
+      "codename": "view_submission"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can add participant",
+      "content_type": ["home", "participant"],
+      "codename": "add_participant"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can change participant",
+      "content_type": ["home", "participant"],
+      "codename": "change_participant"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can delete participant",
+      "content_type": ["home", "participant"],
+      "codename": "delete_participant"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can view participant",
+      "content_type": ["home", "participant"],
+      "codename": "view_participant"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can add student file",
+      "content_type": ["home", "studentfile"],
+      "codename": "add_studentfile"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can change student file",
+      "content_type": ["home", "studentfile"],
+      "codename": "change_studentfile"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can delete student file",
+      "content_type": ["home", "studentfile"],
+      "codename": "delete_studentfile"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can view student file",
+      "content_type": ["home", "studentfile"],
+      "codename": "view_studentfile"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can add question",
+      "content_type": ["home", "question"],
+      "codename": "add_question"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can change question",
+      "content_type": ["home", "question"],
+      "codename": "change_question"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can delete question",
+      "content_type": ["home", "question"],
+      "codename": "delete_question"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can view question",
+      "content_type": ["home", "question"],
+      "codename": "view_question"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can add answer",
+      "content_type": ["home", "answer"],
+      "codename": "add_answer"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can change answer",
+      "content_type": ["home", "answer"],
+      "codename": "change_answer"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can delete answer",
+      "content_type": ["home", "answer"],
+      "codename": "delete_answer"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can view answer",
+      "content_type": ["home", "answer"],
+      "codename": "view_answer"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can add subsection file",
+      "content_type": ["home", "subsectionfile"],
+      "codename": "add_subsectionfile"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can change subsection file",
+      "content_type": ["home", "subsectionfile"],
+      "codename": "change_subsectionfile"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can delete subsection file",
+      "content_type": ["home", "subsectionfile"],
+      "codename": "delete_subsectionfile"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can view subsection file",
+      "content_type": ["home", "subsectionfile"],
+      "codename": "view_subsectionfile"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can add submission file",
+      "content_type": ["home", "submissionfile"],
+      "codename": "add_submissionfile"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can change submission file",
+      "content_type": ["home", "submissionfile"],
+      "codename": "change_submissionfile"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can delete submission file",
+      "content_type": ["home", "submissionfile"],
+      "codename": "delete_submissionfile"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can view submission file",
+      "content_type": ["home", "submissionfile"],
+      "codename": "view_submissionfile"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can add quiz result",
+      "content_type": ["home", "quizresult"],
+      "codename": "add_quizresult"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can change quiz result",
+      "content_type": ["home", "quizresult"],
+      "codename": "change_quizresult"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can delete quiz result",
+      "content_type": ["home", "quizresult"],
+      "codename": "delete_quizresult"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can view quiz result",
+      "content_type": ["home", "quizresult"],
+      "codename": "view_quizresult"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can add comment",
+      "content_type": ["home", "comment"],
+      "codename": "add_comment"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can change comment",
+      "content_type": ["home", "comment"],
+      "codename": "change_comment"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can delete comment",
+      "content_type": ["home", "comment"],
+      "codename": "delete_comment"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can view comment",
+      "content_type": ["home", "comment"],
+      "codename": "view_comment"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can add chat message",
+      "content_type": ["home", "chatmessage"],
+      "codename": "add_chatmessage"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can change chat message",
+      "content_type": ["home", "chatmessage"],
+      "codename": "change_chatmessage"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can delete chat message",
+      "content_type": ["home", "chatmessage"],
+      "codename": "delete_chatmessage"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can view chat message",
+      "content_type": ["home", "chatmessage"],
+      "codename": "view_chatmessage"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can add favorite classroom",
+      "content_type": ["home", "favoriteclassroom"],
+      "codename": "add_favoriteclassroom"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can change favorite classroom",
+      "content_type": ["home", "favoriteclassroom"],
+      "codename": "change_favoriteclassroom"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can delete favorite classroom",
+      "content_type": ["home", "favoriteclassroom"],
+      "codename": "delete_favoriteclassroom"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can view favorite classroom",
+      "content_type": ["home", "favoriteclassroom"],
+      "codename": "view_favoriteclassroom"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can add answered question",
+      "content_type": ["home", "answeredquestion"],
+      "codename": "add_answeredquestion"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can change answered question",
+      "content_type": ["home", "answeredquestion"],
+      "codename": "change_answeredquestion"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can delete answered question",
+      "content_type": ["home", "answeredquestion"],
+      "codename": "delete_answeredquestion"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can view answered question",
+      "content_type": ["home", "answeredquestion"],
+      "codename": "view_answeredquestion"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can add blocked participant",
+      "content_type": ["home", "blockedparticipant"],
+      "codename": "add_blockedparticipant"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can change blocked participant",
+      "content_type": ["home", "blockedparticipant"],
+      "codename": "change_blockedparticipant"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can delete blocked participant",
+      "content_type": ["home", "blockedparticipant"],
+      "codename": "delete_blockedparticipant"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can view blocked participant",
+      "content_type": ["home", "blockedparticipant"],
+      "codename": "view_blockedparticipant"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can add forum post",
+      "content_type": ["home", "forumpost"],
+      "codename": "add_forumpost"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can change forum post",
+      "content_type": ["home", "forumpost"],
+      "codename": "change_forumpost"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can delete forum post",
+      "content_type": ["home", "forumpost"],
+      "codename": "delete_forumpost"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can view forum post",
+      "content_type": ["home", "forumpost"],
+      "codename": "view_forumpost"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can add forum comment",
+      "content_type": ["home", "forumcomment"],
+      "codename": "add_forumcomment"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can change forum comment",
+      "content_type": ["home", "forumcomment"],
+      "codename": "change_forumcomment"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can delete forum comment",
+      "content_type": ["home", "forumcomment"],
+      "codename": "delete_forumcomment"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can view forum comment",
+      "content_type": ["home", "forumcomment"],
+      "codename": "view_forumcomment"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can add notification system",
+      "content_type": ["home", "notificationsystem"],
+      "codename": "add_notificationsystem"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can change notification system",
+      "content_type": ["home", "notificationsystem"],
+      "codename": "change_notificationsystem"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can delete notification system",
+      "content_type": ["home", "notificationsystem"],
+      "codename": "delete_notificationsystem"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can view notification system",
+      "content_type": ["home", "notificationsystem"],
+      "codename": "view_notificationsystem"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can add contact",
+      "content_type": ["home", "contact"],
+      "codename": "add_contact"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can change contact",
+      "content_type": ["home", "contact"],
+      "codename": "change_contact"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can delete contact",
+      "content_type": ["home", "contact"],
+      "codename": "delete_contact"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can view contact",
+      "content_type": ["home", "contact"],
+      "codename": "view_contact"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can add Google SSO User",
+      "content_type": ["django_google_sso", "googlessouser"],
+      "codename": "add_googlessouser"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can change Google SSO User",
+      "content_type": ["django_google_sso", "googlessouser"],
+      "codename": "change_googlessouser"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can delete Google SSO User",
+      "content_type": ["django_google_sso", "googlessouser"],
+      "codename": "delete_googlessouser"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can view Google SSO User",
+      "content_type": ["django_google_sso", "googlessouser"],
+      "codename": "view_googlessouser"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can add co teacher request",
+      "content_type": ["home", "coteacherrequest"],
+      "codename": "add_coteacherrequest"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can change co teacher request",
+      "content_type": ["home", "coteacherrequest"],
+      "codename": "change_coteacherrequest"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can delete co teacher request",
+      "content_type": ["home", "coteacherrequest"],
+      "codename": "delete_coteacherrequest"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can view co teacher request",
+      "content_type": ["home", "coteacherrequest"],
+      "codename": "view_coteacherrequest"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can add chatbot",
+      "content_type": ["home", "chatbot"],
+      "codename": "add_chatbot"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can change chatbot",
+      "content_type": ["home", "chatbot"],
+      "codename": "change_chatbot"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can delete chatbot",
+      "content_type": ["home", "chatbot"],
+      "codename": "delete_chatbot"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can view chatbot",
+      "content_type": ["home", "chatbot"],
+      "codename": "view_chatbot"
+    }
+  },
+  {
+    "model": "home.customuser",
+    "fields": {
+      "password": "pbkdf2_sha256$870000$mDd22nVNYoIclJR9ZnlLRZ$JCfC1/PqH1cUckIygI96OY+ejq3BQ9nm3HeO2qthZqY=",
+      "last_login": "2024-12-06T10:04:13.094Z",
+      "is_superuser": true,
+      "username": "admin",
+      "first_name": "",
+      "last_name": "",
+      "email": "admin@gmail.com",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2024-12-06T10:03:10Z",
+      "date_of_birth": null,
+      "role": null,
+      "grade": null,
+      "subject": null,
+      "notify_sections": true,
+      "terms_accepted": true,
+      "username_changed": true,
+      "reset_days": 0,
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "home.customuser",
+    "fields": {
+      "password": "pbkdf2_sha256$870000$0OSXg5q9YvM5YimGCxSNo3$U1WZ/n+owJW8sFoogncaS/3IvOdZ/6o4BBkqzHqZdeQ=",
+      "last_login": "2024-12-09T15:51:14.923Z",
+      "is_superuser": false,
+      "username": "teacher",
+      "first_name": "",
+      "last_name": "",
+      "email": "thucuoi.3535@gmail.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2024-12-07T06:23:08.585Z",
+      "date_of_birth": "2009-11-14",
+      "role": "teacher",
+      "grade": "10",
+      "subject": 1,
+      "notify_sections": true,
+      "terms_accepted": true,
+      "username_changed": false,
+      "reset_days": 0,
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "home.customuser",
+    "fields": {
+      "password": "pbkdf2_sha256$870000$4mDUH7VeLOH9pLA0sXpUgs$KBlxh/8PjClbZW9v7MjkjN7ZHJbe2mc51BP67e0l3E8=",
+      "last_login": "2024-12-10T07:19:46.983Z",
+      "is_superuser": false,
+      "username": "khoilieu",
+      "first_name": "",
+      "last_name": "",
+      "email": "khoivl.net@gmail.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2024-12-07T07:06:57.672Z",
+      "date_of_birth": "2004-10-13",
+      "role": "teacher",
+      "grade": "10",
+      "subject": 1,
+      "notify_sections": true,
+      "terms_accepted": true,
+      "username_changed": true,
+      "reset_days": 7,
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "home.customuser",
+    "fields": {
+      "password": "pbkdf2_sha256$870000$gLcJ5q1eR6rjMFZgQPvMNf$N1YKv4p4dYjQt0CeHD6Am94UQcuo48D3gmefOCKUMdo=",
+      "last_login": "2024-12-09T13:31:52.214Z",
+      "is_superuser": false,
+      "username": "Lieu_Khois",
+      "first_name": "",
+      "last_name": "",
+      "email": "khoilieuct03@gmail.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2024-12-07T16:41:11Z",
+      "date_of_birth": "2009-01-01",
+      "role": "student",
+      "grade": "10",
+      "subject": null,
+      "notify_sections": false,
+      "terms_accepted": true,
+      "username_changed": true,
+      "reset_days": 0,
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "home.customuser",
+    "fields": {
+      "password": "pbkdf2_sha256$870000$KfsgtULVB9OBkrbA0ypAEy$oa2LsKeu/S5n+wglndT13dK+6sii63yIj4xlObbd2+0=",
+      "last_login": "2024-12-10T07:19:06.344Z",
+      "is_superuser": false,
+      "username": "linh_ne",
+      "first_name": "",
+      "last_name": "",
+      "email": "linhmngbc210252@fpt.edu.vn",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2024-12-08T03:51:31.292Z",
+      "date_of_birth": "2003-07-07",
+      "role": "student",
+      "grade": "10",
+      "subject": null,
+      "notify_sections": true,
+      "terms_accepted": true,
+      "username_changed": false,
+      "reset_days": 0,
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "home.classroom",
+    "pk": 26,
+    "fields": {
+      "teacher": ["khoilieu"],
+      "name": "Basic Math - Teacher Khoi",
+      "average_rating": "5.00",
+      "subject": 1,
+      "grade": 10,
+      "description": "Good",
+      "school": "FPT Greenwich",
+      "academic_year": 1,
+      "status": false,
+      "password": "",
+      "likes": 3,
+      "allow_chat": true,
+      "link": "MMLeb2xr3k",
+      "created_at": "2024-12-07T07:08:13.035Z"
+    }
+  },
+  {
+    "model": "home.classroom",
+    "pk": 29,
+    "fields": {
+      "teacher": ["khoilieu"],
+      "name": "Basic Math - Teacher Thuc",
+      "average_rating": "0.00",
+      "subject": 1,
+      "grade": 10,
+      "description": "Good",
+      "school": "FPT GreenwichFPT GreenwichFPT Greenwich",
+      "academic_year": 1,
+      "status": true,
+      "password": "123456",
+      "likes": 1,
+      "allow_chat": true,
+      "link": "NDzCteEv7D",
+      "created_at": "2024-12-07T08:15:23Z"
+    }
+  },
+  {
+    "model": "home.comment",
+    "pk": 38,
+    "fields": {
+      "user": ["teacher"],
+      "classroom": 26,
+      "text": "Good",
+      "rating": 5,
+      "created_at": "2024-12-08T03:04:15.722Z"
+    }
+  },
+  {
+    "model": "home.studentfile",
+    "pk": 66,
+    "fields": {
+      "submission": 66,
+      "student": ["Lieu_Khois"],
+      "file": "student_files/B├ío_4_ipOToPX.pdf",
+      "score": "5.00",
+      "feedback": "Not Good",
+      "date_submitted": "2024-12-09T08:14:59.997Z"
+    }
+  },
+  {
+    "model": "home.studentfile",
+    "pk": 67,
+    "fields": {
+      "submission": 66,
+      "student": ["linh_ne"],
+      "file": "student_files/B├ío_2.pdf",
+      "score": "7.00",
+      "feedback": "Good",
+      "date_submitted": "2024-12-09T08:16:59.884Z"
+    }
+  },
+  {
+    "model": "home.participant",
+    "pk": 150,
+    "fields": {
+      "user": ["khoilieu"],
+      "classroom": 26,
+      "date_joined": "2024-12-07T07:08:13.048Z",
+      "role": "teacher"
+    }
+  },
+  {
+    "model": "home.participant",
+    "pk": 190,
+    "fields": {
+      "user": ["Lieu_Khois"],
+      "classroom": 26,
+      "date_joined": "2024-12-08T03:49:45.505Z",
+      "role": "student"
+    }
+  },
+  {
+    "model": "home.participant",
+    "pk": 194,
+    "fields": {
+      "user": ["khoilieu"],
+      "classroom": 29,
+      "date_joined": "2024-12-09T16:28:03.339Z",
+      "role": "teacher"
+    }
+  },
+  {
+    "model": "home.participant",
+    "pk": 195,
+    "fields": {
+      "user": ["linh_ne"],
+      "classroom": 26,
+      "date_joined": "2024-12-10T07:19:25.220Z",
+      "role": "student"
+    }
+  },
+  {
+    "model": "home.quizresult",
+    "pk": 216,
+    "fields": {
+      "submission": 68,
+      "student": ["Lieu_Khois"],
+      "correct_answers": 1,
+      "answered_questions": 1,
+      "total_questions": 1,
+      "score": "10.00",
+      "time_taken": "00:01:59",
+      "date_submitted": "2024-12-09T13:38:49.027Z"
+    }
+  },
+  {
+    "model": "home.chatmessage",
+    "pk": 358,
+    "fields": {
+      "user": ["khoilieu"],
+      "classroom": 26,
+      "message": "Hi",
+      "image": "",
+      "file": "",
+      "timestamp": "2024-12-08T03:32:27.146Z",
+      "file_size": 0.0
+    }
+  },
+  {
+    "model": "home.chatmessage",
+    "pk": 359,
+    "fields": {
+      "user": ["khoilieu"],
+      "classroom": 26,
+      "message": "dss",
+      "image": "",
+      "file": "",
+      "timestamp": "2024-12-08T03:32:35.466Z",
+      "file_size": 0.0
+    }
+  },
+  {
+    "model": "home.chatmessage",
+    "pk": 362,
+    "fields": {
+      "user": ["Lieu_Khois"],
+      "classroom": 26,
+      "message": "Hi",
+      "image": "",
+      "file": "",
+      "timestamp": "2024-12-08T05:20:15.789Z",
+      "file_size": 0.0
+    }
+  },
+  {
+    "model": "home.favoriteclassroom",
+    "pk": 112,
+    "fields": {
+      "user": ["Lieu_Khois"],
+      "classroom": 26,
+      "added_at": "2024-12-07T16:59:01.288Z"
+    }
+  },
+  {
+    "model": "home.favoriteclassroom",
+    "pk": 113,
+    "fields": {
+      "user": ["teacher"],
+      "classroom": 26,
+      "added_at": "2024-12-08T03:01:57.386Z"
+    }
+  },
+  {
+    "model": "home.forumpost",
+    "pk": 19,
+    "fields": {
+      "title": "1 + 1 =?",
+      "content": "Trß║ú lß╗¥i ─æiss",
+      "post_type": "question",
+      "classroom": 26,
+      "user": ["Lieu_Khois"],
+      "created_at": "2024-12-09T14:39:05.202Z",
+      "is_approved": false,
+      "is_rejected": true,
+      "likes": 0,
+      "views": 1,
+      "reason": "Ngu",
+      "liked_by": [],
+      "views_by": [["Lieu_Khois"]]
+    }
+  },
+  {
+    "model": "home.forumpost",
+    "pk": 20,
+    "fields": {
+      "title": "1 + 2 =?",
+      "content": "Question?",
+      "post_type": "question",
+      "classroom": 26,
+      "user": ["khoilieu"],
+      "created_at": "2024-12-09T15:15:42.577Z",
+      "is_approved": true,
+      "is_rejected": false,
+      "likes": 1,
+      "views": 2,
+      "reason": null,
+      "liked_by": [["Lieu_Khois"]],
+      "views_by": [["khoilieu"], ["Lieu_Khois"]]
+    }
+  },
+  {
+    "model": "home.forumcomment",
+    "pk": 16,
+    "fields": {
+      "post": 20,
+      "user": ["Lieu_Khois"],
+      "text": "333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333",
+      "created_at": "2024-12-09T15:20:47Z"
+    }
+  },
+  {
+    "model": "home.coteacherrequest",
+    "pk": 34,
+    "fields": {
+      "requester": ["teacher"],
+      "classroom": 26,
+      "message": "",
+      "status": "pending",
+      "created_at": "2024-12-09T16:30:38.119Z"
+    }
+  },
+  {
+    "model": "home.coteacherrequest",
+    "pk": 35,
+    "fields": {
+      "requester": ["teacher"],
+      "classroom": 29,
+      "message": "",
+      "status": "pending",
+      "created_at": "2024-12-09T16:31:47.768Z"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 1284,
+    "fields": {
+      "action_time": "2024-12-06T10:03:50.597Z",
+      "user": ["admin"],
+      "content_type": ["home", "customuser"],
+      "object_id": "60",
+      "object_repr": "admin - None",
+      "action_flag": 2,
+      "change_message": "[{\"changed\": {\"fields\": [\"Terms accepted\", \"Username changed\"]}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 1285,
+    "fields": {
+      "action_time": "2024-12-07T07:06:36.866Z",
+      "user": ["admin"],
+      "content_type": ["home", "customuser"],
+      "object_id": "61",
+      "object_repr": "Khoi Vinh L. - None",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 1286,
+    "fields": {
+      "action_time": "2024-12-07T07:08:32.152Z",
+      "user": ["admin"],
+      "content_type": ["home", "customuser"],
+      "object_id": "62",
+      "object_repr": "student - 10",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 1287,
+    "fields": {
+      "action_time": "2024-12-07T16:27:22.268Z",
+      "user": ["admin"],
+      "content_type": ["home", "participant"],
+      "object_id": "175",
+      "object_repr": "Khoi Vinh L.",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 1288,
+    "fields": {
+      "action_time": "2024-12-07T16:40:41.640Z",
+      "user": ["admin"],
+      "content_type": ["home", "customuser"],
+      "object_id": "65",
+      "object_repr": "Lieu Khoi - 10",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 1289,
+    "fields": {
+      "action_time": "2024-12-07T16:44:47.667Z",
+      "user": ["admin"],
+      "content_type": ["home", "customuser"],
+      "object_id": "66",
+      "object_repr": "Lieu_Khoi - 10",
+      "action_flag": 2,
+      "change_message": "[{\"changed\": {\"fields\": [\"Username\", \"Username changed\"]}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 1290,
+    "fields": {
+      "action_time": "2024-12-07T17:25:20.084Z",
+      "user": ["admin"],
+      "content_type": ["home", "submission"],
+      "object_id": "64",
+      "object_repr": "Ass Day 1",
+      "action_flag": 2,
+      "change_message": "[{\"changed\": {\"fields\": [\"Close date\"]}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 1291,
+    "fields": {
+      "action_time": "2024-12-07T17:27:00.262Z",
+      "user": ["admin"],
+      "content_type": ["home", "submission"],
+      "object_id": "64",
+      "object_repr": "Ass Day 1",
+      "action_flag": 2,
+      "change_message": "[{\"changed\": {\"fields\": [\"Close date\"]}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 1292,
+    "fields": {
+      "action_time": "2024-12-07T17:28:19.425Z",
+      "user": ["admin"],
+      "content_type": ["home", "submission"],
+      "object_id": "64",
+      "object_repr": "Ass Day 1",
+      "action_flag": 2,
+      "change_message": "[{\"changed\": {\"fields\": [\"Open date\"]}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 1293,
+    "fields": {
+      "action_time": "2024-12-07T18:10:42.523Z",
+      "user": ["admin"],
+      "content_type": ["home", "submission"],
+      "object_id": "65",
+      "object_repr": "Ques Test Day 1",
+      "action_flag": 2,
+      "change_message": "[{\"changed\": {\"fields\": [\"Open date\"]}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 1294,
+    "fields": {
+      "action_time": "2024-12-07T18:11:58.032Z",
+      "user": ["admin"],
+      "content_type": ["home", "submission"],
+      "object_id": "64",
+      "object_repr": "Ass Day 1",
+      "action_flag": 2,
+      "change_message": "[{\"changed\": {\"fields\": [\"Open date\"]}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 1295,
+    "fields": {
+      "action_time": "2024-12-08T03:52:09.630Z",
+      "user": ["admin"],
+      "content_type": ["home", "quizresult"],
+      "object_id": "200",
+      "object_repr": "linh_ne - Ques Test Day 1 - Score: 0.00",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 1296,
+    "fields": {
+      "action_time": "2024-12-08T04:35:50.006Z",
+      "user": ["admin"],
+      "content_type": ["home", "studentfile"],
+      "object_id": "56",
+      "object_repr": "Lieu_Khois - Ass Day 1",
+      "action_flag": 2,
+      "change_message": "[{\"changed\": {\"fields\": [\"Feedback\"]}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 1297,
+    "fields": {
+      "action_time": "2024-12-08T04:36:11.529Z",
+      "user": ["admin"],
+      "content_type": ["home", "studentfile"],
+      "object_id": "56",
+      "object_repr": "Lieu_Khois - Ass Day 1",
+      "action_flag": 2,
+      "change_message": "[{\"changed\": {\"fields\": [\"Feedback\"]}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 1298,
+    "fields": {
+      "action_time": "2024-12-08T04:40:00.805Z",
+      "user": ["admin"],
+      "content_type": ["home", "quizresult"],
+      "object_id": "201",
+      "object_repr": "linh_ne - Ques Test Day 1 - Score: 10.00",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 1299,
+    "fields": {
+      "action_time": "2024-12-08T04:40:08.775Z",
+      "user": ["admin"],
+      "content_type": ["home", "quizresult"],
+      "object_id": "199",
+      "object_repr": "Lieu_Khois - Ques Test Day 1 - Score: 10.00",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 1300,
+    "fields": {
+      "action_time": "2024-12-08T04:44:00.711Z",
+      "user": ["admin"],
+      "content_type": ["home", "quizresult"],
+      "object_id": "202",
+      "object_repr": "Lieu_Khois - Ques Test Day 1 - Score: 0.00",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 1301,
+    "fields": {
+      "action_time": "2024-12-08T04:44:36.732Z",
+      "user": ["admin"],
+      "content_type": ["home", "quizresult"],
+      "object_id": "203",
+      "object_repr": "Lieu_Khois - Ques Test Day 1 - Score: 0.00",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 1302,
+    "fields": {
+      "action_time": "2024-12-08T04:45:34.045Z",
+      "user": ["admin"],
+      "content_type": ["home", "quizresult"],
+      "object_id": "204",
+      "object_repr": "Lieu_Khois - Ques Test Day 1 - Score: 10.00",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 1303,
+    "fields": {
+      "action_time": "2024-12-09T08:46:13.886Z",
+      "user": ["admin"],
+      "content_type": ["home", "quizresult"],
+      "object_id": "206",
+      "object_repr": "Lieu_Khois - Test Day 1 - Score: 10.00",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 1304,
+    "fields": {
+      "action_time": "2024-12-09T08:47:38.797Z",
+      "user": ["admin"],
+      "content_type": ["home", "quizresult"],
+      "object_id": "207",
+      "object_repr": "Lieu_Khois - Test Day 1 - Score: 10.00",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 1305,
+    "fields": {
+      "action_time": "2024-12-09T08:52:30.130Z",
+      "user": ["admin"],
+      "content_type": ["home", "quizresult"],
+      "object_id": "208",
+      "object_repr": "Lieu_Khois - Test Day 1 - Score: 10.00",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 1306,
+    "fields": {
+      "action_time": "2024-12-09T08:55:06.057Z",
+      "user": ["admin"],
+      "content_type": ["home", "quizresult"],
+      "object_id": "209",
+      "object_repr": "Lieu_Khois - Test Day 1 - Score: 5.00",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 1307,
+    "fields": {
+      "action_time": "2024-12-09T15:33:40.264Z",
+      "user": ["admin"],
+      "content_type": ["home", "forumcomment"],
+      "object_id": "16",
+      "object_repr": "Comment by Lieu_Khois on 1 + 2 =?",
+      "action_flag": 2,
+      "change_message": "[{\"changed\": {\"fields\": [\"Text\"]}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 1308,
+    "fields": {
+      "action_time": "2024-12-09T16:28:03.347Z",
+      "user": ["admin"],
+      "content_type": ["home", "participant"],
+      "object_id": "194",
+      "object_repr": "khoilieu",
+      "action_flag": 1,
+      "change_message": "[{\"added\": {}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 1309,
+    "fields": {
+      "action_time": "2024-12-10T06:39:31.647Z",
+      "user": ["admin"],
+      "content_type": ["home", "classroom"],
+      "object_id": "29",
+      "object_repr": "Basic Math - Teacher Thuc Basic Math - Teacher Thuc - Mathematics - Grade 10 - True",
+      "action_flag": 2,
+      "change_message": "[{\"changed\": {\"fields\": [\"Name\"]}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 1310,
+    "fields": {
+      "action_time": "2024-12-10T06:40:26.514Z",
+      "user": ["admin"],
+      "content_type": ["home", "classroom"],
+      "object_id": "29",
+      "object_repr": "Basic Math - Teacher Thuc - Mathematics - Grade 10 - True",
+      "action_flag": 2,
+      "change_message": "[{\"changed\": {\"fields\": [\"Name\", \"School\"]}}]"
+    }
+  }
+]

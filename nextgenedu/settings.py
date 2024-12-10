@@ -123,10 +123,15 @@ WSGI_APPLICATION = 'nextgenedu.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'nextgenedu',  # Tên cơ sở dữ liệu
+        'USER': 'postgres',   # Tên người dùng PostgreSQL
+        'PASSWORD': 'vinhkhoi1310',  # Mật khẩu
+        'HOST': 'localhost',  # Máy chủ (hoặc IP)
+        'PORT': '5432',  # Cổng PostgreSQL mặc định
     }
 }
+
 
 
 # Password validation

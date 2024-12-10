@@ -118,8 +118,24 @@ def home(request):
             grouped_subjects[subject.grade] = []
         grouped_subjects[subject.grade].append(subject)
 
+    total_participants = Participant.objects.count()
+    total_classrooms = Classroom.objects.count()
+    total_lectures = SubmissionFile.objects.count() + SubsectionFile.objects.count()
+    total_submissions = Submission.objects.count()
+
+    if request.user.is_authenticated:
+        recently_accessed_classrooms = Classroom.objects.filter(participants__user=request.user).order_by('-created_at')[:4]
+    else:
+        recently_accessed_classrooms = []
+
+
     context = {
-        'grouped_subjects': grouped_subjects
+        'grouped_subjects': grouped_subjects,
+        'total_participants': total_participants,
+        'total_classrooms': total_classrooms,
+        'total_lectures': total_lectures,
+        'total_submissions': total_submissions,
+        'recently_accessed_classrooms': recently_accessed_classrooms,
     }
     return render(request, 'home.html', context)
 
@@ -351,7 +367,7 @@ def auth_receiver(request):
             return HttpResponse(status=403)
 
         email = user_data.get('email')
-        base_username = user_data.get('name')
+        base_username = user_data.get('name').replace(" ", "_")
 
         try:
             user = CustomUser.objects.get(email=email)
@@ -822,30 +838,32 @@ def classroom_detail(request, id):
     is_favorite = FavoriteClassroom.objects.filter(user=request.user, classroom=classroom).exists()
     participants = classroom.participants.all()
 
+    # Lấy tất cả kết quả kiểm tra của lớp học
+    quiz_results = QuizResult.objects.filter(
+        submission__section__classroom=classroom,
+        submission__submission_type='question_test'
+    ).select_related('student')
+
     scores_data = []
-    for participant in participants:
-        if participant.user.role == 'student': 
-            quiz_results = QuizResult.objects.filter(
-                submission__section__classroom=classroom,
-                student=participant.user,
-                submission__submission_type='question_test'
-            )
+    for result in quiz_results:
+        participant_exists = Participant.objects.filter(classroom=classroom, user=result.student).exists()
 
-            total_score = sum(result.score for result in quiz_results)
-            num_tests = quiz_results.count()
-            total_time = sum((result.time_taken for result in quiz_results if result.time_taken), timedelta())
-            
-            total_time_hms = str(total_time)
+        duration = result.submission.duration
+        time_taken = result.time_taken
+        time_spent = duration - time_taken if duration and time_taken else None
+        
+        scores_data.append({
+            'user': result.student,
+            'total_score': result.score,
+            'num_tests': 1,  # Mỗi kết quả là một bài kiểm tra
+            'total_time': str(result.time_taken),
+            'time_spent': str(time_spent) if time_spent else "N/A", 
+            'total_time_seconds': result.time_taken.total_seconds() if result.time_taken else 0,
+            'is_out': not participant_exists  # Kiểm tra nếu người dùng đã bị loại
+        })
 
-            scores_data.append({
-                'user': participant.user,
-                'total_score': total_score,
-                'num_tests': num_tests,
-                'total_time': total_time_hms, 
-                'total_time_seconds': total_time.total_seconds() 
-            })
-
-    scores_data.sort(key=lambda x: (-x['total_score'], -x['total_time_seconds']))
+    # Sắp xếp dữ liệu theo điểm và thời gian, nhưng không xếp hạng nếu is_out là True
+    scores_data.sort(key=lambda x: (x['is_out'], -x['total_score'], -x['total_time_seconds']))
 
     submissions = Submission.objects.filter(section__classroom=classroom)
 
@@ -923,6 +941,13 @@ def save_message(request):
         })
 
     return JsonResponse({'status': 'error'}, status=400)
+
+@login_required
+@csrf_exempt
+def delete_message(request, message_id):
+    message = get_object_or_404(ChatMessage, id=message_id)
+    message.delete()
+    return JsonResponse({'status': 'success'})
 
 
 
@@ -1028,6 +1053,7 @@ def take_quiz(request, submission_id, question_id):
     remaining_time = quiz_result.time_taken.total_seconds()
 
     previous_question = Question.objects.filter(submission=submission, id__lt=question_id).last()
+    next_question = Question.objects.filter(submission=submission, id__gt=question_id).first()
 
     if 'previous' in request.GET:
         quiz_result.answered_questions -= 1
@@ -1037,6 +1063,8 @@ def take_quiz(request, submission_id, question_id):
     answered = answered_question is not None
     selected_answer = answered_question.selected_answer.id if answered else None
 
+    is_last_question = next_question is None
+
     return render(request, 'take_quiz.html', {
         'submission': submission,
         'current_question': question, 
@@ -1045,7 +1073,8 @@ def take_quiz(request, submission_id, question_id):
         'remaining_time': remaining_time,
         'previous_question': previous_question,
         'answered': answered,
-        'selected_answer': selected_answer
+        'selected_answer': selected_answer,
+        'is_last_question': is_last_question
     })
 
 @login_required
@@ -1200,9 +1229,21 @@ def handle_co_teacher_request(request):
             if action == 'accept':
                 Participant.objects.create(user=co_teacher_request.requester, classroom=co_teacher_request.classroom, role='co_teacher')
                 co_teacher_request.delete()
+                send_mail(
+                    'Co-Teacher Request Accepted',
+                    f'Hi {co_teacher_request.requester.username},\n\nYour request to become a co-teacher in the classroom "{co_teacher_request.classroom.name}" has been accepted.\n\nBest regards,\nYour Classroom Team',
+                    'nextgenedu03.info@gmail.com',
+                    [co_teacher_request.requester.email]
+                )
                 return JsonResponse({'status': 'success', 'message': 'Request accepted successfully!'})
             elif action == 'reject':
                 co_teacher_request.delete()
+                send_mail(
+                    'Co-Teacher Request Rejected',
+                    f'Hi {co_teacher_request.requester.username},\n\nYour request to become a co-teacher in the classroom "{co_teacher_request.classroom.name}" has been rejected.\n\nBest regards,\nYour Classroom Team',
+                    'nextgenedu03.info@gmail.com',
+                    [co_teacher_request.requester.email]
+                )
                 return JsonResponse({'status': 'success', 'message': 'Request rejected successfully!'})
             else:
                 return JsonResponse({'status': 'error', 'message': 'Invalid action.'})
@@ -1315,11 +1356,16 @@ def question_list(request, submission_id):
     quiz_results = submission.quiz_results.all()
     number_of_participants = quiz_results.count()
     total_participants = submission.section.classroom.participants.count()
+    
+    # Kiểm tra xem submission đã có quiz result nào chưa
+    has_results = quiz_results.exists()
+
     context = {
         'submission': submission,
         'questions': questions,
         'number_of_participants': number_of_participants,
         'total_participants': total_participants,
+        'has_results': has_results,  # Truyền thông tin này sang template
     }
     
     return render(request, 'question_list.html', context)
@@ -1429,13 +1475,22 @@ def edit_question(request, submission_id, question_id):
         question.text = question_text
         question.save()
 
-        question.answers.all().delete()
-        for idx, option_text in enumerate(options, start=1):
-            Answer.objects.create(
-                question=question,
-                text=option_text,
-                is_correct=(idx == correct_option)
-            )
+        students = CustomUser.objects.filter(quiz_results__submission=submission).distinct()
+        for student in students:
+            subject = f"Question Updated in Test '{submission.title}'"
+            message = f"Dear {student.username},\n\nThe question in the test '{submission.title}' has been updated. You can retake the test.\n\nBest regards,\nYour Classroom Team"
+            recipient_list = [student.email]
+            send_mail(subject, message, 'nextgenedu03.info@gmail.com', recipient_list)
+
+        # Hủy các quiz result liên quan
+        QuizResult.objects.filter(submission=submission).delete()
+
+        # Cập nhật câu trả lời mới trên các câu trả lời cũ
+        answers = question.answers.all()
+        for idx, answer in enumerate(answers):
+            answer.text = options[idx]
+            answer.is_correct = (idx + 1 == correct_option)
+            answer.save()
 
         return redirect('question_list', submission_id=submission.id)
 
@@ -1541,6 +1596,8 @@ def setting(request):
             if new_username != user.username:
                 if user.username_changed:
                     return JsonResponse({'status': 'error', 'message': 'Username can only be changed once.'})
+                if " " in new_username:
+                    return JsonResponse({'status': 'error', 'message': 'Username cannot contain spaces.'})
                 user.username = new_username
                 user.username_changed = True
 
@@ -1552,16 +1609,18 @@ def setting(request):
             new_password = request.POST.get('new-password')
             confirm_password = request.POST.get('confirm-password')
 
-            if new_password == confirm_password:
-                if user.check_password(current_password):
-                    user.set_password(new_password)
-                    user.save()
-                    update_session_auth_hash(request, user)
-                    return JsonResponse({'status': 'success', 'message': 'Password updated successfully.'})
-                else:
-                    return JsonResponse({'status': 'error', 'message': 'Current password is incorrect.', 'error_type': 'current_password'})
-            else:
+            if len(new_password) < 8:
+                return JsonResponse({'status': 'error', 'message': 'New password must be at least 8 characters long.', 'error_type': 'password_length'})
+            elif new_password != confirm_password:
                 return JsonResponse({'status': 'error', 'message': 'New password and confirmation do not match.', 'error_type': 'password_mismatch'})
+            elif user.check_password(current_password):
+                user.set_password(new_password)
+                user.save()
+                update_session_auth_hash(request, user)
+                return JsonResponse({'status': 'success', 'message': 'Password updated successfully.'})
+            else:
+                return JsonResponse({'status': 'error', 'message': 'Current password is incorrect.', 'error_type': 'current_password'})
+
 
         elif 'delete_account' in request.POST:
             user.delete()
@@ -2011,12 +2070,14 @@ def searchPage(request):
     participant_classrooms = []
     if request.user.is_authenticated:
         participant_classrooms = Participant.objects.filter(user=request.user).values_list('classroom_id', flat=True)
+        co_teacher_requests = CoTeacherRequest.objects.filter(requester=request.user).values_list('classroom_id', flat=True)
     
     return render(request, 'searchPage.html', {
         'public_classrooms': public_classrooms,
         'private_classrooms': private_classrooms,
         'query': query,
         'participant_classrooms': participant_classrooms,
+        'co_teacher_requests': co_teacher_requests,
     })
 
 from .models import Chatbot, CoTeacherRequest, ForumComment, ForumPost, NotificationSystem
@@ -2084,7 +2145,8 @@ def create_post(request, classroom_id):
 def manage_posts(request, classroom_id):
     classroom = get_object_or_404(Classroom, id=classroom_id)
     posts = ForumPost.objects.filter(classroom=classroom, user=request.user)
-    return render(request, 'manage_posts.html', {'posts': posts, 'classroom_id': classroom_id, 'classroom': classroom})
+    participant = Participant.objects.filter(user=request.user, classroom=classroom).first()
+    return render(request, 'manage_posts.html', {'posts': posts, 'classroom_id': classroom_id, 'classroom': classroom, 'participant': participant})
 
 from django.views.decorators.http import require_POST
 @require_POST
@@ -2099,6 +2161,8 @@ def edit_post(request, post_id):
         post.title = title
         post.content = content
         post.post_type = post_type
+        post.is_approved = False
+        post.is_rejected = False
         post.save()
         # Trả về JSONResponse để xử lý modal thông báo thành công
         return JsonResponse({'status': 'success', 'message': 'Post updated successfully.'})

@@ -141,6 +141,15 @@
 </head>
 <body>
     {% include "headerMain.html" %}
+    <div id="loadingSpinner" class="spinner-border" role="status" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9999; animation: spin 1s linear infinite; color: var(--accent-color) !important;">
+        <span class="visually-hidden" style="font-size: 0.8em;">Loading...</span>
+    </div>
+    <style>
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
     <div class="create-question-section">
         <div class="submission-title d-flex justify-content-between align-items-center">
 
@@ -198,6 +207,7 @@
     <script>
 
         function validateForm() {
+            document.getElementById('loadingSpinner').style.display = 'block';
             var questionText = document.getElementById('question_text').value.trim();
             var options = document.querySelectorAll('.option-input');
             var correctOption = document.querySelector('input[name="correct_option"]:checked');
@@ -205,6 +215,7 @@
             if (!questionText) {
                 document.getElementById('error-message').textContent = 'Please fill in the question text.';
                 document.getElementById('error-message').style.display = 'block';
+                document.getElementById('loadingSpinner').style.display = 'none';
                 return false;
             }
     
@@ -212,6 +223,7 @@
                 if (!options[i].value.trim()) {
                     document.getElementById('error-message').textContent = 'Please fill in all fields.';
                     document.getElementById('error-message').style.display = 'block';
+                    document.getElementById('loadingSpinner').style.display = 'none';
                     return false;
                 }
             }
@@ -219,6 +231,7 @@
             if (!correctOption) {
                 document.getElementById('error-message').textContent = 'Please select the correct option.';
                 document.getElementById('error-message').style.display = 'block';
+                document.getElementById('loadingSpinner').style.display = 'none';
                 return false;
             }
     

@@ -152,7 +152,7 @@
                             </div>
                             <div class="achievement-item">
                                 <i class="fas fa-award" style="color: #f59e0b;"></i>
-                                    <span style="background-color: #f59e0b; color: #fff;">{{ average_rating }}</span>
+                                    <span style="background-color: #f59e0b; color: #fff;">{{ average_rating|floatformat:1 }}</span>
                                 <p>Average Rating</p>
                             </div>
                         {% elif user.role == 'student' %}
@@ -163,7 +163,7 @@
                             </div>
                             <div class="achievement-item">
                                 <i class="fas fa-star" style="color: #f59e0b;"></i>
-                                <span style="background-color: #f59e0b; color: #fff;">{{ highest_score }}</span>
+                                <span style="background-color: #f59e0b; color: #fff;">{{ highest_score|floatformat:1 }}</span>
                                 <p>Highest Score</p>
                             </div>
                             <div class="achievement-item">

@@ -921,6 +921,10 @@
                                 return true;
                             }
                         }
+
+                        document.getElementById('editSubmissionModal').addEventListener('hidden.bs.modal', function () {
+                            document.getElementById('descriptionErrorSubmission').style.display = 'none';
+                        });
                     </script>
                 </div>
 
@@ -980,6 +984,11 @@
                             return true;
                         }
                     }
+
+                    // Hide descriptionErrorClassroom when modal is closed
+                    document.getElementById('editClassroomDescriptionModal').addEventListener('hidden.bs.modal', function () {
+                        document.getElementById('descriptionErrorClassroom').style.display = 'none';
+                    });
                 </script>
             </div>
 
@@ -1036,6 +1045,10 @@
                                 return true;
                             }   
                         }
+
+                        document.getElementById('editDescriptionModal').addEventListener('hidden.bs.modal', function () {
+                            document.getElementById('descriptionError').style.display = 'none';
+                        });
                     </script>
                 </div>
 
@@ -1109,6 +1122,11 @@
                             localStorage.setItem('activeLeftSidebarId', activeLeftSidebarId);
                             return true;
                         }
+
+                        document.getElementById('editFilesModal').addEventListener('hidden.bs.modal', function () {
+                            document.getElementById('uploadFileError').style.display = 'none';
+                            document.getElementById('deleteFileError').style.display = 'none';
+                        });
                     </script>
                 </div>
             </div>
@@ -1154,6 +1172,23 @@
         </div>
     
         <div id="participants" class="tab-content active">
+            <div class="d-flex justify-content-between mb-3" style="float: right;">
+                <div class="d-flex justify-content-end">
+                    <div class="dropdown">
+                        <select id="roleFilter" class="form-control" style="width: 150px; margin-right: 10px; display: inline-block;">
+                            <option value="">All roles</option>
+                            <option value="teacher">Teacher</option>
+                            <option value="student">Student</option>
+                            <option value="co_teacher">Co-teacher</option>
+                        </select>
+                        <i class="fas fa-caret-down" style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%); pointer-events: none;"></i>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <input type="text" id="searchInput" class="form-control" style="width: 200px;" placeholder="Search by name...">
+                        <i class="fas fa-search ml-2" style="margin-left: 10px; color: white; font-size: 20px;"></i>
+                    </div>
+                </div>
+            </div>
             <table>
                 <thead>
                     <tr>
@@ -1164,12 +1199,12 @@
                         {% endif %}
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="participantsTable">
                     {% for participant in participants %}
                     <tr>
                         <td>{{ participant.user.username }}</td>
                         <td>{{ participant.role }}</td>
-                        {% if request.user.role == 'teacher' %}
+                        {% if request.user.role == 'teacher' and participant.user.id != request.user.id and participant.role == 'student' %}
                             <td><button class="delete-btn" onclick="deleteMember({{ participant.id }})">🗑️</button></td>
                         {% endif %}
                     </tr>
@@ -1177,6 +1212,33 @@
                 </tbody>
             </table>
         </div>
+        <script>
+            document.getElementById('searchInput').addEventListener('input', function() {
+                var searchValue = this.value.toLowerCase();
+                var rows = document.querySelectorAll('#participantsTable tr');
+                rows.forEach(function(row) {
+                    var username = row.cells[0].textContent.toLowerCase();
+                    if (username.includes(searchValue)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+
+            document.getElementById('roleFilter').addEventListener('change', function() {
+                var filterValue = this.value;
+                var rows = document.querySelectorAll('#participantsTable tr');
+                rows.forEach(function(row) {
+                    var role = row.cells[1].textContent;
+                    if (filterValue === '' || role === filterValue) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+        </script>
     
         <div id="scores" class="tab-content hidden">
             <table>
@@ -1191,18 +1253,20 @@
                 </thead>
                 <tbody>
                     {% for score in scores_data %}
-                    <tr>
+                    <tr {% if score.is_out %}style="opacity: 0.5;"{% endif %}>
                         <td>
                             <div style="position: relative; display: inline-block;">
                                 <img src="{% static 'account.png' %}" alt="User Icon" style="width: 40px; height: 40px; background-color: white; border-radius: 50%;">
+                                {% if not score.is_out %}
                                 <span style="position: absolute; bottom: -7px; right: -10px; background-color: white; color: black; border: 2px solid black; border-radius: 50%; padding: 2px 8px; font-size: 12px; font-weight: bold;">
-                                    {{ forloop.counter }}
+                                    {{ forloop.counter0|add:1 }}
                                 </span>
+                                {% endif %}
                             </div>
                         </td>
                         <td>{{ score.user.username }}</td>
                         <td>{{ score.num_tests }}</td>
-                        <td>{{ score.total_time }}</td>
+                        <td>{{ score.total_time }} ({{ score.time_spent }})</td>
                         <td>{{ score.total_score }}</td>
                     </tr>
                     {% endfor %}
@@ -1235,7 +1299,9 @@
                                 <p class="m-0">
                                     <a href="{{ message.file.url }}" download>{{ message.file.name|cut:"chat_files/"|slice:":20" }}</a>
                                 </p>
-                                <span>🗑️</span>
+                                {% if message.user == request.user %}
+                                    <span onclick="deleteMessage('{{ message.id }}')" style="cursor: pointer;">🗑️</span>
+                                {% endif %}
                             </div>
                             <hr class="m-0">
                         {% elif message.is_image and message.image %}
@@ -1243,7 +1309,9 @@
                                 <p class="m-0">
                                     <a href="{{ message.image.url }}" download>{{ message.image.name|cut:"chat_files/"|slice:":20" }}</a>
                                 </p>
-                                <span>🗑️</span>
+                                {% if message.user == request.user %}
+                                    <span onclick="deleteMessage('{{ message.id }}')" style="cursor: pointer;">🗑️</span>
+                                {% endif %}
                             </div>
                             <hr class="m-0">
                         {% endif %}
@@ -1252,6 +1320,40 @@
             </div>
         </div>
     </div>
+
+    <script>
+        function deleteMessage(messageId) {
+            // Lưu trạng thái modal trước khi tải lại trang
+            localStorage.setItem('folderModalOpen', 'true');
+    
+            fetch(`/delete_message/${messageId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    location.reload();
+                } else {
+                    alert('An error occurred while deleting the message.');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    
+        document.addEventListener('DOMContentLoaded', function() {
+            if (localStorage.getItem('folderModalOpen') === 'true') {
+                // Mở lại modal
+                var folderModal = new bootstrap.Modal(document.getElementById('folderModal'));
+                folderModal.show();
+    
+                // Xóa trạng thái modal sau khi mở
+                localStorage.removeItem('folderModalOpen');
+            }
+        });
+    </script>
     
     
 
@@ -1578,6 +1680,39 @@
         </div>
     </button>
 
+    <div class="modal fade" id="shareClassroomModal" tabindex="-1" aria-labelledby="shareClassroomModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content" style="border: 5px solid var(--accent-color); border-radius: 15px;">
+                <div class="modal-header d-flex justify-content-between align-items-center" style="background-color: var(--accent-color);">
+                    <h5 class="modal-title" id="shareClassroomModalLabel" style="color: #fff;">Share Classroom</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" style="background-color: #fff; border: none;" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" style="border-bottom: 2px solid var(--accent-color);">
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" id="invitationLink" value="{{ request.scheme }}://{{ request.get_host }}{% url 'access_join_classroom' classroom.link %}" readonly>
+                        <button class="btn" style="background-color: var(--accent-color); color: #fff;" onclick="copyClassroomLink()">Copy Link</button>
+                    </div>
+                    <div id="copySuccess" class="text-success" style="display: none;">Link copied to clipboard!</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function copyClassroomLink() {
+            var copyText = document.getElementById("invitationLink");
+            copyText.select();
+            copyText.setSelectionRange(0, 99999); 
+            document.execCommand("copy");
+    
+            var copySuccess = document.getElementById("copySuccess");
+            copySuccess.style.display = "block";
+            setTimeout(function() {
+                copySuccess.style.display = "none";
+            }, 2000);
+        }
+    </script>
+
     <div class="content-area">
         {% for section in sections %}
         {% if forloop.first %}
@@ -1622,38 +1757,6 @@
                         </ul>
                     </div>
                     {% endif %}
-                    <div class="modal fade" id="shareClassroomModal" tabindex="-1" aria-labelledby="shareClassroomModalLabel" aria-hidden="true">
-                        <div class="modal-dialog modal-lg">
-                            <div class="modal-content" style="border: 5px solid var(--accent-color); border-radius: 15px;">
-                                <div class="modal-header d-flex justify-content-between align-items-center" style="background-color: var(--accent-color);">
-                                    <h5 class="modal-title" id="shareClassroomModalLabel" style="color: #fff;">Share Classroom</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" style="background-color: #fff; border: none;" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body" style="border-bottom: 2px solid var(--accent-color);">
-                                    <div class="input-group mb-3">
-                                        <input type="text" class="form-control" id="invitationLink" value="{{ request.scheme }}://{{ request.get_host }}{% url 'access_join_classroom' classroom.link %}" readonly>
-                                        <button class="btn" style="background-color: var(--accent-color); color: #fff;" onclick="copyClassroomLink()">Copy Link</button>
-                                    </div>
-                                    <div id="copySuccess" class="text-success" style="display: none;">Link copied to clipboard!</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <script>
-                        function copyClassroomLink() {
-                            var copyText = document.getElementById("invitationLink");
-                            copyText.select();
-                            copyText.setSelectionRange(0, 99999); 
-                            document.execCommand("copy");
-                    
-                            var copySuccess = document.getElementById("copySuccess");
-                            copySuccess.style.display = "block";
-                            setTimeout(function() {
-                                copySuccess.style.display = "none";
-                            }, 2000);
-                        }
-                    </script>
                     <button class="btn-favorite mr-4" style="outline: none;">
                         <i class="fa-regular fa-star fa-xl {% if is_favorite %}favorite{% endif %}"></i>
                     </button>
@@ -1838,6 +1941,7 @@
                             <i class="fa-solid fa-gear fa-xl" style="transition: transform 0.3s;"></i>
                         </button>
                         <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#shareClassroomModal">Share Classroom</a></li>
                             <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#confirmLeaveModal">Leave the classroom</a></li>
                         </ul>
                     </div>
@@ -1909,6 +2013,7 @@
                             <i class="fa-solid fa-gear fa-xl" style="transition: transform 0.3s;"></i>
                         </button>
                         <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#shareClassroomModal">Share Classroom</a></li>
                             <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#confirmLeaveModal">Leave the classroom</a></li>
                         </ul>
                     </div>
@@ -1980,6 +2085,7 @@
                                 <i class="fa-solid fa-gear fa-xl" style="transition: transform 0.3s;"></i>
                             </button>
                             <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#shareClassroomModal">Share Classroom</a></li>
                                 <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#confirmLeaveModal">Leave the classroom</a></li>
                             </ul>
                         </div>
@@ -2026,19 +2132,36 @@
                         <p>Deadline time: {{ student_file.submission.open_date }} - {{ student_file.submission.close_date }}</p>
                         <div class="d-flex align-items-end pt-3 pb-3">
                             <div class="doc-icon mr-3">
-                                <img src="{% static "google-docs.png" %}" alt="Document Icon">
+                                <a href="{{ student_file.file.url }}" download>
+                                    <img src="{% static "google-docs.png" %}" alt="Document Icon">
+                                </a>
                             </div>
                             <p class="m-0">{{ student_file.file.name|filename }}</p> 
                         </div>
-                        <div class="d-flex justify-content-start align-items-center">
-                            <p class="m-0 ml-1" style="font-weight: 700;">Your score: {{ student_file.score }}/10.00</p>
+                        <p class="m-0 ml-1" style="font-weight: 700;">Your score: {{ student_file.score }}/10.00</p>             
+                        <button class="btn-doc ml-3 mt-2" style="outline: none; padding: 5px 10px; background-color: var(--accent-color);" data-bs-toggle="modal" data-bs-target="#feedbackModal{{ student_file.id }}">View feedback</button>
+
+                        <div class="modal fade" id="feedbackModal{{ student_file.id }}" tabindex="-1" aria-labelledby="feedbackModalLabel{{ student_file.id }}" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content" style="border: 5px solid var(--accent-color); border-radius: 15px;">
+                                    <div class="modal-header" style="background-color: var(--accent-color);">
+                                        <h5 class="modal-title" id="feedbackModalLabel{{ student_file.id }}" style="color: #fff;">Feedback</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="background-color: #fff; border: none;"></button>
+                                    </div>
+                                    <div class="modal-body" style="max-height: 400px; overflow-y: auto; border-bottom: 2px solid var(--accent-color); text-align: left;">
+                                        <p style="white-space: pre-wrap; word-wrap: break-word; margin: 0;">{{ student_file.feedback|linebreaksbr }}</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     {% else %}
                         <h1 style="font-weight: 700;" class="text-truncate">Submit assignment</h1>
                         <p>Deadline time: {{ student_file.submission.open_date }} - {{ student_file.submission.close_date }}</p>
                         <div class="d-flex align-items-end pt-3 pb-3">
                             <div class="doc-icon mr-3">
-                                <img src="{% static "google-docs.png" %}" alt="Document Icon">
+                                <a href="{{ student_file.file.url }}" download>
+                                    <img src="{% static "google-docs.png" %}" alt="Document Icon">
+                                </a>
                             </div>
                             <p class="m-0" style="font-weight: 500;">{{ student_file.file.name|filename }}</p> 
                         </div>
@@ -2047,7 +2170,7 @@
                                 <form action="{% url 'update_file_submission' student_file.id %}" method="post" enctype="multipart/form-data" style="margin-right: 10px;" onsubmit="return validateFileSubmissionUpdate()">
                                     {% csrf_token %}
                                     <div id="fileErrorUpdate" class="text-danger" style="display: none; margin-bottom: 1rem;">Please choose a file to update.</div>
-                                    <input type="file" name="file" class="btn-doc text-white" style="outline: none; padding: 3px 6px; font-size: 12px; background-color: var(--accent-color);" onchange="checkFileSubmissionUpdate()">
+                                    <input type="file" name="file" accept=".pdf" id="fileInputUpdate" class="btn-doc text-white" style="outline: none; padding: 3px 6px; font-size: 12px; background-color: var(--accent-color);" onchange="checkFileSubmissionUpdate()">
                                     <button type="submit" class="btn-doc mr-3" style="outline: none; padding: 5px 10px; background-color: var(--accent-color);">Update</button> 
                                 </form>
                                 <script>
@@ -2059,6 +2182,19 @@
                                         fileErrorUpdate.style.display = 'none';
                                         var deleteButton = document.querySelector('form[action="{% url 'delete_file_submission' student_file.id %}"] button');
                                         deleteButton.style.marginTop = '0px';
+
+                                        var fileInput = document.getElementById('fileInputUpdate');
+                                        var file = fileInput.files[0];
+                                        var allowedExtensions = /(\.pdf)$/i;
+
+                                        if (!allowedExtensions.test(file.name)) {
+                                            fileErrorUpdate.innerText = 'Only PDF files are allowed.';
+                                            fileErrorUpdate.style.display = 'block';
+                                            fileCheckedUpdate = false;
+                                            var deleteButton = document.querySelector('form[action="{% url 'delete_file_submission' student_file.id %}"] button');
+                                            deleteButton.style.marginTop = '40px';
+                                            return false;
+                                        }
                                         return true;
                                     }
 
@@ -2127,67 +2263,87 @@
                                     </div>
                                 </div>
                             {% else %}
-                                <p class="text-muted">Submission period has ended. You cannot update or delete your submission.</p>
+                                <button class="btn-doc" style="outline: none; padding: 5px 10px;" disabled>Submission period has ended. You cannot update or delete your submission.</button>
                             {% endif %}
                         </div>
                     {% endif %}
                 {% endfor %}
 
-                {% if not student_files %}
-                    {% if submission.is_open %}
-                        <h1 style="font-weight: 700;" class="text-truncate">Submit assignment</h1>
-                        <p>Deadline time: {{submission.open_date}} - {{submission.close_date}}</p>
-                        <form action="{% url 'submit_assignment' submission.id %}" method="post" enctype="multipart/form-data" onsubmit="return validateFileSubmission()">
-                            {% csrf_token %}
-                            <div id="fileError" class="text-danger" style="display: none;">Please choose a file to submit.</div>
-                            <div class="d-flex align-items-end pt-3 pb-3">
-                                <div class="doc-icon mr-3">
-                                    <img src="{% static "google-docs.png" %}" alt="Document Icon">
+                {% if user.role != 'teacher' %}
+                    {% if not student_files %}
+                        {% if submission.is_open %}
+                            <h1 style="font-weight: 700;" class="text-truncate">Submit assignment</h1>
+                            <p>Deadline time: {{submission.open_date}} - {{submission.close_date}}</p>
+                            <form action="{% url 'submit_assignment' submission.id %}" method="post" enctype="multipart/form-data" onsubmit="return validateFileSubmission()">
+                                {% csrf_token %}
+                                <div id="fileError" class="text-danger" style="display: none;">Please choose a file to submit.</div>
+                                <div class="d-flex align-items-end pt-3 pb-3">
+                                    <div class="doc-icon mr-3">
+                                        <img src="{% static "google-docs.png" %}" alt="Document Icon">
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <input type="file" id="fileInputSubmit" accept=".pdf" class="btn-doc text-white" style="outline: none; padding: 3px 6px; font-size: 12px; background-color: var(--accent-color);" name="file" onchange="checkFileSubmissionSubmit()">
+                                        <label for="fileInputSubmit" style="margin-left: 10px; font-size: 12px; font-weight: 500; color: #000;">(Only PDF files are allowed)</label>
+                                    </div>
                                 </div>
-                                <input type="file" id="fileInput" class="btn-doc text-white" style="outline: none; padding: 3px 6px; font-size: 12px; background-color: var(--accent-color);" name="file" onchange="checkFileSubmission()">
-                            </div>
-                            <div class="d-flex justify-content-start">
-                                <button type="submit" class="btn-doc" style="outline: none; padding: 5px 10px;">Submit</button> 
-                            </div>
-                        </form>
+                                <div class="d-flex justify-content-start">
+                                    <button type="submit" class="btn-doc" style="outline: none; padding: 5px 10px;">Submit</button> 
+                                </div>
+                            </form>
 
-                        <script>
-                            let fileCheckedSubmision = false;
+                            <script>
+                                let fileCheckedSubmision = false;
 
-                            function checkFileSubmission() {
-                                fileCheckedSubmision = true;
-                                var fileError = document.getElementById('fileError');
-                                fileError.style.display = 'none';
-                                return true;
-                            }
-
-                            function validateFileSubmission() {
-
-                                if (!fileCheckedSubmision) {
+                                function checkFileSubmissionSubmit() {
+                                    fileCheckedSubmision = true;
                                     var fileError = document.getElementById('fileError');
-                                    fileError.style.display = 'block';
-                                    return false;
+                                    fileError.style.display = 'none';
+
+                                    var fileInput = document.getElementById('fileInputSubmit');
+                                    var file = fileInput.files[0];
+                                    var allowedExtensions = /(\.pdf)$/i;
+
+                                    if (!allowedExtensions.test(file.name)) {
+                                        fileError.innerText = 'Only PDF files are allowed.';
+                                        fileError.style.display = 'block';
+                                        fileCheckedSubmision = false;
+                                        return false;
+                                    }
+                                    return true;
                                 }
 
-                                // Save the current state before submitting
-                                const rightSidebarExpanded = document.querySelector('.right-sidebar').classList.contains('expanded');
-                                const activeSectionId = document.querySelector('.content-section.active')?.id;
-                                const activeLeftSidebarId = document.querySelector('.nav-link.active')?.dataset.content;
-                                localStorage.setItem('rightSidebarExpanded', rightSidebarExpanded);
-                                localStorage.setItem('activeSectionId', activeSectionId);
-                                localStorage.setItem('activeLeftSidebarId', activeLeftSidebarId);
-                                return true;
-                            }
-                        </script>
-                    {% elif submission.not_open_yet %}
-                        <h1 style="font-weight: 700;" class="text-truncate">Submit assignment</h1>
-                        <p>Deadline time: {{submission.open_date}} - {{submission.close_date}}</p>
-                        <p>Submit not open yet. Starts at {{ submission.open_date }}</p>
-                    {% elif submission.closed %}
-                        <h1 style="font-weight: 700;" class="text-truncate">Submit assignment</h1>
-                        <p>Deadline time: {{submission.open_date}} - {{submission.close_date}}</p>
-                        <p>Submit closed on {{ submission.close_date }}</p>
+                                function validateFileSubmission() {
+
+                                    if (!fileCheckedSubmision) {
+                                        var fileError = document.getElementById('fileError');
+                                        fileError.style.display = 'block';
+                                        return false;
+                                    }
+
+                                    // Save the current state before submitting
+                                    const rightSidebarExpanded = document.querySelector('.right-sidebar').classList.contains('expanded');
+                                    const activeSectionId = document.querySelector('.content-section.active')?.id;
+                                    const activeLeftSidebarId = document.querySelector('.nav-link.active')?.dataset.content;
+                                    localStorage.setItem('rightSidebarExpanded', rightSidebarExpanded);
+                                    localStorage.setItem('activeSectionId', activeSectionId);
+                                    localStorage.setItem('activeLeftSidebarId', activeLeftSidebarId);
+                                    return true;
+                                }
+                            </script>
+                        {% elif submission.not_open_yet %}
+                            <h1 style="font-weight: 700;" class="text-truncate">Submit assignment</h1>
+                            <p>Deadline time: {{submission.open_date}} - {{submission.close_date}}</p>
+                            <button class="btn-doc" style="outline: none; padding: 5px 10px;" disabled>Submit not open yet. Starts at {{ submission.open_date }}</button>
+                        {% elif submission.closed %}
+                            <h1 style="font-weight: 700;" class="text-truncate">Submit assignment</h1>
+                            <p>Deadline time: {{submission.open_date}} - {{submission.close_date}}</p>
+                            <button class="btn-doc" style="outline: none; padding: 5px 10px;" disabled>Submit closed on {{ submission.close_date }}</button>
+                        {% endif %}
                     {% endif %}
+                {% else %}
+                    <h1 style="font-weight: 700;" class="text-truncate">Submit assignment</h1>
+                    <p>Deadline time: {{submission.open_date}} - {{submission.close_date}}</p>
+                    <button class="btn-doc" style="outline: none; padding: 5px 10px; background-color: #f97316; border: none;" onclick="window.location.href='{% url 'marking' submission.id %}'">Marking</button>
                 {% endif %}
             </div>
             {% elif submission.submission_type == 'question_test' %}
@@ -2212,6 +2368,7 @@
                                 <i class="fa-solid fa-gear fa-xl" style="transition: transform 0.3s;"></i>
                             </button>
                             <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#shareClassroomModal">Share Classroom</a></li>
                                 <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#confirmLeaveModal">Leave the classroom</a></li>
                             </ul>
                         </div>
@@ -2256,7 +2413,7 @@
                         <h1 style="font-weight: 700;" class="text-truncate">Answer the question</h1>
                         {% with quiz_results|get_item:submission.id as result %}
                             {% if result %}
-                                <p>There are a total of {{ result.total_questions }} questions</p>
+                                <p>There are a total of {{ submission.questions.count }} questions</p>
                             {% endif %}
                         {% endwith %}
                         <div class="d-flex align-items-end pb-3">
@@ -2272,9 +2429,10 @@
                                             Your score: <span>{{ result.correct_answers }}/{{ result.total_questions }}</span> 
                                             <span class="text-muted">(<span style="color: {% if result.score <= 5 %}orange{% elif result.score <= 8 %}blue{% else %}green{% endif %};">{{ result.score }}</span>/10.00)</span>
                                         </p>
-                                        <p class="m-0" style="font-weight: 700;">
+                                        <p class="m-0 mt-2" style="font-weight: 700;">
                                             Time taken: <span class="text-success">{{ result.time_taken }}</span>
                                         </p>
+                                        <button class="btn-doc mt-2" style="outline: none; padding: 5px 10px; background-color: var(--accent-color); border: none;" onclick="window.location.href='{% url 'view_answer_history' result.id %}'">View answer history</button>
                                     </div>
                                 {% endif %}
                             {% endwith %}
@@ -2289,16 +2447,20 @@
                         </div> 
                     </div>
                     <div class="d-flex justify-content-start">
-                        {% if submission.questions.first %}
-                            {% if submission.is_open %}
-                                <a href="{% url 'take_quiz' submission.id submission.questions.first.id %}" class="btn-doc" style="outline: none; padding: 5px 10px;" onclick="saveStatusPage()">Get started</a>
-                            {% elif submission.not_open_yet %}
-                                <button class="btn-doc" style="outline: none; padding: 5px 10px;" disabled>Quiz not open yet. Starts at {{ submission.open_date }}</button>
-                            {% elif submission.closed %}
-                                <button class="btn-doc" style="outline: none; padding: 5px 10px;" disabled>Quiz closed on {{ submission.close_date }}</button>
+                        {% if user.role != 'teacher' %}
+                            {% if submission.questions.first %}
+                                {% if submission.is_open %}
+                                    <a href="{% url 'take_quiz' submission.id submission.questions.first.id %}" class="btn-doc" style="outline: none; padding: 5px 10px;" onclick="saveStatusPage()">Get started</a>
+                                {% elif submission.not_open_yet %}
+                                    <button class="btn-doc" style="outline: none; padding: 5px 10px;" disabled>Quiz not open yet. Starts at {{ submission.open_date }}</button>
+                                {% elif submission.closed %}
+                                    <button class="btn-doc" style="outline: none; padding: 5px 10px;" disabled>Quiz closed on {{ submission.close_date }}</button>
+                                {% endif %}
+                            {% else %}
+                                <button class="btn-doc" style="outline: none; padding: 5px 10px;" disabled>No questions available</button>
                             {% endif %}
                         {% else %}
-                            <button class="btn-doc" style="outline: none; padding: 5px 10px;" disabled>No questions available</button>
+                            <button class="btn-doc" style="outline: none; padding: 5px 10px; background-color: #f97316; border: none;" onclick="window.location.href='{% url 'question_test_marking' submission.id %}'">View scores</button>
                         {% endif %}
                     </div>
                 {% endif %}
@@ -2501,10 +2663,7 @@
                                     }
                                 }
                             }
-                        }else{
-                            console.log('targetLink is not a submission or subsection');
                         }
-
                     }
                 }
             }

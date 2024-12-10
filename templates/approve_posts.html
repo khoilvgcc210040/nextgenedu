@@ -225,12 +225,9 @@
                             <td>{{ post.user.username }}</td>
                             <td>{{ post.created_at }}</td>
                             <td>
-                                <form method="post" action="{% url 'approve_post' post.id %}" class="approve-form" style="display:inline;">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn-approve" style="transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateX(0)'">Approve</button>
-                                </form>
+                                <button type="button" class="btn-approve" data-bs-toggle="modal" data-bs-target="#approveConfirmModal{{ post.id }}" style="transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateX(0)'">Approve</button>
                                 |
-                                <button type="button" class="btn-reject" data-toggle="modal" data-target="#rejectModal{{ post.id }}" style="transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateX(0)'">Reject</button>
+                                <button type="button" class="btn-reject" data-bs-toggle="modal" data-bs-target="#rejectConfirmModal{{ post.id }}" style="transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateX(0)'">Reject</button>
                             </td>
                         </tr>
                     {% endif %}
@@ -264,7 +261,7 @@
                             <td>{{ post.created_at }}</td>
                             <td>
                                 <span style="color: #28a745;">Approved</span> |
-                                <button type="button" class="btn-reject" data-toggle="modal" data-target="#rejectModal{{ post.id }}" style="transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateX(0)'">Reject</button>
+                                <button type="button" class="btn-reject" data-bs-toggle="modal" data-bs-target="#rejectConfirmModal{{ post.id }}" style="transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateX(0)'">Reject</button>
                             </td>
                         </tr>
                     {% endif %}
@@ -297,10 +294,7 @@
                             <td>{{ post.user.username }}</td>
                             <td>{{ post.created_at }}</td>
                             <td>
-                                <form method="post" action="{% url 'approve_post' post.id %}" class="approve-form" style="display:inline;">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn-approve" style="transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateX(0)'">Approve</button>
-                                </form>
+                                <button type="button" class="btn-approve" data-bs-toggle="modal" data-bs-target="#approveConfirmModal{{ post.id }}" style="transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateX(0)'">Approve</button>
                                 |
                                 <span style="color: #dc3545;">Rejected</span>
                             </td>
@@ -309,6 +303,54 @@
                 {% endfor %}
             </tbody>
         </table>
+
+        <!-- Approve Confirmation Modal -->
+        {% for post in posts %}
+            <div class="modal fade" id="approveConfirmModal{{ post.id }}" tabindex="-1" aria-labelledby="approveConfirmModalLabel{{ post.id }}" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="approveConfirmModalLabel{{ post.id }}" style="color: #fff;">Confirm Approval</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" style="background-color: #fff; border: none;" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            Are you sure you want to approve this post titled "{{ post.title }}"?
+                        </div>
+                        <div class="modal-footer">
+                            <form class="approve-form" action="{% url 'approve_post' post.id %}" method="post">
+                                {% csrf_token %}
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn" style="background-color: var(--accent-color); color: #fff;">Approve</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+
+        {% for post in posts %}
+            <div class="modal fade" id="rejectConfirmModal{{ post.id }}" tabindex="-1" aria-labelledby="rejectConfirmModalLabel{{ post.id }}" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="rejectConfirmModalLabel{{ post.id }}" style="color: #fff;">Confirm Rejection</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" style="background-color: #fff; border: none;" aria-label="Close"></button>
+                        </div>
+                        <form class="reject-form" action="{% url 'reject_post' post.id %}" method="post">
+                            <div class="modal-body">
+                                <p>Are you sure you want to reject this post titled "{{ post.title }}"?</p>
+                                <textarea name="reason" placeholder="Enter reason for rejection"></textarea>
+                            </div>
+                            <div class="modal-footer">
+                                {% csrf_token %}
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn" style="background-color: var(--accent-color); color: #fff;">Reject</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
     </div>
 
     <div id="loadingSpinner" class="spinner-border" role="status" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9999; animation: spin 1s linear infinite; color: var(--accent-color) !important;">

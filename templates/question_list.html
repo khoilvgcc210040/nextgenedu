@@ -155,7 +155,7 @@
                     <form id="editDurationForm">
                         <div class="form-group">
                             <label for="durationInput" style="font-size: 16px; font-weight: 500;">New Duration (in minutes)</label>
-                            <input type="number" class="form-control" id="durationInput" required>
+                            <input type="text" class="form-control" id="durationInput" required>
                             <div id="duration-error-message" style="color: red; display: none; margin-top: 5px;"></div>
                         </div>
                         <input type="hidden" id="durationSubmissionId" value="{{ submission.id }}">
@@ -168,7 +168,7 @@
 
     <div class="content-wrapper">
         <div class="submission-title d-flex justify-content-between align-items-center">
-            <button class="btn-back" onclick="history.back()" style="outline: none;">
+            <button class="btn-back" onclick="window.location.href='{% url 'manage_classroom_detail' submission.section.classroom.id %}'" style="outline: none;">
                 <svg height="16" width="16" fill="currentColor" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 1024 1024">
                     <path d="M874.690416 495.52477c0 11.2973-9.168824 20.466124-20.466124 20.466124l-604.773963 0 188.083679 188.083679c7.992021 7.992021 7.992021 20.947078 0 28.939099-4.001127 3.990894-9.240455 5.996574-14.46955 5.996574-5.239328 0-10.478655-1.995447-14.479783-5.996574l-223.00912-223.00912c-3.837398-3.837398-5.996574-9.046027-5.996574-14.46955 0-5.433756 2.159176-10.632151 5.996574-14.46955l223.019353-223.029586c7.992021-7.992021 20.957311-7.992021 28.949332 0 7.992021 8.002254 7.992021 20.957311 0 28.949332l-188.073446 188.073446 604.753497 0C865.521592 475.058646 874.690416 484.217237 874.690416 495.52477z"></path>
                 </svg>
@@ -227,9 +227,35 @@
                                     </div>
                                 </div>
                                 <div class="question-actions">
+                                    {% if has_results %}
+                                    <a href="{% url 'edit_question' submission.id question.id %}" data-toggle="modal" data-target="#confirmEditModal{{ question.id }}">
+                                        <i class="fas fa-edit fa-lg" style="vertical-align: 0;"></i>
+                                    </a>
+                                    
+                                    <div class="modal fade" id="confirmEditModal{{ question.id }}" tabindex="-1" role="dialog" aria-labelledby="confirmEditModalLabel{{ question.id }}" aria-hidden="true">
+                                        <div class="modal-dialog" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header" style="background-color: var(--accent-color); color: #fff;">
+                                                    <h5 class="modal-title" id="confirmEditModalLabel{{ question.id }}" style="color: #fff;">Confirm Edit</h5>
+                                                    <button type="button" class="close" style="color: #fff;" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    This submission has been completed by students, are you sure you want to update? (If updated, all results of students for this submission will be deleted)
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                                    <a href="{% url 'edit_question' submission.id question.id %}" class="btn" style="background-color: var(--accent-color); color: #fff; border: none; border-radius: 5px; padding: 10px 20px; font-size: 14px; cursor: pointer; transition: transform 0.2s;">Confirm</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% else %}
                                     <a href="{% url 'edit_question' submission.id question.id %}">
                                         <i class="fas fa-edit fa-lg" style="vertical-align: 0;"></i>
                                     </a>
+                                    {% endif %}
                                     <i class="fas fa-trash-alt fa-lg text-danger" style="line-height: 1;" data-toggle="modal" data-target="#deleteModal{{ question.id }}"></i>
                                 </div>                               
                             </div>
@@ -382,12 +408,31 @@
         });
     });
 
+    $('#editDurationModal').on('show.bs.modal', function (event) {
+        var modal = $(this);
+        var currentDuration = "{{ submission.duration }}";
+        var durationInMinutes = 0;
+        if (currentDuration.includes(':')) {
+            var timeParts = currentDuration.split(':');
+            durationInMinutes = parseInt(timeParts[0]) * 60 + parseInt(timeParts[1]);
+        } else {
+            durationInMinutes = parseInt(currentDuration);
+        }
+        modal.find('#durationInput').val(durationInMinutes);
+    });
+
     $('#editDurationForm').on('submit', function (event) {
         event.preventDefault();
-        var submissionId = {{ submission.id }};
         var newDuration = $('#durationInput').val();
         var errorMessage = $('#duration-error-message');
 
+        if (isNaN(newDuration) || newDuration < 1) {
+            errorMessage.text('Duration must be a positive number and at least 1 minute.');
+            errorMessage.show();
+            return;
+        }
+
+        var submissionId = {{ submission.id }};
         $.ajax({
             url: '{% url "edit_submission_duration" %}',
             method: 'POST',
@@ -410,4 +455,10 @@
             }
         });
     });
+
+    $('#editDurationModal').on('hidden.bs.modal', function () {
+        $('#duration-error-message').hide();
+    });
+
+    
 </script>

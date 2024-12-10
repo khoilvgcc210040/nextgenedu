@@ -251,6 +251,10 @@
                 });
             }
         });
+
+        document.getElementById('markingModal').addEventListener('hidden.bs.modal', function () {
+            document.getElementById('error-messageMarking').style.display = 'none';
+        });
     
     </script>    
 
@@ -379,7 +383,7 @@
                                         document.getElementById('studentFileId').value = studentFileId;
                                         document.getElementById('scoreInput').value = score !== 'None' ? score : '';
 
-                                        document.getElementById('feedbackInput').value = feedback || '';
+                                        document.getElementById('feedbackInput').value = feedback !== 'None' ? feedback : '';
                                     }
 
                                     document.addEventListener('DOMContentLoaded', function() {

@@ -43,11 +43,13 @@
         border: 2px solid var(--accent-color);
         padding: 20px;
         margin-bottom: 30px;
+        border-radius: 10px;
     }
 
     section {
         border: 2px solid var(--accent-color);
         padding: 20px !important;
+        border-radius: 10px;
     }
 
     .manage-header {
@@ -222,20 +224,22 @@
                         <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492M5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0"/>
                         <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115z"/>
                     </svg>  
-                    <ul class="dropdown-menu dropdown-menu-post" aria-labelledby="dropdownMenuButton">
+                    <ul class="dropdown-menu dropdown-menu-post" style="position: absolute; top: 0%; left: 24px; z-index: 1000; display: none;" aria-labelledby="dropdownMenuButton">
                         <li><a class="dropdown-item" href="{% url 'manage_posts' post.classroom.id %}">Manage This Post</a></li>
                     </ul>
                 </div>
             </div>
-            {% endif %}
             <script>
                 document.addEventListener('DOMContentLoaded', function () {
                     const dropdownButton = document.getElementById('dropdownMenuButton');
+                    const dropdownMenu = document.querySelector('.dropdown-menu-post');
                     dropdownButton.addEventListener('click', function() {
                         this.style.transform = this.style.transform === 'rotate(90deg)' ? 'rotate(0deg)' : 'rotate(90deg)';
+                        dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
                     });
                 });
             </script>
+            {% endif %}
         </div>
 
         <div class="classroom-navigation">
@@ -327,11 +331,11 @@
                 <div class="user-icon mr-3" style="margin-right: 10px;">
                     <img src="{% static "account.png" %}" alt="User Icon">
                 </div>
-                <div class="comment-box">
+                <div class="comment-box" style="background-color: var(--accent-color);">
                     <form id="commentForm" method="post" action="{% url 'add_comment' post.id %}">
                         {% csrf_token %}
                         <div class="comment-content">
-                            <textarea id="comment" name="comment" placeholder="Please share your thoughts about the classroom. So that you know, you can only leave a comment once..." oninput="clearErrorMessage()"></textarea>
+                            <textarea id="comment" style="background-color: var(--accent-color);; color: #fff;" name="comment" placeholder="Please share your thoughts about the classroom. So that you know, you can only leave a comment once..." oninput="clearErrorMessage()"></textarea>
                             <div id="error-message" class="error-message" style="color: red; padding: 5px; font-size: 14px;"></div>
                         </div>
                         <div class="send-button d-flex justify-content-end align-items-center">
@@ -408,17 +412,18 @@
             <h3 style="font-weight: 700; margin-bottom: 20px; color: var(--accent-color);">Comments:</h3>
             <div class="pb-5">
                 {% for comment in comments reversed %}
-                <div class="d-flex align-items-center mt-3">
-                    <div class="user-icon mr-3">
-                        <img src="{% static "account.png" %}" alt="User Icon">
+                <div class="comment-card" style="background-color: var(--accent-color); border-radius: 10px; padding: 10px;">
+                    <div class="d-flex align-items-center mt-3 mb-2">
+                        <div class="user-icon mr-3">
+                            <img src="{% static "account.png" %}" alt="User Icon" style="background-color: #fff;">
+                        </div>
+                        <div class="comment-content">
+                            <p class="m-0" style="color: #fff;">{{ comment.user.username }}<span class="ml-3 text-white" style="font-size: 11px; opacity: 0.6;">&nbsp;({{ comment.created_at|date:"H:i, d-m-Y"}})</span></p>
+                        </div>
                     </div>
-                    <div class="comment-content">
-                        <p class="m-0">{{ comment.user.username }}<span class="ml-3 text-muted" style="font-size: 11px">&nbsp;({{ comment.created_at|date:"H:i, d-m-Y"}})</span></p>
-                        
+                    <div class="modal-body" style="max-height: 400px; overflow-y: auto; text-align: left; padding-top: 5px; padding-bottom: 5px; margin-left: 65px;">
+                        <p style="white-space: pre-wrap; word-wrap: break-word; margin: 0; color: #fff;">{{ comment.text|linebreaksbr }}</p>
                     </div>
-                </div>
-                <div class="modal-body" style="max-height: 400px; overflow-y: auto; border-bottom: 2px solid var(--accent-color); text-align: left; padding-top: 20px; padding-bottom: 20px;">
-                    <p style="white-space: pre-wrap; word-wrap: break-word; margin: 0;">{{ comment.text|linebreaksbr }}</p>
                 </div>
                 {% endfor %}
             </div>

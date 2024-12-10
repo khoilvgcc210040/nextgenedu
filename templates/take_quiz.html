@@ -448,7 +448,13 @@
                         {% if previous_question %}
                         <a href="{% url 'take_quiz' submission.id previous_question.id %}?previous=true" class="btn btn-secondary" style="width: 48%;">Previous Question</a>
                         {% endif %}
-                        <button type="submit" class="btn btn-primary" style="width: 48%; margin: 0;">Next Question</button>
+                        <button type="submit" class="btn btn-primary" style="width: 48%; margin: 0;">
+                            {% if is_last_question %}
+                                Submit
+                            {% else %}
+                                Next Question
+                            {% endif %}
+                        </button>
                     </div>
                 </form>
 

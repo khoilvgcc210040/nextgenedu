@@ -597,11 +597,24 @@
                     if (data.error_type === 'current_password') {
                         currentPasswordError.innerText = data.message;
                         document.getElementById('current-password').classList.add('error-border');
+                        document.getElementById('toggle-current-password').style.top = '26%';
+                        document.getElementById('toggle-new-password').style.top = '47%';
+                        document.getElementById('toggle-confirm-password').style.top = '68%';
+                    } else if (data.error_type === 'password_length') {
+                        passwordError.innerText = data.message;
+                        document.getElementById('new-password').classList.add('error-border');
+                        document.getElementById('confirm-password').classList.add('error-border');
+                        document.getElementById('toggle-current-password').style.top = '19%';
+                        document.getElementById('toggle-new-password').style.top = '47%';
+                        document.getElementById('toggle-confirm-password').style.top = '68%';
                     } else if (data.error_type === 'password_mismatch') {
                         passwordError.innerText = data.message;
                         document.getElementById('new-password').classList.add('error-border');
                         document.getElementById('confirm-password').classList.add('error-border');
-                    }
+                        document.getElementById('toggle-current-password').style.top = '19%';
+                        document.getElementById('toggle-new-password').style.top = '47%';
+                        document.getElementById('toggle-confirm-password').style.top = '68%';
+                    } 
                 } else {
                     showSuccessModal(data.message);
                     if (data.status === 'success') {
@@ -615,17 +628,26 @@
             passwordError.innerText = '';
             this.classList.remove('error-border');
             document.getElementById('confirm-password').classList.remove('error-border');
+            document.getElementById('toggle-current-password').style.top = '21%';
+            document.getElementById('toggle-new-password').style.top = '44%';
+            document.getElementById('toggle-confirm-password').style.top = '66%';
         });
 
         document.getElementById('confirm-password').addEventListener('input', function() {
             passwordError.innerText = '';
             this.classList.remove('error-border');
             document.getElementById('new-password').classList.remove('error-border');
+            document.getElementById('toggle-current-password').style.top = '21%';
+            document.getElementById('toggle-new-password').style.top = '44%';
+            document.getElementById('toggle-confirm-password').style.top = '66%';
         });
 
         document.getElementById('current-password').addEventListener('input', function() {
             currentPasswordError.innerText = '';
             this.classList.remove('error-border');
+            document.getElementById('toggle-current-password').style.top = '21%';
+            document.getElementById('toggle-new-password').style.top = '44%';
+            document.getElementById('toggle-confirm-password').style.top = '66%';
         });
 
         notifySectionsCheckbox.addEventListener('change', function() {
