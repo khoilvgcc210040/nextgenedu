@@ -14,6 +14,7 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 from decouple import config
+import dj_database_url
 
 
 load_dotenv()
@@ -34,6 +35,10 @@ SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin-allow-popups"
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+SECRET_KEY = os.environ.get("SECRET_KEY", "default_secret_key")
+DEBUG = os.environ.get("DEBUG", "True") == "True"
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "localhost").split(",")
 
 
 # Quick-start development settings - unsuitable for production
@@ -79,7 +84,7 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            "hosts": [('127.0.0.1', 6379)],  # Đảm bảo địa chỉ và cổng này là đúng
+            "hosts": [os.environ.get('REDIS_URL', 'redis://localhost:6379')],
         },
     },
 }
@@ -122,14 +127,7 @@ WSGI_APPLICATION = 'nextgenedu.wsgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'nextgenedu',  # Tên cơ sở dữ liệu
-        'USER': 'postgres',   # Tên người dùng PostgreSQL
-        'PASSWORD': 'vinhkhoi1310',  # Mật khẩu
-        'HOST': 'localhost',  # Máy chủ (hoặc IP)
-        'PORT': '5432',  # Cổng PostgreSQL mặc định
-    }
+    'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'))
 }
 
 
