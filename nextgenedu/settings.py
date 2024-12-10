@@ -86,10 +86,10 @@ ASGI_APPLICATION = 'nextgenedu.asgi.application'  # Replace with your project na
 
 # Channel layers configuration (using Redis as the backend)
 CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': {
-            "hosts": [os.environ.get('HEROKU_REDIS_OLIVE_URL')],
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [os.environ.get("REDIS_URL")],
         },
     },
 }
