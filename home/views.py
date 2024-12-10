@@ -693,6 +693,7 @@ def leave_classroom(request, classroom_id):
         return redirect('classroom_detail', id=classroom_id)
 
 
+@csrf_exempt
 def classrooms(request, subject_id, grade):
     subject = get_object_or_404(Subjects, id=subject_id, grade=grade)
     status = request.GET.get('status', None)
@@ -723,6 +724,7 @@ def classrooms(request, subject_id, grade):
     return render(request, 'classrooms.html', context)
 
 @login_required
+@csrf_exempt
 def request_co_teacher(request, classroom_id):
     if request.method == 'POST':
         classroom = get_object_or_404(Classroom, id=classroom_id)
@@ -732,6 +734,7 @@ def request_co_teacher(request, classroom_id):
     return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=400)
 
 @login_required
+@csrf_exempt
 def join_classroom(request, classroom_id):
     classroom = get_object_or_404(Classroom, id=classroom_id)
     user = request.user
@@ -747,6 +750,8 @@ def join_classroom(request, classroom_id):
 
 import bleach
 
+
+@csrf_exempt
 def enter_password(request, classroom_id):
     classroom = get_object_or_404(Classroom, id=classroom_id)
     
@@ -950,7 +955,7 @@ def delete_message(request, message_id):
     return JsonResponse({'status': 'success'})
 
 
-
+@csrf_exempt
 def update_section(request, classroom_id, section_id):
     section = get_object_or_404(Section, id=section_id, classroom_id=classroom_id)
 
@@ -974,7 +979,7 @@ def update_section(request, classroom_id, section_id):
         return redirect('classroom_detail', id=classroom_id)
 
 
-    
+@csrf_exempt
 def update_submission(request, classroom_id, submission_id):
     submission = get_object_or_404(Submission, id=submission_id)
 
@@ -993,6 +998,7 @@ def update_submission(request, classroom_id, submission_id):
 
         return redirect('classroom_detail', id=classroom_id)
     
+@csrf_exempt
 def update_classroom_description(request, classroom_id):
     classroom = get_object_or_404(Classroom, id=classroom_id)
     if request.method == 'POST':
@@ -1003,6 +1009,7 @@ def update_classroom_description(request, classroom_id):
     return HttpResponse("Invalid request", status=400)
 
 @login_required
+@csrf_exempt
 def submit_assignment(request, submission_id):
     submission = get_object_or_404(Submission, id=submission_id)
     classroom = submission.section.classroom
@@ -1128,6 +1135,7 @@ def submit_answer(request, submission_id, question_id):
     else:
         return redirect('quiz_result', submission_id=submission.id)
 
+@csrf_exempt
 def quiz_result(request, submission_id):
     submission = get_object_or_404(Submission, id=submission_id)
     classroom = submission.section.classroom
@@ -1136,6 +1144,7 @@ def quiz_result(request, submission_id):
 
     return redirect('classroom_detail', id=classroom.id)
 
+@csrf_exempt
 def exit_quiz(request, submission_id):
     submission = get_object_or_404(Submission, id=submission_id)
     classroom = submission.section.classroom
@@ -1148,6 +1157,7 @@ def exit_quiz(request, submission_id):
 
 
 @login_required
+@csrf_exempt
 def update_file_submission(request, file_id):
     student_file = get_object_or_404(StudentFile, id=file_id, student=request.user)
     submission = student_file.submission
@@ -1164,6 +1174,7 @@ def update_file_submission(request, file_id):
     return redirect('classroom_detail', id=classroom.id)
 
 @login_required
+@csrf_exempt
 def delete_file_submission(request, file_id):
     student_file = get_object_or_404(StudentFile, id=file_id, student=request.user)
     submission = student_file.submission
@@ -1173,6 +1184,7 @@ def delete_file_submission(request, file_id):
     return redirect('classroom_detail', id=classroom.id)
 
 
+@csrf_exempt
 def setting_classroom(request, id):
     classroom = get_object_or_404(Classroom, id=id)
     blocked_participants = BlockedParticipant.objects.filter(classroom=classroom)
@@ -1183,6 +1195,7 @@ def setting_classroom(request, id):
     return render(request, 'setting_classroom.html', context)
 
 @login_required
+@csrf_exempt
 def unblock_participant(request, classroom_id):
     if request.method == 'POST':
         participant_id = request.POST.get('participant_id')
@@ -1191,6 +1204,8 @@ def unblock_participant(request, classroom_id):
         return JsonResponse({'status': 'success', 'message': 'Participant unblocked successfully!'})
     return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
 
+
+@csrf_exempt
 def manage_classroom_detail(request, id):
     classroom = get_object_or_404(Classroom, id=id)
     sections = classroom.sections.all()
@@ -1253,6 +1268,7 @@ def handle_co_teacher_request(request):
 
 from datetime import timedelta
 
+@csrf_exempt
 def create_section_submission(request):
     if request.method == 'POST':
         classroom_id = request.POST.get('classroom_id')
@@ -1310,6 +1326,8 @@ def create_section_submission(request):
             return JsonResponse({'status': 'success', 'message': 'Submission created successfully!'})
     return redirect('home')
 
+
+@csrf_exempt
 def notify_participants(classroom, item_type, item_title, participants):
     subject = f'New {item_type} added to {classroom.name}'
     message = f"""
@@ -1340,6 +1358,8 @@ def update_notification_preference(request):
         return JsonResponse({'status': 'success'})
     return JsonResponse({'status': 'failed'}, status=400)
 
+
+@csrf_exempt
 def manage_classroom_list(request):
     user = request.user
     status = request.GET.get('status', None)
@@ -1350,6 +1370,8 @@ def manage_classroom_list(request):
     }
     return render(request, 'manage_classroom_list.html', context)
 
+
+@csrf_exempt
 def question_list(request, submission_id):
     submission = get_object_or_404(Submission, id=submission_id, submission_type='question_test')
     questions = submission.questions.all()
@@ -1428,6 +1450,7 @@ def edit_assignment_time(request):
     return JsonResponse({'success': False, 'error': 'Invalid request method'})
     
 
+@csrf_exempt
 def create_question(request, submission_id):
     submission = get_object_or_404(Submission, id=submission_id, submission_type='question_test')
 
@@ -1458,6 +1481,7 @@ def create_question(request, submission_id):
 
     return render(request, 'create_question.html', context)
 
+@csrf_exempt
 def edit_question(request, submission_id, question_id):
     submission = get_object_or_404(Submission, id=submission_id, submission_type='question_test')
     question = get_object_or_404(Question, id=question_id, submission=submission)
@@ -1501,6 +1525,7 @@ def edit_question(request, submission_id, question_id):
     }
     return render(request, 'edit_question.html', context)
 
+@csrf_exempt
 def delete_question(request, submission_id, question_id):
     submission = get_object_or_404(Submission, id=submission_id, submission_type='question_test')
     question = get_object_or_404(Question, id=question_id, submission=submission)
@@ -1519,7 +1544,7 @@ def delete_question(request, submission_id, question_id):
 from django.http import JsonResponse
 
 import json
-
+@csrf_exempt
 def marking(request, assignment_id):
     assignment = get_object_or_404(Submission, id=assignment_id)
     student_files = assignment.student_files.all()
@@ -1564,6 +1589,7 @@ from django.contrib.auth import update_session_auth_hash
 import random
 
 @login_required
+@csrf_exempt
 def setting(request):
     user = request.user
 
@@ -1629,6 +1655,7 @@ def setting(request):
     return render(request, 'setting.html', {'user': user})
 
 @login_required
+@csrf_exempt
 def verify_email_otp(request):
     if request.method == 'POST':
         data = json.loads(request.body)  # Đọc dữ liệu từ request body
@@ -1643,6 +1670,7 @@ def verify_email_otp(request):
         return JsonResponse({'success': False})
 
 @login_required
+@csrf_exempt
 def resend_email_otp(request):
     if request.method == 'POST':
         otp = ''.join(random.choices('0123456789', k=6))
@@ -1656,6 +1684,7 @@ def resend_email_otp(request):
         )
         return JsonResponse({'success': True})
 
+@csrf_exempt
 def delete_section(request, section_id):
     if request.method == 'POST':
         section = get_object_or_404(Section, id=section_id)
@@ -1663,6 +1692,7 @@ def delete_section(request, section_id):
         return JsonResponse({'success': True, 'message': 'Section deleted successfully.'})
     
 
+@csrf_exempt
 def delete_submission(request, submission_id):
     if request.method == 'POST':
         submission = get_object_or_404(Submission, id=submission_id)
@@ -1697,6 +1727,7 @@ def block_member(request):
             return JsonResponse({'success': False, 'error': 'Participant not found'})
     return JsonResponse({'success': False, 'error': 'Invalid request'})
 
+@csrf_exempt
 def question_test_marking(request, submission_id):
     submission = get_object_or_404(Submission, id=submission_id)
     quiz_results = submission.quiz_results.all()
@@ -1710,6 +1741,8 @@ def question_test_marking(request, submission_id):
     }
     return render(request, 'question_test_marking.html', context)
 
+
+@csrf_exempt
 def view_answer_history(request, quiz_result_id):
     quiz_result = get_object_or_404(QuizResult, id=quiz_result_id)
     answered_questions = quiz_result.answeredquestion_set.all()
@@ -1719,6 +1752,7 @@ def view_answer_history(request, quiz_result_id):
     }
     return render(request, 'view_answer_history.html', context)
 
+@csrf_exempt
 def delete_quiz_result(request, quiz_result_id):
     if request.method == 'POST':
         quiz_result = get_object_or_404(QuizResult, id=quiz_result_id)
@@ -1726,6 +1760,7 @@ def delete_quiz_result(request, quiz_result_id):
         return JsonResponse({'success': True})
     return JsonResponse({'success': False})
 
+@csrf_exempt
 def delete_assignment(request, assignment_id):
     if request.method == 'POST':
         assignment = get_object_or_404(StudentFile, id=assignment_id)
@@ -1733,6 +1768,7 @@ def delete_assignment(request, assignment_id):
         return JsonResponse({'success': True})
     return JsonResponse({'success': False})
 
+@csrf_exempt
 def delete_account_admin(request, account_id):
     if request.method == 'POST':
         account = get_object_or_404(CustomUser, id=account_id)
@@ -1741,6 +1777,7 @@ def delete_account_admin(request, account_id):
     return JsonResponse({'status': 'failed'}, status=400)
 
 @login_required
+@csrf_exempt
 def adminPage(request):
     if not request.user.is_superuser:
         return redirect('home')
@@ -1838,7 +1875,7 @@ def create_account_admin(request):
 
         return JsonResponse({'status': 'otp_required', 'message': 'OTP has been sent to the provided email.'})
 
-
+@csrf_exempt
 def update_account(request):
     if request.method == 'POST':
         if 'add_account_admin_data' in request.session:
@@ -1902,7 +1939,8 @@ def update_account(request):
             account.email = new_email
             account.save()
             return JsonResponse({'status': 'success', 'message': 'Account updated successfully.'})
-    
+
+@csrf_exempt
 def verify_otp_admin_combined(request):
     if request.method == 'POST':
         data = json.loads(request.body)
@@ -1967,6 +2005,7 @@ def verify_otp_admin_combined(request):
         else:
             return JsonResponse({'status': 'error', 'message': 'Invalid OTP. Please try again.'})
 
+@csrf_exempt
 def resend_otp_admin_combined(request):
     if request.method == 'POST':
         # Determine if we need to resend for add or update
@@ -1984,6 +2023,7 @@ from django.db.models import Sum, Max, Avg
 from django.contrib.auth.decorators import login_required
 
 @login_required
+@csrf_exempt
 def achivement(request):
     user = request.user
     context = {}
@@ -2013,6 +2053,7 @@ def achivement(request):
     return render(request, 'achivement.html', context)
 
 @login_required
+@csrf_exempt
 def favorite(request):
     user = request.user
     status = request.GET.get('status', None)
@@ -2051,6 +2092,8 @@ def favorite_classroom(request, classroom_id):
 
     return JsonResponse({'is_favorite': is_favorite})
 
+
+@csrf_exempt
 def myclassroom(request):
     user = request.user
     participants = Participant.objects.filter(user=user)
@@ -2062,6 +2105,8 @@ def myclassroom(request):
     }
     return render(request, 'myclassroom.html', context)
 
+
+@csrf_exempt
 def searchPage(request):
     query = request.GET.get('q', '')
     public_classrooms = Classroom.objects.filter(status=False, name__icontains=query) | Classroom.objects.filter(status=False, teacher__username__icontains=query)
@@ -2082,7 +2127,7 @@ def searchPage(request):
 
 from .models import Chatbot, CoTeacherRequest, ForumComment, ForumPost, NotificationSystem
 from django.core.paginator import Paginator
-
+@csrf_exempt
 def forum(request, classroom_id):
     user = request.user
     classroom = get_object_or_404(Classroom, id=classroom_id)
@@ -2099,6 +2144,8 @@ def forum(request, classroom_id):
         'forum_posts': forum_posts,
     })
 
+
+@csrf_exempt
 def forum_detail(request, post_id):
     post = get_object_or_404(ForumPost, id=post_id)
     comments = post.forum_comments.all()
@@ -2109,6 +2156,7 @@ def forum_detail(request, post_id):
     return render(request, 'forum_detail.html', {'post': post, 'comments': comments})
 
 
+@csrf_exempt
 def add_comment(request, post_id):
     if request.method == 'POST':
         post = get_object_or_404(ForumPost, id=post_id)
@@ -2120,6 +2168,8 @@ def add_comment(request, post_id):
             return JsonResponse({'status': 'error', 'message': 'Please provide a comment.'})
     return JsonResponse({'status': 'error', 'message': 'Invalid request method.'})
 
+
+@csrf_exempt
 def create_post(request, classroom_id):
     if request.method == 'POST':
         title = request.POST.get('title')
@@ -2142,6 +2192,8 @@ def create_post(request, classroom_id):
     
     return render(request, 'create_post.html', {'classroom_id': classroom_id})
 
+
+@csrf_exempt
 def manage_posts(request, classroom_id):
     classroom = get_object_or_404(Classroom, id=classroom_id)
     posts = ForumPost.objects.filter(classroom=classroom, user=request.user)
@@ -2150,6 +2202,7 @@ def manage_posts(request, classroom_id):
 
 from django.views.decorators.http import require_POST
 @require_POST
+@csrf_exempt
 def edit_post(request, post_id):
     post = get_object_or_404(ForumPost, id=post_id, user=request.user)
     title = request.POST.get('title')
@@ -2171,17 +2224,21 @@ def edit_post(request, post_id):
     return JsonResponse({'status': 'error', 'message': 'Failed to update the post. Title and Content are required.'})
 
 @require_POST
+@csrf_exempt
 def delete_post(request, post_id):
     post = get_object_or_404(ForumPost, id=post_id, user=request.user)
     post.delete()
     # Trả về JSONResponse để xử lý modal thông báo thành công
     return JsonResponse({'status': 'success', 'message': 'Post deleted successfully.'})
-    
+
+@csrf_exempt  
 def manage_approve_posts(request, classroom_id):
     classroom = get_object_or_404(Classroom, id=classroom_id)
     posts = ForumPost.objects.filter(classroom=classroom)
     return render(request, 'approve_posts.html', {'posts': posts, 'classroom_id': classroom_id, 'classroom': classroom})
 
+
+@csrf_exempt
 def approve_post(request, post_id):
     post = get_object_or_404(ForumPost, id=post_id)
     if request.method == 'POST':
@@ -2197,6 +2254,7 @@ def approve_post(request, post_id):
         return JsonResponse({'status': 'success', 'message': 'Post approved successfully.'})
     return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=400)
 
+@csrf_exempt
 def reject_post(request, post_id):
     post = get_object_or_404(ForumPost, id=post_id)
     if request.method == 'POST':
@@ -2215,6 +2273,7 @@ def reject_post(request, post_id):
     return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=400)
 
 @require_POST
+@csrf_exempt
 def toggle_like(request, post_id):
     post = get_object_or_404(ForumPost, id=post_id)
     user = request.user
@@ -2229,6 +2288,8 @@ def toggle_like(request, post_id):
     post.save()
     return JsonResponse({'status': 'success', 'likes': post.likes, 'message': message})
 
+
+@csrf_exempt
 def notification(request):
     user_notifications = NotificationSystem.objects.filter(user=request.user).order_by('-created_at')
     return render(request, 'notification.html', {'notifications': user_notifications})
@@ -2241,6 +2302,8 @@ def delete_notification(request, notification_id):
         return JsonResponse({'status': 'success', 'message': 'Notification deleted successfully.'})
     return JsonResponse({'status': 'error', 'message': 'Invalid request method.'})
 
+
+@csrf_exempt
 def mark_notification_as_read(request, notification_id):
     if request.method == 'POST':
         try:
@@ -2252,6 +2315,7 @@ def mark_notification_as_read(request, notification_id):
             return JsonResponse({'status': 'error', 'message': 'Notification not found'})
     return JsonResponse({'status': 'error', 'message': 'Invalid request'})
 
+@csrf_exempt
 def get_unread_notification_count(request):
     if request.user.is_authenticated:
         unread_count = NotificationSystem.objects.filter(user=request.user, is_read=False).count()
@@ -2267,6 +2331,7 @@ def delete_all_notifications(request):
 
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
+@csrf_exempt
 def create_notification(request):
     if request.method == 'POST':
         user_id = request.POST.get('user')
