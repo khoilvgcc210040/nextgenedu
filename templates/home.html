@@ -44,7 +44,11 @@
             <h1>Welcome to <span>NextGenEdu</span></h1>
             <p style="text-align: justify;">NextGenEdu is the #1 global learning platform. Join our community of learners using NextGenEdu’s question tests, submit assignments, and AI-powered tools to improve their marks and reach their goals.</p>
             <div class="d-flex">
-              <a href="{% url "auth" %}?form=login" class="btn-get-started">Get Started</a>
+              {% if user.is_authenticated %}
+                <a href="{% url "subjects" %}" class="btn-get-started">Get Started</a>
+              {% else %}
+                <a href="{% url "auth" %}?form=login" class="btn-get-started">Get Started</a>
+              {% endif %}
             </div>
           </div>
         </div>
