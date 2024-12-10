@@ -369,7 +369,7 @@
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         const userWebSocket = new WebSocket(
-            'ws://' + window.location.host + '/ws/notifications/'
+            `${window.location.protocol === 'https:' ? 'wss://' : 'ws://'}${window.location.host}/ws/notifications/`
         );
 
         userWebSocket.onmessage = function(e) {
