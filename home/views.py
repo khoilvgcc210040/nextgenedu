@@ -491,7 +491,7 @@ def forgot_password(request):
                 uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
                 c = {
                     "email": user.email,
-                    'domain': 'localhost:8000',
+                    'domain': 'nextgenedu.online',
                     'site_name': 'NextGenEdu',
                     "uidb64": uidb64,
                     "user": user,
