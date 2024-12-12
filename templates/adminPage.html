@@ -8,6 +8,7 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.min.js"></script>
+    <link rel="icon" type="image/x-icon" href="{% static 'school-bag.png' %}">
     <style>
         .sidebar {
             background-color: var(--accent-color);
@@ -192,6 +193,8 @@
             transform: translateY(-5%);
         }   
     </style>
+
+    
 </head>
 <body>
     {% include "headerMain.html" %}
@@ -225,30 +228,242 @@
                 <h1 style="font-weight: 700;" class="text-truncate ">STATISTICAL ANALYSIS</h1>
             </div>
             <hr style="border: 1px solid #000;">
-            <!-- Table for Statistical Analysis -->
-            <table class="table text-center">
-                <thead>
-                    <tr>
-                        <th scope="col">ID</th>
-                        <th scope="col">Name</th>
-                        <th scope="col">Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for data in statistical_data %}
-                    <tr>
-                        <td>{{ data.id }}</td>
-                        <td>{{ data.name }}</td>
-                        <td>
-                            <button class="btn btn-edit" data-bs-toggle="modal" data-bs-target="#editStatisticalModal" data-bs-id="{{ data.id }}">Edit</button>
-                            <button class="btn btn-delete" onclick="deleteStatistical({{ data.id }})">Delete</button>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addStatisticalModal">Add New</button>
+            <div class="row">
+                <div class="col-md-12">
+                    <h3 class="text-center">Academic Statistics</h3>
+                    <table class="table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <th style="background-color: var(--accent-color); color: #fff;">Metric</th>
+                                <th style="background-color: var(--accent-color); color: #fff;">Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Total Classrooms</td>
+                                <td>{{ academic_statistics.total_classrooms }}</td>
+                            </tr>
+                            <tr>
+                                <td>Total Section + Subsection Files</td>
+                                <td>{{ academic_statistics.total_section_files }}</td>
+                            </tr>
+                            <tr>
+                                <td>Total Submission Files</td>
+                                <td>{{ academic_statistics.total_submission_files }}</td>
+                            </tr>
+                            <tr>
+                                <td>Total Assignment Submissions</td>
+                                <td>{{ academic_statistics.total_submissions }}</td>
+                            </tr>
+                            <tr>
+                                <td>Total Question Tests Submissions</td>
+                                <td>{{ academic_statistics.total_tests }}</td>
+                            </tr>
+                            <tr>
+                                <td>Total Messages</td>
+                                <td>{{ academic_statistics.total_messages }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <hr style="border: 1px solid #000;">
+        
+            <div class="row">
+                <!-- Biểu đồ cột bên trái -->
+                <div class="col-md-6">
+                    <div class="text-center">
+                        <label for="filter-date" style="font-weight: 700; color: #000; font-size: 18px;">Select Date:</label>
+                        <input type="date" id="filter-date" style="background-color: var(--accent-color); color: #fff; border: 2px solid #fff; border-radius: 5px; padding: 5px 10px;" value="{{ now|date:'Y-m-d' }}">
+                    </div>
+                
+                    <!-- Chart -->
+                    <div id="user-login-chart" style="width: 100%; height: 400px;"></div>
+                </div>
+                <!-- Biểu đồ đường bên phải -->
+                <div class="col-md-6">
+                    <div id="classroom-interaction-chart" style="width: 100%; height: 400px;"></div>
+                </div>
+            </div>
+            <!-- Date Filter -->
+            
+
+            <hr style="border: 1px solid #000;">
+            <div class="row">
+                <!-- Biểu đồ cột bên trái -->
+                <div class="col-md-6">
+                    <div id="submission-type-chart" style="width: 100%; height: 400px;"></div>
+                </div>
+                <!-- Biểu đồ đường bên phải -->
+                <div class="col-md-6">
+                    <div id="submission-date-chart" style="width: 100%; height: 400px;"></div>
+                </div>
+            </div>
+            <hr style="border: 1px solid #000;">
+            <div class="row">
+                <!-- Biểu đồ cột bên trái -->
+                <div class="col-md-6">
+                    <div id="favorite-classroom-chart" style="width: 100%; height: 400px;"></div>
+                </div>
+                <!-- Biểu đồ đường bên phải -->
+                <div class="col-md-6">
+                    <h3 class="text-center">Forum Analysis</h3>
+                    <table class="table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <th style="background-color: var(--accent-color); color: #fff;">Title</th>
+                                <th style="background-color: var(--accent-color); color: #fff;">Views</th>
+                                <th style="background-color: var(--accent-color); color: #fff;">Likes</th>
+                                <th style="background-color: var(--accent-color); color: #fff;">Comments</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for post in forum_data %}
+                            <tr>
+                                <td>{{ post.title|truncatechars:50 }}</td>
+                                <td>{{ post.views }}</td>
+                                <td>{{ post.likes }}</td>
+                                <td>{{ post.comment_count }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
+        
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+        <!-- Statistical Analysis 1 -->
+        <script type="text/javascript">
+            google.charts.load('current', { packages: ['corechart'] });
+            google.charts.setOnLoadCallback(drawInitialChart);
+        
+            function drawInitialChart() {
+                const chartData = {{ chart_data|safe }};
+                drawChart(chartData);
+            }
+        
+            function drawChart(chartData) {
+                const data = google.visualization.arrayToDataTable(chartData);
+        
+                const options = {
+                    title: 'User Login Activity',
+                    hAxis: { title: 'Date', titleTextStyle: { color: '#333' } },
+                    vAxis: { title: 'Logins', minValue: 0 },
+                    bar: { groupWidth: '75%' },
+                    colors: ['#2b4464'],
+                };
+        
+                const chart = new google.visualization.ColumnChart(document.getElementById('user-login-chart'));
+                chart.draw(data, options);
+            }
+        
+            // Handle Date Change
+            document.getElementById('filter-date').addEventListener('change', function () {
+                const selectedDate = this.value;
+                if (selectedDate) {
+                    // Send AJAX request to get new data
+                    fetch(`/get-chart-data/?filter_date=${selectedDate}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.chart_data) {
+                                drawChart(data.chart_data); // Update chart with new data
+                            } else {
+                                alert('No data available for the selected date.');
+                            }
+                        })
+                        .catch(error => console.error('Error fetching chart data:', error));
+                }
+            });
+        </script>
+        <!-- Statistical Analysis 2 -->
+        <script type="text/javascript">
+            google.charts.load('current', { packages: ['corechart'] });
+        
+            google.charts.setOnLoadCallback(drawCharts);
+        
+            function drawCharts() {
+                drawSubmissionTypeChart();
+                drawSubmissionDateChart();
+            }
+        
+            // Biểu đồ bên trái: Phân tích loại bài tập
+            function drawSubmissionTypeChart() {
+                const chartData = {{ submission_chart_data|safe }};
+                const data = google.visualization.arrayToDataTable(chartData);
+        
+                const options = {
+                    title: 'Assignment Types Analysis',
+                    hAxis: { title: 'Submission Type', titleTextStyle: { color: '#333' } },
+                    vAxis: { title: 'Count', minValue: 0 },
+                    bar: { groupWidth: '75%' },
+                    colors: ['#2b4464'],
+                };
+        
+                const chart = new google.visualization.ColumnChart(document.getElementById('submission-type-chart'));
+                chart.draw(data, options);
+            }
+        
+            // Biểu đồ bên phải: Phân tích số lượng bài tập nộp theo ngày
+            function drawSubmissionDateChart() {
+                const chartData = {{ student_file_chart_data|safe }};
+                const data = google.visualization.arrayToDataTable(chartData);
+        
+                const options = {
+                    title: 'Assignment Submissions Over Time',
+                    hAxis: { title: 'Date', titleTextStyle: { color: '#333' } },
+                    vAxis: { title: 'Submissions', minValue: 0 },
+                    curveType: 'function',
+                    colors: ['#2b4464'],
+                };
+        
+                const chart = new google.visualization.LineChart(document.getElementById('submission-date-chart'));
+                chart.draw(data, options);
+            }
+        </script>
+        <!-- Statistical Analysis 3 -->
+        <script type="text/javascript">
+            google.charts.load('current', { packages: ['corechart'] });
+            google.charts.setOnLoadCallback(drawInteractionChart);
+        
+            function drawInteractionChart() {
+                const chartData = {{ interaction_chart_data|safe }};
+                const data = google.visualization.arrayToDataTable(chartData);
+        
+                const options = {
+                    title: 'Classroom Interaction Analysis',
+                    hAxis: { title: 'Count', minValue: 0 },
+                    vAxis: { title: 'Classroom' },
+                    bars: 'horizontal',
+                    bar: { groupWidth: '75%' },
+                    colors: ['#2b4464', '#f97316'], // Tin nhắn màu xanh, bình luận màu xanh lá
+                    legend: { position: 'top', alignment: 'end' },
+                };
+        
+                const chart = new google.visualization.BarChart(document.getElementById('classroom-interaction-chart'));
+                chart.draw(data, options);
+            }
+        </script>
+        <!-- Statistical Analysis 4 -->
+        <script type="text/javascript">
+            google.charts.load('current', { packages: ['corechart'] });
+            google.charts.setOnLoadCallback(drawFavoriteClassroomChart);
+        
+            function drawFavoriteClassroomChart() {
+                const chartData = {{ favorite_classroom_chart_data|safe }};
+                const data = google.visualization.arrayToDataTable(chartData);
+        
+                const options = {
+                    title: 'Classroom Popularity',
+                    pieHole: 0.4, // Sử dụng Donut chart
+                    colors: ['#4285F4', '#EA4335', '#FBBC05', '#34A853'], // Màu sắc cho từng phần
+                    is3D: true, // Hiển thị hiệu ứng 3D
+                };
+        
+                const chart = new google.visualization.PieChart(document.getElementById('favorite-classroom-chart'));
+                chart.draw(data, options);
+            }
+        </script>
 
         <div id="account-content" class="content-section pb-lg-5">
             <div class="text-center">

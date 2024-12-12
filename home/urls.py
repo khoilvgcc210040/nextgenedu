@@ -95,4 +95,5 @@ urlpatterns = [
     path('verify-otp-admin-combined/', views.verify_otp_admin_combined, name='verify_otp_admin_combined'),
     path('delete-account-admin/<int:account_id>/', views.delete_account_admin, name='delete_account_admin'),
     path('delete_message/<int:message_id>/', views.delete_message, name='delete_message'),
+    path('get-chart-data/', views.get_chart_data, name='get_chart_data'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

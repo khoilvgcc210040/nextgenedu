@@ -43,6 +43,8 @@ ALLOWED_HOSTS = ['nextgenedu.online', 'www.nextgenedu.online', 'nextgenedu-ac7ff
 CSRF_TRUSTED_ORIGINS = [
     'https://nextgenedu.online',
     'https://www.nextgenedu.online',
+    'https://nextgenedu-ac7fffbe3b2c.herokuapp.com',
+    'http://localhost:8000',
 ]
 
 
@@ -138,6 +140,17 @@ WSGI_APPLICATION = 'nextgenedu.wsgi.application'
 DATABASES = {
     'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'))
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'nextgenedu',  # Tên cơ sở dữ liệu
+#         'USER': 'postgres',   # Tên người dùng PostgreSQL
+#         'PASSWORD': 'vinhkhoi1310',  # Mật khẩu
+#         'HOST': 'localhost',  # Máy chủ (hoặc IP)
+#         'PORT': '5432',  # Cổng PostgreSQL mặc định
+#     }
+# }
 
 
 

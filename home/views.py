@@ -1776,6 +1776,10 @@ def delete_account_admin(request, account_id):
         return JsonResponse({'status': 'success'})
     return JsonResponse({'status': 'failed'}, status=400)
 
+from django.db.models import Count
+from django.utils.timezone import now, timedelta
+from django.db.models.functions import TruncDate  # Import TruncDate đúng
+
 @login_required
 @csrf_exempt
 def adminPage(request):
@@ -1796,6 +1800,100 @@ def adminPage(request):
     submission_files = SubmissionFile.objects.all()
     users = CustomUser.objects.all()
 
+
+    #statistical analysis 1
+    today = now().date()
+    login_data = (
+        CustomUser.objects.filter(last_login__isnull=False)
+        .filter(last_login__date__gte=today - timedelta(days=6))
+        .annotate(day=TruncDate('last_login'))  # Dùng TruncDate
+        .values('day')
+        .annotate(login_count=Count('id'))
+        .order_by('day')
+    )
+
+    # Chuẩn bị dữ liệu cho Google Chart
+    chart_data = [['Date', 'Logins']]
+    for entry in login_data:
+        chart_data.append([entry['day'].strftime('%Y-%m-%d'), entry['login_count']])
+
+    #statistical analysis 2
+    # Biểu đồ bên trái: Số lượng bài tập theo loại
+    submission_data = (
+        Submission.objects.values('submission_type')
+        .annotate(count=Count('id'))
+        .order_by('submission_type')
+    )
+
+    submission_chart_data = [['Submission Type', 'Count']]
+    for entry in submission_data:
+        submission_chart_data.append([entry['submission_type'], entry['count']])
+
+    # Biểu đồ bên phải: Số lượng bài tập nộp theo ngày
+    student_file_data = (
+        StudentFile.objects.annotate(date=TruncDate('date_submitted'))
+        .values('date')
+        .annotate(count=Count('id'))
+        .order_by('date')
+    )
+
+    student_file_chart_data = [['Date', 'Submissions']]
+    for entry in student_file_data:
+        student_file_chart_data.append([entry['date'].strftime('%Y-%m-%d'), entry['count']])
+
+    #statistical analysis 3
+    interaction_data = (
+        Classroom.objects.annotate(
+            chat_count=Count('chatmessage'),
+            comment_count=Count('comments'),
+            total_interactions=Count('chatmessage') + Count('comments')  # Tính tổng tương tác
+        ).values('name', 'chat_count', 'comment_count', 'total_interactions')
+        .order_by('-total_interactions')  # Sắp xếp giảm dần theo tổng tương tác
+    )
+
+
+    interaction_chart_data = [['Classroom', 'Messages', 'Comments']]
+    for entry in interaction_data:
+        interaction_chart_data.append([entry['name'], entry['chat_count'], entry['comment_count']])
+
+    # statistical analysis 4
+    # Biểu đồ tròn: Số lượng yêu thích theo lớp học
+    favorite_classroom_data = (
+        Classroom.objects.annotate(
+            like_count=Count('favorited_by')
+        ).values('name', 'like_count')
+    )
+
+    # Chuẩn bị dữ liệu cho Google Chart
+    favorite_classroom_chart_data = [['Classroom', 'Likes']]
+    for entry in favorite_classroom_data:
+        favorite_classroom_chart_data.append([entry['name'], entry['like_count']])
+
+    # statistical analysis 5: Forum Analysis
+    forum_data = (
+        ForumPost.objects.annotate(
+            comment_count=Count('forum_comments')
+        ).values('title', 'views', 'likes', 'comment_count')
+        .order_by('-views')[:5]  # Sắp xếp theo lượt xem giảm dần
+    )
+
+    # statistical analysis 6: Academic Statistics
+    total_classrooms = Classroom.objects.count()
+    total_section_files = SubsectionFile.objects.count()
+    total_submission_files = SubmissionFile.objects.count()
+    total_submissions = Submission.objects.count()
+    total_tests = QuizResult.objects.count()
+    total_messages = ChatMessage.objects.count()
+
+    academic_statistics = {
+        'total_classrooms': total_classrooms,
+        'total_section_files': total_section_files,
+        'total_submission_files': total_submission_files,
+        'total_submissions': total_submissions,
+        'total_tests': total_tests,
+        'total_messages': total_messages,
+    }
+
     context = {
         'statistical_data': statistical_data,
         'accounts': accounts,
@@ -1806,9 +1904,60 @@ def adminPage(request):
         'notification_types': NotificationSystem.NOTIFICATION_TYPE_CHOICES,
         'days': days,  # Added list of days
         'months': months,  # Added dictionary of months
-        'years': years,  # Added list of years
+        'years': years, 
+        'chart_data': chart_data,
+        'submission_chart_data': submission_chart_data,
+        'student_file_chart_data': student_file_chart_data,
+        'interaction_chart_data': interaction_chart_data,
+        'favorite_classroom_chart_data': favorite_classroom_chart_data,
+        'forum_data': forum_data,
+        'academic_statistics': academic_statistics,
     }
     return render(request, 'adminPage.html', context)
+
+@login_required
+def get_chart_data(request):
+    if not request.user.is_superuser:
+        return JsonResponse({'error': 'Unauthorized'}, status=403)
+
+    # Lấy ngày từ request
+    filter_date_str = request.GET.get('filter_date')
+    try:
+        filter_date = datetime.strptime(filter_date_str, '%Y-%m-%d').date() if filter_date_str else None
+    except ValueError:
+        return JsonResponse({'error': 'Invalid date format'}, status=400)
+
+    # Nếu có filter_date, chỉ hiển thị dữ liệu của ngày đó
+    if filter_date:
+        login_data = (
+            CustomUser.objects.filter(last_login__isnull=False)
+            .filter(last_login__date=filter_date)
+            .annotate(day=TruncDate('last_login'))
+            .values('day')
+            .annotate(login_count=Count('id'))
+        )
+
+        # Nếu không có dữ liệu, thêm ngày với giá trị login_count = 0
+        if not login_data.exists():
+            login_data = [{'day': filter_date, 'login_count': 0}]
+    else:
+        # Mặc định hiển thị 7 ngày gần nhất
+        today = now().date()
+        login_data = (
+            CustomUser.objects.filter(last_login__isnull=False)
+            .filter(last_login__date__gte=today - timedelta(days=6))
+            .annotate(day=TruncDate('last_login'))
+            .values('day')
+            .annotate(login_count=Count('id'))
+            .order_by('day')
+        )
+
+    # Chuẩn bị dữ liệu cho Google Chart
+    chart_data = [['Date', 'Logins']]
+    for entry in login_data:
+        chart_data.append([entry['day'].strftime('%Y-%m-%d'), entry['login_count']])
+
+    return JsonResponse({'chart_data': chart_data})
 
 @csrf_exempt
 def create_account_admin(request):
