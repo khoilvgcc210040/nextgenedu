@@ -82,6 +82,8 @@ INSTALLED_APPS = [
     'home.apps.HomeConfig',
     'channels',
     'rest_framework',
+    'cloudinary',
+    'cloudinary_storage',
 ]
 
 ASGI_APPLICATION = 'nextgenedu.asgi.application'  # Replace with your project name
@@ -205,7 +207,13 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+STATICFILES_STORAGE = 'cloudinary_storage.storage.StaticHashedCloudinaryStorage'
+
+# Cấu hình Cloudinary
+CLOUDINARY_URL = os.environ.get('CLOUDINARY_URL')
 
 TIME_ZONE = 'Asia/Ho_Chi_Minh'
 USE_TZ = True
