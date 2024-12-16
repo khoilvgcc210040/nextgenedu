@@ -4,6 +4,7 @@ from django.forms import ValidationError
 from django.utils import timezone
 import random
 import string
+from cloudinary.models import CloudinaryField
 
 class Subjects(models.Model):
     GRADE_CHOICES = [
@@ -111,7 +112,7 @@ class Section(models.Model):
     
 class SubsectionFile(models.Model):
     subsection = models.ForeignKey(Section, on_delete=models.CASCADE, related_name='files')
-    file = models.FileField(upload_to='subsection_files/')
+    file = CloudinaryField('file', null=True, blank=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -150,7 +151,7 @@ class Submission(models.Model):
     
 class SubmissionFile(models.Model):
     submission = models.ForeignKey(Submission, on_delete=models.CASCADE, related_name='files')
-    file = models.FileField(upload_to='submission_files/')
+    file = CloudinaryField('file', null=True, blank=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -160,7 +161,7 @@ class SubmissionFile(models.Model):
 class StudentFile(models.Model):
     submission = models.ForeignKey(Submission, on_delete=models.CASCADE, related_name='student_files')
     student = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='student_files')
-    file = models.FileField(upload_to='student_files/')
+    file = CloudinaryField('file', null=True, blank=True)
     score = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
     feedback = models.TextField(null=True, blank=True)
     date_submitted = models.DateTimeField(auto_now_add=True)
@@ -223,8 +224,8 @@ class ChatMessage(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     classroom = models.ForeignKey(Classroom, on_delete=models.CASCADE)
     message = models.TextField()
-    image = models.ImageField(upload_to='chat_images/', null=True, blank=True) 
-    file = models.FileField(upload_to='chat_files/', null=True, blank=True) 
+    image = CloudinaryField('image', null=True, blank=True)
+    file = CloudinaryField('file', null=True, blank=True)
     timestamp = models.DateTimeField(auto_now_add=True)
     file_size = models.FloatField(null=True, blank=True)
     
