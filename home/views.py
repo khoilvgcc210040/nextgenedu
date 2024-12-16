@@ -948,6 +948,7 @@ def save_message(request):
         file = request.FILES.get('file')
         classroom = Classroom.objects.get(id=classroom_id)
 
+        # Tạo ChatMessage
         chat_message = ChatMessage.objects.create(
             user=request.user,
             classroom=classroom,
@@ -957,17 +958,22 @@ def save_message(request):
             file_size=(math.ceil(file.size / 1024)) if file else 0
         )
 
+        # Xử lý URL cho image và file
+        image_url = chat_message.image if isinstance(chat_message.image, str) else (chat_message.image.url if chat_message.image else None)
+        file_url = chat_message.file if isinstance(chat_message.file, str) else (chat_message.file.url if chat_message.file else None)
 
+        # Trả về JSON Response
         return JsonResponse({
             'status': 'success',
             'username': request.user.username,
             'message': chat_message.message,
-            'image_url': chat_message.image.url if chat_message.image else None,
-            'file_url': chat_message.file.url if chat_message.file else None, 
+            'image_url': image_url,
+            'file_url': file_url,
             'file_size': chat_message.file_size if chat_message.file else 0
         })
 
     return JsonResponse({'status': 'error'}, status=400)
+
 
 @login_required
 @csrf_exempt
@@ -976,7 +982,8 @@ def delete_message(request, message_id):
     message.delete()
     return JsonResponse({'status': 'success'})
 
-
+from cloudinary import CloudinaryResource
+from urllib.parse import unquote
 @csrf_exempt
 def update_section(request, classroom_id, section_id):
     section = get_object_or_404(Section, id=section_id, classroom_id=classroom_id)
@@ -992,10 +999,19 @@ def update_section(request, classroom_id, section_id):
 
         if 'deleteFile' in request.POST and request.POST['deleteFile']:
             file_to_delete = request.POST['deleteFile'].strip()
-            subsection_file = SubsectionFile.objects.filter(subsection=section)
-            
-            for file in subsection_file:
-                if file.file.name.endswith(file_to_delete):
+            subsection_files = SubsectionFile.objects.filter(subsection=section)
+
+            for file in subsection_files:
+                # Kiểm tra nếu file là CloudinaryResource
+                if isinstance(file.file, CloudinaryResource):
+                    # Giải mã tên file từ public_id
+                    uploaded_file_name = unquote(file.file.public_id.split('/')[-1])
+                else:
+                    # Dùng file.url nếu không phải CloudinaryResource
+                    uploaded_file_name = unquote(file.file.url.split('/')[-1])
+
+                # Kiểm tra khớp tên file
+                if uploaded_file_name == file_to_delete:
                     file.delete()
 
         return redirect('classroom_detail', id=classroom_id)
@@ -1585,9 +1601,10 @@ def marking(request, assignment_id):
                     score = float(score)
                     if 0 <= score <= 10:
                         student_file = get_object_or_404(StudentFile, id=student_file_id)
-                        student_file.score = score
-                        student_file.feedback = feedback
-                        student_file.save()
+                        StudentFile.objects.filter(id=student_file.id).update(
+                            score=score,
+                            feedback=feedback
+                        )
                         return JsonResponse({'status': 'success', 'message': 'Score updated successfully.'})
                     else:
                         return JsonResponse({'status': 'error', 'message': 'Score must be between 0 and 10.'})

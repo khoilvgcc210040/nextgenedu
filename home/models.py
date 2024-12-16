@@ -215,8 +215,30 @@ class StudentFile(models.Model):
     feedback = models.TextField(null=True, blank=True)
     date_submitted = models.DateTimeField(auto_now_add=True)
 
+    def save(self, *args, **kwargs):
+        if isinstance(self.file, str) or self.file is None:
+            super().save(*args, **kwargs)
+            return
+        
+        original_filename, file_extension = os.path.splitext(self.file.name)
+        uploaded_file = upload(
+            self.file,
+            public_id=f"student_files/{original_filename}",
+            resource_type="auto",
+            overwrite=True,
+            secure=True
+        )
+
+        self.file = uploaded_file['secure_url']
+        super().save(*args, **kwargs)
+
     def __str__(self):
-        return f'{self.student.username} - {self.submission.title}'
+        try:
+            file_url = self.file.url  
+            file_name = unquote(file_url.split('/')[-1])
+            return f'{self.student.username} - {self.submission.title} - {file_name}'
+        except AttributeError:
+            return f'{self.student.username} - {self.submission.title}'
     
 class Participant(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='participants')
@@ -277,9 +299,48 @@ class ChatMessage(models.Model):
     file = CloudinaryField('file', null=True, blank=True)
     timestamp = models.DateTimeField(auto_now_add=True)
     file_size = models.FloatField(null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        # Xử lý khi upload file
+        if self.file and not isinstance(self.file, str):
+            original_filename, file_extension = os.path.splitext(self.file.name)
+            uploaded_file = upload(
+                self.file,
+                public_id=f"chat_files/{original_filename}",
+                resource_type="auto",
+                overwrite=True,
+                secure=True
+            )
+            self.file = uploaded_file['secure_url']
+
+        # Xử lý khi upload image
+        if self.image and not isinstance(self.image, str):
+            original_filename, file_extension = os.path.splitext(self.image.name)
+            uploaded_image = upload(
+                self.image,
+                public_id=f"chat_images/{original_filename}",
+                resource_type="auto",
+                overwrite=True,
+                secure=True
+            )
+            self.image = uploaded_image['secure_url']
+
+        super().save(*args, **kwargs)
     
     def __str__(self):
-        return f"{self.user.username}: {self.message[:50]} - {self.classroom.name}"
+        try:
+            if self.file:
+                file_url = self.file  
+                file_name = unquote(file_url.split('/')[-1])
+                return f"{self.user.username}: {self.message[:50]} - {self.classroom.name} - {file_name}"
+            elif self.image:
+                image_url = self.image  
+                image_name = unquote(image_url.split('/')[-1])
+                return f"{self.user.username}: {self.message[:50]} - {self.classroom.name} - {image_name}"
+            else:
+                return f"{self.user.username}: {self.message[:50]} - {self.classroom.name}"
+        except AttributeError:
+            return f"{self.user.username}: {self.message[:50]} - {self.classroom.name}"
     
     @property
     def is_file(self):

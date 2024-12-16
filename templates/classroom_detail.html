@@ -1300,7 +1300,7 @@
                         {% if message.is_file and message.file %}
                             <div class="d-flex justify-content-between align-items-center p-3">
                                 <p class="m-0">
-                                    <a href="{{ message.file.url }}" download>{{ message.file.name|cut:"chat_files/"|slice:":20" }}</a>
+                                    <a href="{{ message.file.url|url_https }}" download>{{ message.file.url|url_https|basename|truncatechars:20 }}</a>
                                 </p>
                                 {% if message.user == request.user %}
                                     <span onclick="deleteMessage('{{ message.id }}')" style="cursor: pointer;">🗑️</span>
@@ -1310,7 +1310,7 @@
                         {% elif message.is_image and message.image %}
                             <div class="d-flex justify-content-between align-items-center p-3">
                                 <p class="m-0">
-                                    <a href="{{ message.image.url }}" download>{{ message.image.name|cut:"chat_files/"|slice:":20" }}</a>
+                                    <a href="{{ message.image.url|url_https }}" download>{{ message.image.url|url_https|basename|truncatechars:20 }}</a>
                                 </p>
                                 {% if message.user == request.user %}
                                     <span onclick="deleteMessage('{{ message.id }}')" style="cursor: pointer;">🗑️</span>
@@ -1384,13 +1384,23 @@
                         const fileUrl = data.file_url;
                         const username = data.username;
                         const fileSize = data.file_size;
-
-
-                        
+                    
                         const chatBody = document.getElementById('chatBody');
                         const messageElement = document.createElement('div');
                         messageElement.className = username === currentUsername ? 'chat-message my-message' : 'chat-message other-message'; 
-    
+                    
+                        // Giải mã URL và lấy tên file
+                        const decodeFileName = (url) => {
+                            try {
+                                const fileName = decodeURIComponent(url.split('/').pop());
+                                return fileName.length > 20 ? fileName.substring(0, 20) + '...' : fileName;
+                            } catch (error) {
+                                return 'Unknown File';
+                            }
+                        };
+                    
+                        const fileName = fileUrl ? decodeFileName(fileUrl) : '';
+                    
                         messageElement.innerHTML = `
                             <div class="user-icon">
                                 <img src="{% static 'account.png' %}" alt="User Icon" class="img-fluid">
@@ -1409,7 +1419,7 @@
                                     <div class="file-details" style="margin-left: 10px; word-wrap: break-word; white-space: normal; max-width: 115px; display: flex; flex-direction: column; text-align: center;">
                                         <div class="file-name" style="font-weight: bold;">
                                             <a href="${fileUrl}" download>
-                                                ${fileUrl.split('/').pop().length > 20 ? fileUrl.split('/').pop().substring(0, 20) + '...' : fileUrl.split('/').pop()}
+                                                ${fileName}
                                             </a>
                                         </div>
                                         <div class="file-size">${fileSize} KB</div>
@@ -1417,10 +1427,11 @@
                                 </div>` : ''}
                             </div>
                         `;
-    
+                    
                         chatBody.appendChild(messageElement);
                         chatBody.scrollTop = chatBody.scrollHeight;
                     };
+                    
                 }
             });
         
@@ -1571,8 +1582,8 @@
                                         </div>
                                         <div class="file-details" style="margin-left: 10px; word-wrap: break-word; white-space: normal; max-width: 115px; display: flex; flex-direction: column; text-align: center;">
                                             <div class="file-name" style="font-weight: bold;">
-                                                <a href="{{ message.file.url }}" download>
-                                                    {{ message.file.name|cut:"chat_files/"|slice:":20" }}
+                                                <a href="{{ message.file.url|url_https }}" download>
+                                                    {{ message.file.url|url_https|basename|truncatechars:20 }}
                                                 </a>
                                             </div>
                                             <div class="file-size">{{ message.file_size }} KB</div>
@@ -2164,11 +2175,11 @@
                         <p>Deadline time: {{ student_file.submission.open_date }} - {{ student_file.submission.close_date }}</p>
                         <div class="d-flex align-items-end pt-3 pb-3">
                             <div class="doc-icon mr-3">
-                                <a href="{{ student_file.file.url }}" download>
+                                <a href="{{ student_file.file.url|url_https }}" download>
                                     <img src="{% static "google-docs.png" %}" alt="Document Icon">
                                 </a>
                             </div>
-                            <p class="m-0">{{ student_file.file.name|filename }}</p> 
+                            <p class="m-0">{{ student_file.file.url|url_https|basename }}</p> 
                         </div>
                         <p class="m-0 ml-1" style="font-weight: 700;">Your score: {{ student_file.score }}/10.00</p>             
                         <button class="btn-doc ml-3 mt-2" style="outline: none; padding: 5px 10px; background-color: var(--accent-color);" data-bs-toggle="modal" data-bs-target="#feedbackModal{{ student_file.id }}">View feedback</button>
@@ -2191,11 +2202,11 @@
                         <p>Deadline time: {{ student_file.submission.open_date }} - {{ student_file.submission.close_date }}</p>
                         <div class="d-flex align-items-end pt-3 pb-3">
                             <div class="doc-icon mr-3">
-                                <a href="{{ student_file.file.url }}" download>
+                                <a href="{{ student_file.file.url|url_https }}" download>
                                     <img src="{% static "google-docs.png" %}" alt="Document Icon">
                                 </a>
                             </div>
-                            <p class="m-0" style="font-weight: 500;">{{ student_file.file.name|filename }}</p> 
+                            <p class="m-0" style="font-weight: 500;">{{ student_file.file.url|url_https|basename }}</p> 
                         </div>
                         <div class="d-flex justify-content-start align-items-center">
                             {% if submission.is_open %}
@@ -2228,8 +2239,8 @@
                                             return false;
                                         }
 
-                                        if (file.size > 20 * 1024 * 1024) {
-                                            fileErrorUpdate.innerText = 'File size exceeds the maximum limit of 20MB.';
+                                        if (file.size > 10 * 1024 * 1024) {
+                                            fileErrorUpdate.innerText = 'File size exceeds the maximum limit of 10MB.';
                                             fileErrorUpdate.style.display = 'block';
                                             fileCheckedUpdate = false;
                                             var deleteButton = document.querySelector('form[action="{% url 'delete_file_submission' student_file.id %}"] button');
@@ -2324,7 +2335,7 @@
                                     </div>
                                     <div class="d-flex align-items-center">
                                         <input type="file" id="fileInputSubmit" accept=".pdf" class="btn-doc text-white" style="outline: none; padding: 3px 6px; font-size: 12px; background-color: var(--accent-color);" name="file" onchange="checkFileSubmissionSubmit()">
-                                        <label for="fileInputSubmit" style="margin-left: 10px; font-size: 12px; font-weight: 500; color: #000;">(Only PDF files are allowed and <span style="color: orange;">max size 20MB</span>)</label>
+                                        <label for="fileInputSubmit" style="margin-left: 10px; font-size: 12px; font-weight: 500; color: #000;">(Only PDF files are allowed and <span style="color: orange;">max size 10MB</span>)</label>
                                     </div>
                                 </div>
                                 <div class="d-flex justify-content-start">
@@ -2351,8 +2362,8 @@
                                         return false;
                                     }
 
-                                    if (file.size > 20 * 1024 * 1024) {
-                                        fileError.innerText = 'File size exceeds the maximum limit of 20MB.';
+                                    if (file.size > 10 * 1024 * 1024) {
+                                        fileError.innerText = 'File size exceeds the maximum limit of 10MB.';
                                         fileError.style.display = 'block';
                                         fileCheckedSubmision = false;
                                         return false;
