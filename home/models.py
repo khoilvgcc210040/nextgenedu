@@ -131,9 +131,10 @@ class SubsectionFile(models.Model):
             public_id=f"subsection_files/{original_filename}",
             resource_type="auto",
             overwrite=True,
+            secure=True
         )
         
-        self.file = uploaded_file['url']
+        self.file = uploaded_file['secure_url']
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -191,9 +192,10 @@ class SubmissionFile(models.Model):
             public_id=f"submission_files/{original_filename}",
             resource_type="auto",
             overwrite=True,
+            secure=True
         )
 
-        self.file = uploaded_file['url']
+        self.file = uploaded_file['secure_url']
         super().save(*args, **kwargs)
 
     def __str__(self):

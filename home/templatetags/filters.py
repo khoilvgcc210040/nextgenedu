@@ -1,7 +1,7 @@
 import os
 from django import template
 import datetime
-from urllib.parse import unquote, urlparse
+from urllib.parse import unquote, urlparse, urlunparse
 
 register = template.Library()
 
@@ -21,6 +21,16 @@ def basename(file_url):
         return unquote(file_name)
     except Exception:
         return "Unknown File"
+    
+@register.filter(name='url_https')
+def url_https(url):
+    if not url:
+        return ''
+    parsed_url = urlparse(url)
+    if parsed_url.scheme == 'http':
+        secure_url = urlunparse(('https',) + parsed_url[1:])
+        return secure_url
+    return url
 
 @register.filter
 def get_item(dictionary, key):
