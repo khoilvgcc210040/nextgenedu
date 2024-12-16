@@ -1,6 +1,7 @@
 import os
 from django import template
 import datetime
+from urllib.parse import unquote, urlparse
 
 register = template.Library()
 
@@ -11,6 +12,15 @@ def filter_range(start, end):
 @register.filter
 def filename(value):
     return os.path.basename(value)
+
+@register.filter(name='basename')
+def basename(file_url):
+    try:
+        path = urlparse(file_url).path
+        file_name = os.path.basename(path)
+        return unquote(file_name)
+    except Exception:
+        return "Unknown File"
 
 @register.filter
 def get_item(dictionary, key):

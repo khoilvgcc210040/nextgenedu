@@ -1969,22 +1969,36 @@
             <p>There are {{ section.files.count }} documents on {{ section.title }}</p>
             
             {% for file in section.files.all %}
-            <div class="d-flex justify-content-between align-items-center pt-3 pb-3" style="padding-right: 400px;">
-                <div class="doc-icon mr-3">
-                    <a href="{{ file.file.url }}" download>
-                        <img src="{% static 'google-docs.png' %}" alt="Document Icon">
-                    </a>
+                <div class="d-flex justify-content-between align-items-center pt-3 pb-3" style="padding-right: 400px;">
+                    <div class="doc-icon mr-3">
+                        <a href="{{ file.file.url }}" download>
+                            <img src="{% static 'google-docs.png' %}" alt="Document Icon">
+                        </a>
+                    </div>
+
+                    <!-- Hiển thị tên file giải mã từ URL -->
+                    <div class="file-name-container" style="flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500;">
+                        <p class="m-0">
+                            {{ file.file.url|basename }}
+                        </p>
+                    </div>
+
+                    <button class="btn-doc" style="outline: none; margin-left: 15px;" 
+                            onclick="openPDFModal('{{ file.file.url }}', '{{ file.file.url|basename }}')">
+                        Open
+                    </button>
+                    <span style="margin-left: 10px;">|</span>
+                    <button class="btn-doc" style="outline: none; margin-left: 10px;">
+                        <a href="{{ file.file.url }}" download 
+                        style="text-decoration: none; color: white;" 
+                        onmouseover="this.style.color='white'" 
+                        onmouseout="this.style.color='white'">
+                            Download
+                        </a>
+                    </button>
                 </div>
-                <div class="file-name-container" style="flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500;">
-                    <p class="m-0">{{ file.file.name|filename }}</p>
-                </div>
-                <button class="btn-doc" style="outline: none; margin-left: 15px;" onclick="openPDFModal('{{ file.file.url }}', '{{ file.file.name|filename }}')">Open</button>
-                <span style="margin-left: 10px;">|</span>
-                <button class="btn-doc" style="outline: none; margin-left: 10px;">
-                    <a href="{{ file.file.url }}" download style="text-decoration: none; color: white;" onmouseover="this.style.color='white'" onmouseout="this.style.color='white'">Download</a>
-                </button>
-            </div>              
             {% endfor %}
+
             <div class="edit-files d-flex justify-content-end">
                 {% if user.id == classroom.teacher.id %}
                 <a href="#" class="edit-icon">
@@ -2040,21 +2054,33 @@
             <h1 style="font-weight: 700;" class="text-truncate">Documents</h1>                     
             <p>There are {{ subsection.files.count }} documents on {{ subsection.title }}</p>
             {% for file in subsection.files.all %}
-            <div class="d-flex justify-content-between align-items-center pt-3 pb-3" style="padding-right: 400px;">
-                <div class="doc-icon mr-3">
-                    <a href="{{ file.file.url }}" download>
-                        <img src="{% static 'google-docs.png' %}" alt="Document Icon">
-                    </a>
+                <div class="d-flex justify-content-between align-items-center pt-3 pb-3" style="padding-right: 400px;">
+                    <div class="doc-icon mr-3">
+                        <a href="{{ file.file.url }}" download>
+                            <img src="{% static 'google-docs.png' %}" alt="Document Icon">
+                        </a>
+                    </div>
+
+                    <div class="file-name-container" style="flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500;">
+                        <p class="m-0">{{ file.file.url|basename }}</p>
+                    </div>
+
+                    <button class="btn-doc" style="outline: none; margin-left: 15px;" 
+                            onclick="openPDFModal('{{ file.file.url }}', '{{ file.file.url|basename }}')">
+                        Open
+                    </button>
+
+                    <span style="margin-left: 10px;">|</span>
+
+                    <button class="btn-doc" style="outline: none; margin-left: 10px;">
+                        <a href="{{ file.file.url }}" download 
+                        style="text-decoration: none; color: white;" 
+                        onmouseover="this.style.color='white'" 
+                        onmouseout="this.style.color='white'">
+                            Download
+                        </a>
+                    </button>
                 </div>
-                <div class="file-name-container" style="flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500;">
-                    <p class="m-0">{{ file.file.name|filename }}</p>
-                </div>
-                <button class="btn-doc" style="outline: none; margin-left: 15px;" onclick="openPDFModal('{{ file.file.url }}', '{{ file.file.name|filename }}')">Open</button>
-                <span style="margin-left: 10px;">|</span>
-                <button class="btn-doc" style="outline: none; margin-left: 10px;">
-                    <a href="{{ file.file.url }}" download style="text-decoration: none; color: white;" onmouseover="this.style.color='white'" onmouseout="this.style.color='white'">Download</a>
-                </button>
-            </div>     
             {% endfor %}
             <div class="edit-files d-flex justify-content-end">
                 {% if user.id == classroom.teacher.id %}
@@ -2106,13 +2132,16 @@
                     {% for file in submission.files.all %}
                         <div class="d-flex align-items-center pt-2 pb-2">
                             <div class="doc-icon mr-3">
-                                <a href="{{ file.file.url }}" download data-file-id="{{ file.id }}" onclick="openPDFModal('{{ file.file.url }}', '{{ file.file.name|filename }}'); return false;">
-                                    <img src="{% static 'google-docs.png' %}" alt="{{ file.file.name|filename }}">
+                                <a href="{{ file.file.url }}" download data-file-id="{{ file.id }}" 
+                                onclick="openPDFModal('{{ file.file.url }}', '{{ file.file.url|basename }}'); return false;">
+                                    <img src="{% static 'google-docs.png' %}" alt="{{ file.file.url|basename }}">
                                 </a>
                             </div>
+                            
                             <div class="file-name-container" style="flex: 1;">
-                                <p class="m-0" style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;  font-weight: 500;" title="{{ file.file.name|filename }}">
-                                    {{ file.file.name|filename }}
+                                <p class="m-0" style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500;" 
+                                title="{{ file.file.url|basename }}">
+                                    {{ file.file.url|basename }}
                                 </p>
                             </div>
                         </div>
@@ -2405,13 +2434,13 @@
                     {% for file in submission.files.all %}
                         <div class="d-flex align-items-center pt-2 pb-2">
                             <div class="doc-icon mr-3">
-                                <a href="{{ file.file.url }}" download data-file-id="{{ file.id }}" onclick="openPDFModal('{{ file.file.url }}', '{{ file.file.name|filename }}'); return false;">
-                                    <img src="{% static 'google-docs.png' %}" alt="{{ file.file.name|filename }}">
+                                <a href="{{ file.file.url }}" download data-file-id="{{ file.id }}" onclick="openPDFModal('{{ file.file.url }}', '{{ file.file.url|basename }}'); return false;">
+                                    <img src="{% static 'google-docs.png' %}" alt="{{ file.file.url|basename }}">
                                 </a>
                             </div>
                             <div class="file-name-container" style="flex: 1;">
-                                <p class="m-0" style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500;" title="{{ file.file.name|filename }}">
-                                    {{ file.file.name|filename }}
+                                <p class="m-0" style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500;" title="{{ file.file.url|basename }}">
+                                    {{ file.file.url|basename }}
                                 </p>
                             </div>
                         </div>

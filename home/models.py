@@ -5,6 +5,9 @@ from django.utils import timezone
 import random
 import string
 from cloudinary.models import CloudinaryField
+from urllib.parse import unquote
+from cloudinary.uploader import upload
+import os
 
 class Subjects(models.Model):
     GRADE_CHOICES = [
@@ -109,14 +112,37 @@ class Section(models.Model):
 
     def __str__(self):
         return f'{self.title} - {self.classroom.name}'
-    
+
+
 class SubsectionFile(models.Model):
     subsection = models.ForeignKey(Section, on_delete=models.CASCADE, related_name='files')
     file = CloudinaryField('file', null=True, blank=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
+    def save(self, *args, **kwargs):
+        if isinstance(self.file, str) or self.file is None:
+            super().save(*args, **kwargs)
+            return
+        
+        original_filename, file_extension = os.path.splitext(self.file.name)
+        
+        uploaded_file = upload(
+            self.file,
+            public_id=f"subsection_files/{original_filename}",
+            resource_type="auto",
+            overwrite=True,
+        )
+        
+        self.file = uploaded_file['url']
+        super().save(*args, **kwargs)
+
     def __str__(self):
-        return f"File for {self.subsection.title} - {self.file.name}"
+        try:
+            file_url = self.file.url  
+            file_name = unquote(file_url.split('/')[-1])
+            return f"File for {self.subsection.title} - {file_name}"
+        except AttributeError:
+            return f"File for {self.subsection.title} - Unknown"
 
     
 class Submission(models.Model):
@@ -154,8 +180,29 @@ class SubmissionFile(models.Model):
     file = CloudinaryField('file', null=True, blank=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
+    def save(self, *args, **kwargs):
+        if isinstance(self.file, str) or self.file is None:
+            super().save(*args, **kwargs)
+            return
+        
+        original_filename, file_extension = os.path.splitext(self.file.name)
+        uploaded_file = upload(
+            self.file,
+            public_id=f"submission_files/{original_filename}",
+            resource_type="auto",
+            overwrite=True,
+        )
+
+        self.file = uploaded_file['url']
+        super().save(*args, **kwargs)
+
     def __str__(self):
-        return f"File for {self.submission.title} - {self.file.name}"
+        try:
+            file_url = self.file.url  
+            file_name = unquote(file_url.split('/')[-1]) 
+            return f"File for {self.submission.title} - {file_name}"
+        except AttributeError:
+            return f"File for {self.submission.title} - Unknown"
 
     
 class StudentFile(models.Model):
