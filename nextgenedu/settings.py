@@ -15,6 +15,8 @@ from pathlib import Path
 from dotenv import load_dotenv
 from decouple import config
 import dj_database_url
+import cloudinary
+import cloudinary_storage
 
 
 load_dotenv()
@@ -51,7 +53,13 @@ CSRF_TRUSTED_ORIGINS = [
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 
-CLOUDINARY_URL = os.getenv('CLOUDINARY_URL')
+CLOUDINARY_URL = os.environ.get('CLOUDINARY_URL')
+
+cloudinary.config(
+    cloud_name=os.environ.get('CLOUDINARY_CLOUD_NAME'),
+    api_key=os.environ.get('CLOUDINARY_API_KEY'),
+    api_secret=os.environ.get('CLOUDINARY_API_SECRET'),
+)
 
 
 
