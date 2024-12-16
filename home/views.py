@@ -831,6 +831,9 @@ def delete_classroom(request, classroom_id):
             return JsonResponse({'status': 'error', 'message': str(e)})
     return redirect('home')
 
+
+from django.db.models import Sum, Count, F, Max, ExpressionWrapper, DurationField, IntegerField
+from django.db.models.functions import Coalesce
 @login_required
 @csrf_exempt
 def classroom_detail(request, id):
@@ -844,31 +847,50 @@ def classroom_detail(request, id):
     participants = classroom.participants.all()
 
     # Lấy tất cả kết quả kiểm tra của lớp học
-    quiz_results = QuizResult.objects.filter(
+    quiz_results_aggregated = QuizResult.objects.filter(
         submission__section__classroom=classroom,
         submission__submission_type='question_test'
-    ).select_related('student')
+    ).values(
+        'student__id',
+        'student__username'
+    ).annotate(
+        total_score=Sum('score'),
+        num_tests=Count('id'),
+        total_time_seconds=Coalesce(
+            Sum(
+                ExpressionWrapper(
+                    F('time_taken'), 
+                    output_field=DurationField()
+                )
+            ), 
+            timezone.timedelta(seconds=0)
+        ),
+        latest_submission=Max('date_submitted')
+    )
 
     scores_data = []
-    for result in quiz_results:
-        participant_exists = Participant.objects.filter(classroom=classroom, user=result.student).exists()
-
-        duration = result.submission.duration
-        time_taken = result.time_taken
-        time_spent = duration - time_taken if duration and time_taken else None
+    for result in quiz_results_aggregated:
+        participant_exists = Participant.objects.filter(classroom=classroom, user_id=result['student__id']).exists()
         
         scores_data.append({
-            'user': result.student,
-            'total_score': result.score,
-            'num_tests': 1,  # Mỗi kết quả là một bài kiểm tra
-            'total_time': str(result.time_taken),
-            'time_spent': str(time_spent) if time_spent else "N/A", 
-            'total_time_seconds': result.time_taken.total_seconds() if result.time_taken else 0,
-            'is_out': not participant_exists  # Kiểm tra nếu người dùng đã bị loại
+            'user_id': result['student__id'],
+            'user': result['student__username'],
+            'total_score': result['total_score'] or 0,
+            'num_tests': result['num_tests'],
+            'total_time_seconds': result['total_time_seconds'].total_seconds() if result['total_time_seconds'] else 0,
+            'latest_submission': result['latest_submission'],
+            'time_spent': str(result['total_time_seconds']) if result['total_time_seconds'] else "N/A",
+            'is_out': not participant_exists
         })
 
-    # Sắp xếp dữ liệu theo điểm và thời gian, nhưng không xếp hạng nếu is_out là True
-    scores_data.sort(key=lambda x: (x['is_out'], -x['total_score'], -x['total_time_seconds']))
+    # Sắp xếp danh sách theo tiêu chí
+    scores_data.sort(key=lambda x: (
+        x['is_out'],                        # Loại trừ người không còn trong lớp học
+        -x['total_score'],                  # Tổng điểm cao nhất xếp trước
+        x['num_tests'],                     # Làm ít bài test hơn sẽ xếp trên
+        -x['total_time_seconds'],           # Nhiều thời gian còn lại hơn xếp trước
+        x['latest_submission']              # Nộp sớm hơn sẽ xếp trước
+    ))
 
     submissions = Submission.objects.filter(section__classroom=classroom)
 
@@ -1799,6 +1821,7 @@ def adminPage(request):
     subsection_files = SubsectionFile.objects.all()
     submission_files = SubmissionFile.objects.all()
     users = CustomUser.objects.all()
+    post_forums = ForumPost.objects.all()
 
 
     #statistical analysis 1
@@ -1897,6 +1920,7 @@ def adminPage(request):
     context = {
         'statistical_data': statistical_data,
         'accounts': accounts,
+        'post_forums': post_forums,
         'subjects': subjects,
         'subsection_files': subsection_files,
         'submission_files': submission_files,
@@ -1958,6 +1982,63 @@ def get_chart_data(request):
         chart_data.append([entry['day'].strftime('%Y-%m-%d'), entry['login_count']])
 
     return JsonResponse({'chart_data': chart_data})
+
+@csrf_exempt
+def add_subject(request):
+    if request.method == 'POST':
+        name = request.POST['name']
+        grade = request.POST['grade']
+        description = request.POST.get('description', '')
+        bg_color = request.POST.get('bg_color', '#ffffff')
+
+        subject = Subjects.objects.create(name=name, grade=grade, description=description, bg_color=bg_color)
+        return JsonResponse({'success': True, 'id': subject.id, 'name': subject.name, 'grade': subject.grade})
+
+@csrf_exempt
+def edit_subject(request, id):
+    subject = get_object_or_404(Subjects, id=id)
+    if request.method == 'POST':
+        subject.name = request.POST['name']
+        subject.grade = request.POST['grade']
+        subject.description = request.POST.get('description', '')
+        subject.bg_color = request.POST.get('bg_color', subject.bg_color)
+        subject.save()
+        return JsonResponse({'success': True})
+
+@csrf_exempt
+def delete_subject(request, id):
+    subject = get_object_or_404(Subjects, id=id)
+    if request.method == 'POST':
+        subject.delete()
+        return JsonResponse({'success': True})
+    
+def delete_subsection_file(request, subsection_file_id):
+    if request.method == "POST":
+        try:
+            file = SubsectionFile.objects.get(pk=subsection_file_id)
+            file.delete()
+            return JsonResponse({'success': True, 'message': 'Subsection file deleted successfully!'})
+        except SubsectionFile.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Subsection file not found!'})
+    return JsonResponse({'success': False, 'error': 'Invalid request!'})
+
+def delete_submission_file(request, submission_file_id):
+    if request.method == "POST":
+        try:
+            file = SubmissionFile.objects.get(pk=submission_file_id)
+            file.delete()
+            return JsonResponse({'success': True, 'message': 'Submission file deleted successfully!'})
+        except SubmissionFile.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Submission file not found!'})
+    return JsonResponse({'success': False, 'error': 'Invalid request!'})
+
+@csrf_exempt
+def delete_post_forum(request, post_forum_id):
+    if request.method == 'POST':
+        post_forum = get_object_or_404(ForumPost, id=post_forum_id)
+        post_forum.delete()
+        return JsonResponse({'success': True})
+    return JsonResponse({'success': False, 'error': 'Invalid request!'})
 
 @csrf_exempt
 def create_account_admin(request):
@@ -2049,9 +2130,10 @@ def update_account(request):
         if new_username != account.username and CustomUser.objects.filter(username=new_username).exists():
             errors['usernameUpdate'] = 'Username is already in use.'
 
-        if new_email == account.email and new_username == account.username:
+        if new_email == account.email and new_username == account.username and role == account.role:
             errors['emailUpdate'] = 'No changes made.'
             errors['usernameUpdate'] = 'No changes made.'
+            errors['roleUpdate'] = 'No changes made.'
     
         if errors:
             return JsonResponse({'status': 'error', 'errors': errors})

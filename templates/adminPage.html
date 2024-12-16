@@ -217,6 +217,9 @@
                 <a id="submissionfile-link" class="nav-link" href="#">Submission File</a>
             </li>
             <li class="nav-item">
+                <a id="postforum-link" class="nav-link" href="#">Post Forum</a>
+            </li>
+            <li class="nav-item">
                 <a id="create-notification-link" class="nav-link" href="#">Create Notification</a>
             </li>            
         </ul>
@@ -671,6 +674,7 @@
                         <th scope="col">ID</th>
                         <th scope="col">Name</th>
                         <th scope="col">Grade</th>
+                        <th scope="col">Description</th>
                         <th scope="col">Action</th>
                     </tr>
                 </thead>
@@ -680,16 +684,134 @@
                         <td>{{ subject.id }}</td>
                         <td>{{ subject.name }}</td>
                         <td>{{ subject.grade }}</td>
+                        <td>{{ subject.description|truncatechars:50 }}</td>
                         <td>
-                            <button class="btn btn-edit" data-bs-toggle="modal" data-bs-target="#editSubjectModal" data-bs-id="{{ subject.id }}">Edit</button>
-                            <button class="btn btn-delete" onclick="deleteSubject({{ subject.id }})">Delete</button>
+                            <button class="btn btn-edit" style="border: 2px solid #000;" 
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#editSubjectModal" 
+                                    data-bs-id="{{ subject.id }}" 
+                                    data-bs-name="{{ subject.name }}" 
+                                    data-bs-grade="{{ subject.grade }}" 
+                                    data-bs-description="{{ subject.description }}" 
+                                    data-bs-bg-color="{{ subject.bg_color }}">
+                                Edit
+                            </button>
+
+                            <button class="btn btn-delete" style="border: 2px solid #000;" 
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#deleteSubjectModal" 
+                                    data-subject-id="{{ subject.id }}">
+                                Delete
+                            </button>
                         </td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addSubjectModal">Add New</button>
+            <button class="btn" style="background-color: var(--accent-color); color: #fff;" data-bs-toggle="modal" data-bs-target="#addSubjectModal">Add New</button>
         </div>
+
+        <!-- Delete Confirmation Modal -->
+        <div class="modal fade" id="deleteSubjectModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color: var(--accent-color); color: #fff;">
+                        <h5 class="modal-title" style="font-size: 18px; font-weight: 500; color: #fff;">Confirm Delete</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" style="background-color: #fff; border: none;"></button>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure you want to delete this subject?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" id="confirmDeleteSubject" class="btn btn-danger">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+            
+                // Add Subject
+                document.getElementById('addSubjectForm').addEventListener('submit', function (e) {
+                    e.preventDefault();
+                    const formData = new FormData(this);
+                    fetch("{% url 'add_subject' %}", {
+                        method: 'POST',
+                        body: formData,
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            location.reload(); // Reload after successful addition
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+                });
+            
+                // Edit Subject
+                const editModal = document.getElementById('editSubjectModal');
+                editModal.addEventListener('show.bs.modal', function (event) {
+                    const button = event.relatedTarget; // Button that triggered the modal
+                    const id = button.getAttribute('data-bs-id'); 
+                    const name = button.getAttribute('data-bs-name'); 
+                    const grade = button.getAttribute('data-bs-grade'); 
+                    const description = button.getAttribute('data-bs-description'); 
+                    const bgColor = button.getAttribute('data-bs-bg-color'); 
+                    
+                    // Populate the form fields
+                    document.getElementById('editSubjectForm').action = `/edit_subject/${id}/`;
+                    document.getElementById('edit-name').value = name;
+                    document.getElementById('edit-grade').value = grade;
+                    document.getElementById('edit-description').value = description || ''; 
+                    document.getElementById('edit-bg-color').value = bgColor || '#ffffff'; 
+                });
+            
+                // Handle form submission for Edit
+                document.getElementById('editSubjectForm').addEventListener('submit', function (e) {
+                    e.preventDefault();
+                    const formData = new FormData(this);
+                    const actionUrl = this.action;
+            
+                    fetch(actionUrl, {
+                        method: 'POST',
+                        body: formData,
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            location.reload(); // Reload after successful edit
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+                });
+            
+                // Delete Subject with Confirmation Modal
+                let deleteSubjectId = null;
+                const deleteModal = document.getElementById('deleteSubjectModal');
+                deleteModal.addEventListener('show.bs.modal', function (event) {
+                    const button = event.relatedTarget;
+                    deleteSubjectId = button.getAttribute('data-subject-id');
+                });
+            
+                document.getElementById('confirmDeleteSubject').addEventListener('click', function () {
+                    fetch(`/delete_subject/${deleteSubjectId}/`, {
+                        method: 'POST',
+                        headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            location.reload(); // Reload after successful deletion
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+                });
+            });
+        </script>
+                    
+
 
         <div id="subsectionfile-content" class="content-section pb-lg-5">
             <div class="text-center">
@@ -711,17 +833,107 @@
                     <tr>
                         <td>{{ file.id }}</td>
                         <td>{{ file.subsection.title }}</td>
-                        <td>{{ file.file.name }}</td>
                         <td>
-                                <button class="btn btn-edit" data-bs-toggle="modal" data-bs-target="#editSubsectionFileModal" data-bs-id="{{ file.id }}">Edit</button>
-                                <button class="btn btn-delete" onclick="deleteSubsectionFile({{ file.id }})">Delete</button>
+                            <a href="{{ file.file.url }}" download="{{ file.file.name }}">
+                                {{ file.file.name }}
+                            </a>
                         </td>
+                        <td>
+                            <button class="btn btn-warning" style="border: 2px solid #000;" 
+                                    data-bs-toggle="modal" 
+                                    data-subsectionfile-id="{{ file.id }}" 
+                                    data-owner-id="{{ file.subsection.classroom.teacher.id }}" 
+                                    data-file-name="{{ file.file.name }}">
+                                Warning
+                            </button>
+                            <button class="btn btn-delete" style="border: 2px solid #000;" data-bs-toggle="modal" data-bs-target="#deleteSubsectionFileModal" 
+                                    data-subsectionfile-id="{{ file.id }}">
+                                Delete
+                            </button>
+                        </td>                        
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addSubsectionFileModal">Add New</button>
         </div>
+
+        <!-- Delete Confirmation Modal -->
+        <div class="modal fade" id="deleteSubsectionFileModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color: var(--accent-color); color: #fff;">
+                        <h5 class="modal-title" style="font-size: 18px; font-weight: 500; color: #fff;">Confirm Delete</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" style="background-color: #fff; border: none;"></button>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure you want to delete this subsection file?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" id="confirmDeleteSubsectionFile" class="btn btn-danger">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const warningButtons = document.querySelectorAll('.btn-warning');
+            
+                warningButtons.forEach(button => {
+                    button.addEventListener('click', function () {
+                        // Lấy dữ liệu từ các thuộc tính data-
+                        const ownerId = this.getAttribute('data-owner-id');
+                        const fileName = this.getAttribute('data-file-name');
+            
+                        // Tự động điền vào form Create Notification
+                        document.getElementById('notificationUser').value = ownerId;
+                        document.getElementById('notificationTitle').value = "Invalid document warning";
+                        document.getElementById('notificationText').value = `Please review the document "${fileName}" and edit`;
+            
+                        // Chuyển đến tab Create Notification
+                        document.querySelectorAll('.content-section').forEach(section => section.classList.remove('active'));
+                        document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+            
+                        document.getElementById('create-notification-content').classList.add('active');
+                        document.getElementById('create-notification-link').classList.add('active');
+                    });
+                });
+            });            
+        </script>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                let deleteSubsectionFileId = null;
+            
+                // Khi mở modal xóa
+                const deleteModal = document.getElementById('deleteSubsectionFileModal');
+                deleteModal.addEventListener('show.bs.modal', function (event) {
+                    const button = event.relatedTarget; // Button that triggered the modal
+                    deleteSubsectionFileId = button.getAttribute('data-subsectionfile-id');
+                });
+            
+                // Khi xác nhận xóa
+                document.getElementById('confirmDeleteSubsectionFile').addEventListener('click', function () {
+                    fetch(`/delete_subsection_file/${deleteSubsectionFileId}/`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        },
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            location.reload(); // Tải lại trang sau khi xóa thành công
+                        } else {
+                            console.error('Delete failed:', data.error);
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+                });
+            });
+        </script>
+
 
         <div id="submissionfile-content" class="content-section pb-lg-5">
             <div class="text-center">
@@ -743,17 +955,173 @@
                     <tr>
                         <td>{{ file.id }}</td>
                         <td>{{ file.submission.title }}</td>
-                        <td>{{ file.file.name }}</td>
                         <td>
-                            <button class="btn btn-edit" data-bs-toggle="modal" data-bs-target="#editSubmissionFileModal" data-bs-id="{{ file.id }}">Edit</button>
-                            <button class="btn btn-delete" onclick="deleteSubmissionFile({{ file.id }})">Delete</button>
+                            <a href="{{ file.file.url }}" download="{{ file.file.name }}">
+                                {{ file.file.name }}
+                            </a>
+                        </td>
+                        <td>
+                            <button class="btn btn-warning" style="border: 2px solid #000;" 
+                                    data-bs-toggle="modal" 
+                                    data-submissionfile-id="{{ file.id }}" 
+                                    data-owner-id="{{ file.submission.section.classroom.teacher.id }}" 
+                                    data-file-name="{{ file.file.name }}">
+                                Warning
+                            </button>
+                            <button class="btn btn-delete" style="border: 2px solid #000;" data-bs-toggle="modal" data-bs-target="#deleteSubmissionFileModal" 
+                                    data-submissionfile-id="{{ file.id }}">
+                                Delete
+                            </button>
                         </td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addSubmissionFileModal">Add New</button>
         </div>
+
+        <div class="modal fade" id="deleteSubmissionFileModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color: var(--accent-color); color: #fff;">
+                        <h5 class="modal-title" style="font-size: 18px; font-weight: 500; color: #fff;">Confirm Delete</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" style="background-color: #fff; border: none;"></button>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure you want to delete this submission file?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" id="confirmDeleteSubmissionFile" class="btn btn-danger">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                let deleteSubmissionFileId = null;
+            
+                // Khi mở modal xóa
+                const deleteModal = document.getElementById('deleteSubmissionFileModal');
+                deleteModal.addEventListener('show.bs.modal', function (event) {
+                    const button = event.relatedTarget; // Button that triggered the modal
+                    deleteSubmissionFileId = button.getAttribute('data-submissionfile-id');
+                });
+            
+                // Khi xác nhận xóa
+                document.getElementById('confirmDeleteSubmissionFile').addEventListener('click', function () {
+                    fetch(`/delete_submission_file/${deleteSubmissionFileId}/`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        },
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            location.reload(); // Tải lại trang sau khi xóa thành công
+                        } else {
+                            console.error('Delete failed:', data.error);
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+                });
+            });
+        </script>
+
+
+        <div id="postforum-content" class="content-section pb-lg-5">
+            <div class="text-center">
+                <h1 style="font-weight: 700;" class="text-truncate ">POST FORUM</h1>
+            </div>
+            <hr style="border: 1px solid #000;">
+            <!-- Table for Post Forum -->
+            <table class="table text-center">
+                <thead>
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Title</th>
+                        <th scope="col">Content</th>
+                        <th scope="col">Classroom</th>
+                        <th scope="col">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for post in post_forums %}
+                    <tr>
+                        <td>{{ post.id }}</td>
+                        <td>{{ post.title|truncatechars:50 }}</td>
+                        <td>{{ post.content|truncatechars:50 }}</td>
+                        <td>{{ post.classroom.name }}</td>
+                        <td>
+                            <button class="btn" style="border: 2px solid #000; background-color: var(--accent-color); color: #fff;" onclick="window.location.href='{% url 'forum_detail' post.id %}'">
+                                View Details
+                            </button>
+                            <button class="btn btn-delete" style="border: 2px solid #000;" data-bs-toggle="modal" data-bs-target="#deletePostForumModal" 
+                                    data-postforum-id="{{ post.id }}">
+                                Delete
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="modal fade" id="deletePostForumModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color: var(--accent-color); color: #fff;">
+                        <h5 class="modal-title" style="font-size: 18px; font-weight: 500; color: #fff;">Confirm Delete</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" style="background-color: #fff; border: none;"></button>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure you want to delete this post forum?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" id="confirmDeletePostForum" class="btn btn-danger">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                let deleteSubmissionFileId = null;
+            
+                // Khi mở modal xóa
+                const deleteModal = document.getElementById('deletePostForumModal');
+                deleteModal.addEventListener('show.bs.modal', function (event) {
+                    const button = event.relatedTarget; // Button that triggered the modal
+                    deletePostForumId = button.getAttribute('data-postforum-id');
+                });
+            
+                // Khi xác nhận xóa
+                document.getElementById('confirmDeletePostForum').addEventListener('click', function () {
+                    fetch(`/delete_post_forum/${deletePostForumId}/`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        },
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            location.reload(); // Tải lại trang sau khi xóa thành công
+                        } else {
+                            console.error('Delete failed:', data.error);
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+                });
+                
+            });
+        </script>
+
+        
+
+        
 
         <div id="create-notification-content" class="content-section pb-lg-5">
             <div class="text-center">
@@ -941,26 +1309,50 @@
     </div>
 
     <!-- Modal for editing Subject -->
-    <div class="modal fade" id="editSubjectModal" tabindex="-1" aria-labelledby="editSubjectModalLabel" aria-hidden="true"> 
+    <!-- Edit Subject Modal -->
+    <div class="modal fade" id="editSubjectModal" tabindex="-1" aria-labelledby="editSubjectModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content" style="border: 5px solid var(--accent-color); border-radius: 15px;">
+                <!-- Modal Header -->
                 <div class="modal-header d-flex justify-content-between align-items-center" style="background-color: var(--accent-color);">
                     <h5 class="modal-title" id="editSubjectModalLabel" style="color: #fff;">Edit Subject</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" style="background-color: #fff; border: none;" aria-label="Close"></button>
-                </div>  
-                <form id="editSubjectForm" method="POST" action="#">
-                    {% csrf_token %}    
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="background-color: #fff;"></button>
+                </div>
+                <!-- Modal Form -->
+                <form id="editSubjectForm" method="POST">
+                    {% csrf_token %}
                     <div class="modal-body" style="border-bottom: 2px solid var(--accent-color);">
-                        <!-- Form fields here -->
+                        <div class="form-group mb-3">
+                            <label for="edit-name">Name</label>
+                            <input type="text" class="form-control" id="edit-name" name="name" placeholder="Enter subject name" required>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="edit-grade">Grade</label>
+                            <select class="form-control" id="edit-grade" name="grade">
+                                <option value="10">10</option>
+                                <option value="11">11</option>
+                                <option value="12">12</option>
+                            </select>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="edit-description">Description</label>
+                            <textarea class="form-control" id="edit-description" name="description" placeholder="Enter subject description"></textarea>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="edit-bg-color">Background Color</label>
+                            <input type="color" class="form-control" id="edit-bg-color" name="bg_color" value="#ffffff">
+                        </div>
                     </div>
+                    <!-- Modal Footer -->
                     <div class="modal-footer d-flex justify-content-end">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn" style="background-color: var(--accent-color); color: #fff;">Save changes</button> 
+                        <button type="submit" class="btn" style="background-color: var(--accent-color); color: #fff;">Save changes</button>
                     </div>
                 </form>
-            </div>  
+            </div>
         </div>
     </div>
+
 
     <!-- Modal for adding new Statistical Analysis -->
     <div class="modal fade" id="addStatisticalModal" tabindex="-1" aria-labelledby="addStatisticalModalLabel" aria-hidden="true">
@@ -1116,18 +1508,41 @@
 
 
     <!-- Modal for adding new Subject -->
+    <!-- Add Subject Modal -->
     <div class="modal fade" id="addSubjectModal" tabindex="-1" aria-labelledby="addSubjectModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content" style="border: 5px solid var(--accent-color); border-radius: 15px;">
+                <!-- Modal Header -->
                 <div class="modal-header d-flex justify-content-between align-items-center" style="background-color: var(--accent-color);">
                     <h5 class="modal-title" id="addSubjectModalLabel" style="color: #fff;">Add New Subject</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" style="background-color: #fff; border: none;" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="background-color: #fff;"></button>
                 </div>
-                <form id="addSubjectForm" method="POST" action="#">
+                <!-- Modal Form -->
+                <form id="addSubjectForm" method="POST">
                     {% csrf_token %}
                     <div class="modal-body" style="border-bottom: 2px solid var(--accent-color);">
-                        <!-- Form fields here -->
+                        <div class="form-group mb-3">
+                            <label for="add-name">Name</label>
+                            <input type="text" class="form-control" id="add-name" name="name" placeholder="Enter subject name" required>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="add-grade">Grade</label>
+                            <select class="form-control" id="add-grade" name="grade">
+                                <option value="10">10</option>
+                                <option value="11">11</option>
+                                <option value="12">12</option>
+                            </select>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="add-description">Description</label>
+                            <textarea class="form-control" id="add-description" name="description" placeholder="Enter subject description"></textarea>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="add-bg-color">Background Color</label>
+                            <input type="color" class="form-control" id="add-bg-color" name="bg_color" value="#ffffff">
+                        </div>
                     </div>
+                    <!-- Modal Footer -->
                     <div class="modal-footer d-flex justify-content-end">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                         <button type="submit" class="btn" style="background-color: var(--accent-color); color: #fff;">Save changes</button>
@@ -1136,6 +1551,7 @@
             </div>
         </div>
     </div>
+
 
     <!-- Modal for adding new SubsectionFile -->
     <div class="modal fade" id="addSubsectionFileModal" tabindex="-1" aria-labelledby="addSubsectionFileModalLabel" aria-hidden="true">
@@ -1533,84 +1949,6 @@
                     document.getElementById(contentId).classList.add('active');
                 });
             });
-
-            // Modal for editing Statistical Analysis
-            const editStatisticalModal = document.getElementById('editStatisticalModal');
-            editStatisticalModal.addEventListener('show.bs.modal', function (event) {
-                const button = event.relatedTarget;
-                const id = button.getAttribute('data-bs-id');
-                const modalBody = editStatisticalModal.querySelector('.modal-body');
-                modalBody.innerHTML = '<p>Loading...</p>';
-                
-            });
-
-
-
-            // Modal for editing SubsectionFile
-            const editSubsectionFileModal = document.getElementById('editSubsectionFileModal');
-            editSubsectionFileModal.addEventListener('show.bs.modal', function (event) {
-                const button = event.relatedTarget;
-                const id = button.getAttribute('data-bs-id');
-                const modalBody = editSubsectionFileModal.querySelector('.modal-body');
-                modalBody.innerHTML = '<p>Loading...</p>';
-            }); 
-
-            // Modal for editing SubmissionFile
-            const editSubmissionFileModal = document.getElementById('editSubmissionFileModal');
-            editSubmissionFileModal.addEventListener('show.bs.modal', function (event) {
-                const button = event.relatedTarget;
-                const id = button.getAttribute('data-bs-id');
-                const modalBody = editSubmissionFileModal.querySelector('.modal-body');
-                modalBody.innerHTML = '<p>Loading...</p>';
-            }); 
-            
-            // Modal for editing Subject
-            const editSubjectModal = document.getElementById('editSubjectModal');
-            editSubjectModal.addEventListener('show.bs.modal', function (event) {
-                const button = event.relatedTarget;
-                const id = button.getAttribute('data-bs-id');
-                const modalBody = editSubjectModal.querySelector('.modal-body');
-                modalBody.innerHTML = '<p>Loading...</p>';
-            });  
-
-            // Modal for adding new Statistical Analysis
-            const addStatisticalModal = document.getElementById('addStatisticalModal');
-            addStatisticalModal.addEventListener('show.bs.modal', function (event) {
-                const modalBody = addStatisticalModal.querySelector('.modal-body');
-                modalBody.innerHTML = '<p>Loading...</p>';
-            }); 
-
-            // Modal for adding new Account
-            const addAccountModal = document.getElementById('addAccountModal');
-            addAccountModal.addEventListener('show.bs.modal', function (event) {
-                // No additional content loading required since the modal form is already in place.
-            });
-
-            // Modal for adding new Subject
-            const addSubjectModal = document.getElementById('addSubjectModal');
-            addSubjectModal.addEventListener('show.bs.modal', function (event) {
-                const modalBody = addSubjectModal.querySelector('.modal-body');
-                modalBody.innerHTML = '<p>Loading...</p>';
-            });  
-
-            // Modal for adding new SubsectionFile
-            const addSubsectionFileModal = document.getElementById('addSubsectionFileModal');
-            addSubsectionFileModal.addEventListener('show.bs.modal', function (event) {
-                const modalBody = addSubsectionFileModal.querySelector('.modal-body');
-                modalBody.innerHTML = '<p>Loading...</p>';
-            });  
-
-            // Modal for adding new SubmissionFile
-            const addSubmissionFileModal = document.getElementById('addSubmissionFileModal');
-            addSubmissionFileModal.addEventListener('show.bs.modal', function (event) {
-                const modalBody = addSubmissionFileModal.querySelector('.modal-body');
-                modalBody.innerHTML = '<p>Loading...</p>';
-            }); 
-
-            
-            
-            
-            
         });
     </script>
 
