@@ -125,8 +125,6 @@ class SubsectionFile(models.Model):
             return
         
         original_filename, file_extension = os.path.splitext(self.file.name)
-        if len(original_filename) > 50:
-            original_filename = original_filename[:50]
         
         uploaded_file = upload(
             self.file,
@@ -189,8 +187,6 @@ class SubmissionFile(models.Model):
             return
         
         original_filename, file_extension = os.path.splitext(self.file.name)
-        if len(original_filename) > 50:
-            original_filename = original_filename[:50]
         uploaded_file = upload(
             self.file,
             public_id=f"submission_files/{original_filename}",
@@ -225,8 +221,6 @@ class StudentFile(models.Model):
             return
         
         original_filename, file_extension = os.path.splitext(self.file.name)
-        if len(original_filename) > 50:
-            original_filename = original_filename[:50]
         uploaded_file = upload(
             self.file,
             public_id=f"student_files/{original_filename}",
@@ -310,8 +304,6 @@ class ChatMessage(models.Model):
         # Xử lý khi upload file
         if self.file and not isinstance(self.file, str):
             original_filename, file_extension = os.path.splitext(self.file.name)
-            if len(original_filename) > 50:
-                original_filename = original_filename[:50]
             uploaded_file = upload(
                 self.file,
                 public_id=f"chat_files/{original_filename}",
@@ -324,8 +316,6 @@ class ChatMessage(models.Model):
         # Xử lý khi upload image
         if self.image and not isinstance(self.image, str):
             original_filename, file_extension = os.path.splitext(self.image.name)
-            if len(original_filename) > 50:
-                original_filename = original_filename[:50]
             uploaded_image = upload(
                 self.image,
                 public_id=f"chat_images/{original_filename}",
