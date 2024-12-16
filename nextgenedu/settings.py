@@ -145,20 +145,20 @@ WSGI_APPLICATION = 'nextgenedu.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-DATABASES = {
-    'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'))
-}
-
 # DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'nextgenedu',  # Tên cơ sở dữ liệu
-#         'USER': 'postgres',   # Tên người dùng PostgreSQL
-#         'PASSWORD': 'vinhkhoi1310',  # Mật khẩu
-#         'HOST': 'localhost',  # Máy chủ (hoặc IP)
-#         'PORT': '5432',  # Cổng PostgreSQL mặc định
-#     }
+#     'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'))
 # }
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'nextgenedu',  # Tên cơ sở dữ liệu
+        'USER': 'postgres',   # Tên người dùng PostgreSQL
+        'PASSWORD': 'vinhkhoi1310',  # Mật khẩu
+        'HOST': 'localhost',  # Máy chủ (hoặc IP)
+        'PORT': '5432',  # Cổng PostgreSQL mặc định
+    }
+}
 
 
 
