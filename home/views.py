@@ -945,11 +945,7 @@ def save_message(request):
         classroom_id = request.POST.get('classroom_id')
         message = request.POST.get('message')
         image = request.FILES.get('image')
-        if len(image) > 100:  # Giới hạn độ dài của message
-            image = image[:100]
         file = request.FILES.get('file')
-        if len(file) > 100:
-            file = file[:100]
         classroom = Classroom.objects.get(id=classroom_id)
 
         # Tạo ChatMessage
