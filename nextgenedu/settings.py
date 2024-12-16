@@ -48,6 +48,12 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 
 
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+
+CLOUDINARY_URL = os.getenv('CLOUDINARY_URL')
+
+
 
 
 # Quick-start development settings - unsuitable for production
@@ -82,6 +88,8 @@ INSTALLED_APPS = [
     'home.apps.HomeConfig',
     'channels',
     'rest_framework',
+    'cloudinary',
+    'cloudinary_storage',
 ]
 
 ASGI_APPLICATION = 'nextgenedu.asgi.application'  # Replace with your project name
