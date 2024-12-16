@@ -15,8 +15,6 @@ from pathlib import Path
 from dotenv import load_dotenv
 from decouple import config
 import dj_database_url
-import cloudinary
-import cloudinary_storage
 
 
 load_dotenv()
@@ -48,18 +46,6 @@ CSRF_TRUSTED_ORIGINS = [
     'https://nextgenedu-ac7fffbe3b2c.herokuapp.com',
     'http://localhost:8000',
 ]
-
-
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-
-
-CLOUDINARY_URL = os.environ.get('CLOUDINARY_URL')
-
-cloudinary.config(
-    cloud_name=os.environ.get('CLOUDINARY_CLOUD_NAME'),
-    api_key=os.environ.get('CLOUDINARY_API_KEY'),
-    api_secret=os.environ.get('CLOUDINARY_API_SECRET'),
-)
 
 
 
@@ -96,8 +82,6 @@ INSTALLED_APPS = [
     'home.apps.HomeConfig',
     'channels',
     'rest_framework',
-    'cloudinary',
-    'cloudinary_storage',
 ]
 
 ASGI_APPLICATION = 'nextgenedu.asgi.application'  # Replace with your project name
@@ -153,20 +137,20 @@ WSGI_APPLICATION = 'nextgenedu.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-DATABASES = {
-    'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'))
-}
-
 # DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'nextgenedu',  # Tên cơ sở dữ liệu
-#         'USER': 'postgres',   # Tên người dùng PostgreSQL
-#         'PASSWORD': 'vinhkhoi1310',  # Mật khẩu
-#         'HOST': 'localhost',  # Máy chủ (hoặc IP)
-#         'PORT': '5432',  # Cổng PostgreSQL mặc định
-#     }
+#     'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'))
 # }
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'nextgenedu',  # Tên cơ sở dữ liệu
+        'USER': 'postgres',   # Tên người dùng PostgreSQL
+        'PASSWORD': 'vinhkhoi1310',  # Mật khẩu
+        'HOST': 'localhost',  # Máy chủ (hoặc IP)
+        'PORT': '5432',  # Cổng PostgreSQL mặc định
+    }
+}
 
 
 
@@ -220,8 +204,8 @@ STATICFILES_DIRS = [
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 
-# MEDIA_URL = '/media/'
-# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 TIME_ZONE = 'Asia/Ho_Chi_Minh'
 USE_TZ = True
