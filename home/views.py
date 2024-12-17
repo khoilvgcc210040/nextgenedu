@@ -987,6 +987,7 @@ from urllib.parse import unquote
 @csrf_exempt
 def update_section(request, classroom_id, section_id):
     section = get_object_or_404(Section, id=section_id, classroom_id=classroom_id)
+    classroom = section.classroom
 
     if request.method == 'POST':
         if 'description' in request.POST:
@@ -995,22 +996,33 @@ def update_section(request, classroom_id, section_id):
 
         if 'uploadFile' in request.FILES:
             file = request.FILES['uploadFile']
-            SubsectionFile.objects.create(subsection=section, file=file)
+            uploaded_file = SubsectionFile.objects.create(subsection=section, file=file)
+
+            student_emails = classroom.participants.filter(role='student', user__notify_sections=True).values_list('user__email', flat=True)
+            if student_emails:
+                subject = f"New File Uploaded in {classroom.name} - {section.title}"
+                message = f"""
+Dear Students,
+
+A new file "{uploaded_file}" has been uploaded to the section "{section.title}" in your classroom "{classroom.name}".
+
+Please check it out at your earliest convenience.
+
+Regards,
+{classroom.teacher.username}
+"""
+                send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, list(student_emails), fail_silently=False)
 
         if 'deleteFile' in request.POST and request.POST['deleteFile']:
             file_to_delete = request.POST['deleteFile'].strip()
             subsection_files = SubsectionFile.objects.filter(subsection=section)
 
             for file in subsection_files:
-                # Kiểm tra nếu file là CloudinaryResource
                 if isinstance(file.file, CloudinaryResource):
-                    # Giải mã tên file từ public_id
                     uploaded_file_name = unquote(file.file.public_id.split('/')[-1])
                 else:
-                    # Dùng file.url nếu không phải CloudinaryResource
                     uploaded_file_name = unquote(file.file.url.split('/')[-1])
 
-                # Kiểm tra khớp tên file
                 if uploaded_file_name == file_to_delete:
                     file.delete()
 
@@ -1020,6 +1032,7 @@ def update_section(request, classroom_id, section_id):
 @csrf_exempt
 def update_submission(request, classroom_id, submission_id):
     submission = get_object_or_404(Submission, id=submission_id)
+    classroom = submission.section.classroom
 
     if request.method == 'POST':
         if 'description' in request.POST:
@@ -1029,6 +1042,21 @@ def update_submission(request, classroom_id, submission_id):
         if 'uploadFile' in request.FILES:
             file = request.FILES['uploadFile']
             SubmissionFile.objects.create(submission=submission, file=file)
+
+            student_emails = classroom.participants.filter(role='student', user__notify_sections=True).values_list('user__email', flat=True)
+            if student_emails:
+                subject = f"New File Uploaded in {classroom.name} - {submission.title}"
+                message = f"""
+Dear Students,
+
+A new file "{file}" has been uploaded to the submission "{submission.title}" in your classroom "{classroom.name}".
+
+Please check it out at your earliest convenience.
+
+Regards,
+{classroom.teacher.username}
+"""
+                send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, list(student_emails), fail_silently=False)
 
         if 'deleteFileSubmission' in request.POST and request.POST['deleteFileSubmission']:
             file_id = request.POST['deleteFileSubmission']

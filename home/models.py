@@ -7,6 +7,7 @@ import string
 from cloudinary.models import CloudinaryField
 from urllib.parse import unquote
 from cloudinary.uploader import upload
+from cloudinary.uploader import destroy
 import os
 
 class Subjects(models.Model):
@@ -119,6 +120,13 @@ class SubsectionFile(models.Model):
     file = CloudinaryField('file', null=True, blank=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
+    def generate_unique_filename(self, original_filename):
+        filename = original_filename.replace(" ", "_")
+        while SubsectionFile.objects.filter(file__icontains=f"{filename}").exists():
+            random_suffix = ''.join(random.choices(string.ascii_letters + string.digits, k=4))
+            filename = f"{original_filename}_{random_suffix}"
+        return filename
+
     def save(self, *args, **kwargs):
         if isinstance(self.file, str) or self.file is None:
             super().save(*args, **kwargs)
@@ -127,9 +135,11 @@ class SubsectionFile(models.Model):
         original_filename, file_extension = os.path.splitext(self.file.name)
         if len(original_filename) > 10:
             original_filename = original_filename[:10]
+        
+        unique_filename = self.generate_unique_filename(original_filename)
         uploaded_file = upload(
             self.file,
-            public_id=f"subsection_files/{original_filename}",
+            public_id=f"subsection_files/{unique_filename}",
             resource_type="auto",
             overwrite=True,
             secure=True
@@ -137,6 +147,12 @@ class SubsectionFile(models.Model):
         
         self.file = uploaded_file['secure_url']
         super().save(*args, **kwargs)
+    
+    def delete(self, *args, **kwargs):
+        if self.file:
+            public_id = self.file.url.split('/')[-1].split('.')[0] 
+            destroy(f"subsection_files/{public_id}")
+        super().delete(*args, **kwargs)
 
     def __str__(self):
         try:
@@ -182,6 +198,14 @@ class SubmissionFile(models.Model):
     file = CloudinaryField('file', null=True, blank=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
+    def generate_unique_filename(self, original_filename):
+        filename = original_filename.replace(" ", "_")
+
+        while SubmissionFile.objects.filter(file__icontains=f"{filename}").exists():
+            random_suffix = ''.join(random.choices(string.ascii_letters + string.digits, k=4))
+            filename = f"{original_filename}_{random_suffix}"
+        return filename
+
     def save(self, *args, **kwargs):
         if isinstance(self.file, str) or self.file is None:
             super().save(*args, **kwargs)
@@ -190,9 +214,11 @@ class SubmissionFile(models.Model):
         original_filename, file_extension = os.path.splitext(self.file.name)
         if len(original_filename) > 10:
             original_filename = original_filename[:10]
+        
+        unique_filename = self.generate_unique_filename(original_filename)
         uploaded_file = upload(
             self.file,
-            public_id=f"submission_files/{original_filename}",
+            public_id=f"submission_files/{unique_filename}",
             resource_type="auto",
             overwrite=True,
             secure=True
@@ -200,6 +226,12 @@ class SubmissionFile(models.Model):
 
         self.file = uploaded_file['secure_url']
         super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        if self.file:
+            public_id = self.file.url.split('/')[-1].split('.')[0] 
+            destroy(f"submission_files/{public_id}")
+        super().delete(*args, **kwargs)
 
     def __str__(self):
         try:
@@ -218,6 +250,14 @@ class StudentFile(models.Model):
     feedback = models.TextField(null=True, blank=True)
     date_submitted = models.DateTimeField(auto_now_add=True)
 
+    def generate_unique_filename(self, original_filename):
+        filename = original_filename.replace(" ", "_")
+
+        while StudentFile.objects.filter(file__icontains=f"{filename}").exists():
+            random_suffix = ''.join(random.choices(string.ascii_letters + string.digits, k=4))
+            filename = f"{original_filename}_{random_suffix}"
+        return filename
+
     def save(self, *args, **kwargs):
         if isinstance(self.file, str) or self.file is None:
             super().save(*args, **kwargs)
@@ -226,9 +266,11 @@ class StudentFile(models.Model):
         original_filename, file_extension = os.path.splitext(self.file.name)
         if len(original_filename) > 10:
             original_filename = original_filename[:10]
+        
+        unique_filename = self.generate_unique_filename(original_filename)
         uploaded_file = upload(
             self.file,
-            public_id=f"student_files/{original_filename}",
+            public_id=f"student_files/{unique_filename}",
             resource_type="auto",
             overwrite=True,
             secure=True
@@ -236,6 +278,12 @@ class StudentFile(models.Model):
 
         self.file = uploaded_file['secure_url']
         super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        if self.file:
+            public_id = self.file.url.split('/')[-1].split('.')[0] 
+            destroy(f"student_files/{public_id}")
+        super().delete(*args, **kwargs)
 
     def __str__(self):
         try:
@@ -305,15 +353,31 @@ class ChatMessage(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
     file_size = models.FloatField(null=True, blank=True)
 
+    def generate_unique_filename(self, original_filename):
+        filename = original_filename.replace(" ", "_")
+
+        if self.file:   
+            while ChatMessage.objects.filter(file__icontains=f"{filename}").exists():
+                random_suffix = ''.join(random.choices(string.ascii_letters + string.digits, k=4))
+                filename = f"{original_filename}_{random_suffix}"
+
+        if self.image:
+            while ChatMessage.objects.filter(image__icontains=f"{filename}").exists():
+                random_suffix = ''.join(random.choices(string.ascii_letters + string.digits, k=4))
+                filename = f"{original_filename}_{random_suffix}"
+        return filename
+
     def save(self, *args, **kwargs):
         # Xử lý khi upload file
         if self.file and not isinstance(self.file, str):
             original_filename, file_extension = os.path.splitext(self.file.name)
             if len(original_filename) > 20:
                 original_filename = original_filename[:20]
+
+            unique_filename = self.generate_unique_filename(original_filename)
             uploaded_file = upload(
                 self.file,
-                public_id=f"chat_files/{original_filename}",
+                public_id=f"chat_files/{unique_filename}",
                 resource_type="auto",
                 overwrite=True,
                 secure=True
@@ -325,9 +389,11 @@ class ChatMessage(models.Model):
             original_filename, file_extension = os.path.splitext(self.image.name)
             if len(original_filename) > 20:
                 original_filename = original_filename[:20]
+
+            unique_filename = self.generate_unique_filename(original_filename)
             uploaded_image = upload(
                 self.image,
-                public_id=f"chat_images/{original_filename}",
+                public_id=f"chat_images/{unique_filename}",
                 resource_type="auto",
                 overwrite=True,
                 secure=True
@@ -335,7 +401,17 @@ class ChatMessage(models.Model):
             self.image = uploaded_image['secure_url']
 
         super().save(*args, **kwargs)
-    
+
+    def delete(self, *args, **kwargs):
+        if self.file:
+            public_id = self.file.url.split('/')[-1].split('.')[0] 
+            destroy(f"chat_files/{public_id}")
+
+        if self.image:
+            public_id = self.image.url.split('/')[-1].split('.')[0] 
+            destroy(f"chat_images/{public_id}")
+        super().delete(*args, **kwargs)
+
     def __str__(self):
         try:
             if self.file:
