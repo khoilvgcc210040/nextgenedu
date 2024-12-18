@@ -374,10 +374,10 @@ class ChatMessage(models.Model):
             if len(original_filename) > 20:
                 original_filename = original_filename[:20]
 
-            unique_filename = self.generate_unique_filename(original_filename)
+            
             uploaded_file = upload(
                 self.file,
-                public_id=f"chat_files/{unique_filename}",
+                public_id=f"chat_files/{original_filename}",
                 resource_type="auto",
                 overwrite=True,
                 secure=True
@@ -389,11 +389,9 @@ class ChatMessage(models.Model):
             original_filename, file_extension = os.path.splitext(self.image.name)
             if len(original_filename) > 20:
                 original_filename = original_filename[:20]
-
-            unique_filename = self.generate_unique_filename(original_filename)
             uploaded_image = upload(
                 self.image,
-                public_id=f"chat_images/{unique_filename}",
+                public_id=f"chat_images/{original_filename}",
                 resource_type="auto",
                 overwrite=True,
                 secure=True

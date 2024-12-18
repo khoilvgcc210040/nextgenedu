@@ -993,20 +993,20 @@ def update_section(request, classroom_id, section_id):
             file = request.FILES['uploadFile']
             uploaded_file = SubsectionFile.objects.create(subsection=section, file=file)
 
-#             student_emails = classroom.participants.filter(role='student', user__notify_sections=True).values_list('user__email', flat=True)
-#             if student_emails:
-#                 subject = f"New File Uploaded in {classroom.name} - {section.title}"
-#                 message = f"""
-# Dear Students,
+            student_emails = classroom.participants.filter(role='student', user__notify_sections=True).values_list('user__email', flat=True)
+            if student_emails:
+                subject = f"New File Uploaded in {classroom.name} - {section.title}"
+                message = f"""
+Dear Students,
 
-# A new file "{uploaded_file}" has been uploaded to the section "{section.title}" in your classroom "{classroom.name}".
+A new file "{uploaded_file}" has been uploaded to the section "{section.title}" in your classroom "{classroom.name}".
 
-# Please check it out at your earliest convenience.
+Please check it out at your earliest convenience.
 
-# Regards,
-# {classroom.teacher.username}
-# """
-#                 send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, list(student_emails), fail_silently=False)
+Regards,
+{classroom.teacher.username}
+"""
+                send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, list(student_emails), fail_silently=False)
 
         if 'deleteFile' in request.POST and request.POST['deleteFile']:
             file_to_delete = request.POST['deleteFile'].strip()
@@ -1038,24 +1038,38 @@ def update_submission(request, classroom_id, submission_id):
             file = request.FILES['uploadFile']
             uploaded_file = SubmissionFile.objects.create(submission=submission, file=file)
 
-#             student_emails = classroom.participants.filter(role='student', user__notify_sections=True).values_list('user__email', flat=True)
-#             if student_emails:
-#                 subject = f"New File Uploaded in {classroom.name} - {submission.title}"
-#                 message = f"""
-# Dear Students,
+            student_emails = classroom.participants.filter(role='student', user__notify_sections=True).values_list('user__email', flat=True)
+            if student_emails:
+                subject = f"New File Uploaded in {classroom.name} - {submission.title}"
+                message = f"""
+Dear Students,
 
-# A new file "{uploaded_file}" has been uploaded to the submission "{submission.title}" in your classroom "{classroom.name}".
+A new file "{uploaded_file}" has been uploaded to the submission "{submission.title}" in your classroom "{classroom.name}".
 
-# Please check it out at your earliest convenience.
+Please check it out at your earliest convenience.
 
-# Regards,
-# {classroom.teacher.username}
-# """
-#                 send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, list(student_emails), fail_silently=False)
+Regards,
+{classroom.teacher.username}
+"""
+                send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, list(student_emails), fail_silently=False)
 
         if 'deleteFileSubmission' in request.POST and request.POST['deleteFileSubmission']:
-            file_id = request.POST['deleteFileSubmission']
-            SubmissionFile.objects.filter(id=file_id).delete()
+            file_id = request.POST['deleteFileSubmission'].strip()
+            file_to_delete = SubmissionFile.objects.get(id=file_id, submission=submission)
+
+            submission_files = SubmissionFile.objects.filter(submission=submission)
+
+            file_to_delete_name = unquote(file_to_delete.file.url.split('/')[-1].split('.')[0])
+
+            for file in submission_files:
+                if isinstance(file.file, CloudinaryResource):
+                    uploaded_file_name = unquote(file.file.public_id.split('/')[-1])
+                else:
+                    uploaded_file_name = unquote(file.file.url.split('/')[-1].split('.')[0])
+
+                if uploaded_file_name == file_to_delete_name:
+                    file.delete()
+
 
         return redirect('classroom_detail', id=classroom_id)
     
