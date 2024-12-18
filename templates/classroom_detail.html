@@ -882,12 +882,14 @@
 
                         <div class="mb-3">
                             <label for="uploadFile" class="form-label" style="color: var(--accent-color); font-weight: 700;">Upload New File</label>
-
-                            <input type="file" id="uploadFile" name="uploadFile" class="form-control" style="border: 2px solid var(--accent-color);">
+                            <div id="fileErrorSubmission" class="text-danger" style="display: none; margin-bottom: 8px;"></div>
+                            <div id="uploadFileErrorSubmission" class="text-danger" style="display: none; margin-bottom: 8px;">Please select a file to upload.</div>
+                            <input type="file" id="uploadFileSubmission" name="uploadFile" class="form-control" style="border: 2px solid var(--accent-color);" onchange="checkFileSubmission()">
                         </div>
 
                         <div class="mb-3">
                             <label for="deleteFileSubmission" class="form-label" style="color: var(--accent-color); font-weight: 700;">Delete Existing File</label>
+                            <div id="deleteFileErrorSubmission" class="text-danger" style="display: none; margin-bottom: 8px;">Please select a file to delete.</div>
                             <select id="deleteFileSubmission" name="deleteFileSubmission" class="form-select" style="border: 2px solid var(--accent-color);">
                                 <option value="">Select a file to delete</option>
                                 <!-- File options will be populated dynamically -->
@@ -903,15 +905,31 @@
                     </form>
 
                     <script>
+                        let fileCheckedSubmission = false;
+
+                        function checkFileSubmission() {
+                            fileCheckedSubmission = true;
+                            return true;
+                        }
+
                         function validateFormSubmission() {
                             var description = document.getElementById('submissionDescription').value;
                             var descriptionError = document.getElementById('descriptionErrorSubmission');
+                            const deleteFile = document.getElementById('deleteFileSubmission').value;
 
                             if (description.trim() === "") {
                                 descriptionError.style.display = 'block';
                                 return false;
                             } else {
                                 descriptionError.style.display = 'none';
+
+                                if (!fileCheckedSubmission && deleteFile === "") {
+                                    var uploadFileError = document.getElementById('uploadFileErrorSubmission');
+                                    var deleteFileError = document.getElementById('deleteFileErrorSubmission');
+                                    uploadFileError.style.display = 'block';
+                                    deleteFileError.style.display = 'block';
+                                    return false;
+                                }
 
                                 // Save the current state before submitting
                                 const rightSidebarExpanded = document.querySelector('.right-sidebar').classList.contains('expanded');
@@ -926,6 +944,9 @@
 
                         document.getElementById('editSubmissionModal').addEventListener('hidden.bs.modal', function () {
                             document.getElementById('descriptionErrorSubmission').style.display = 'none';
+                            document.getElementById('uploadFileErrorSubmission').style.display = 'none';
+                            document.getElementById('deleteFileErrorSubmission').style.display = 'none';
+                            document.getElementById('fileErrorSubmission').style.display = 'none';
                         });
                     </script>
                 </div>
@@ -1077,15 +1098,16 @@
                         <!-- Upload file -->
                         <div class="mb-3">
                             <label for="uploadFile" class="form-label" style="color: var(--accent-color); font-weight: 700;">Upload File</label>
+                            <div id="fileErrorSection" class="text-danger" style="display: none; margin-bottom: 8px;"></div>
                             <div id="uploadFileError" class="text-danger" style="display: none; margin-bottom: 8px;">Please select a file to upload.</div>
-                            <input type="file" id="uploadFile" name="uploadFile" class="form-control" style="border: 2px solid var(--accent-color);" onchange="checkFile()">
+                            <input type="file" id="uploadFileSection" name="uploadFile" class="form-control" style="border: 2px solid var(--accent-color);" onchange="checkFile()">
                         </div>
 
                         <!-- Delete file -->
                         <div class="mb-3">
                             <label for="deleteFile" class="form-label" style="color: var(--accent-color); font-weight: 700;">Delete File</label>
                             <div id="deleteFileError" class="text-danger" style="display: none; margin-bottom: 8px;">Please select a file to delete.</div>
-                            <select id="deleteFile" name="deleteFile" class="form-select" style="border: 2px solid var(--accent-color);">
+                            <select id="deleteFileSection" name="deleteFile" class="form-select" style="border: 2px solid var(--accent-color);">
                                 <option value="">Select a file to delete</option>
                             </select>
 
@@ -1105,7 +1127,7 @@
                         }
 
                         function validateFormFiles() {
-                            const deleteFile = document.getElementById('deleteFile').value;
+                            const deleteFile = document.getElementById('deleteFileSection').value;
 
                             if (!fileChecked && deleteFile === "") {
                                 var uploadFileError = document.getElementById('uploadFileError');
@@ -1128,6 +1150,7 @@
                         document.getElementById('editFilesModal').addEventListener('hidden.bs.modal', function () {
                             document.getElementById('uploadFileError').style.display = 'none';
                             document.getElementById('deleteFileError').style.display = 'none';
+                            document.getElementById('fileErrorSection').style.display = 'none';
                         });
                     </script>
                 </div>
@@ -1608,6 +1631,7 @@
                     <button id="removeFileButton" style="background: red; color: white; border: none; border-radius: 50%;">&times;</button>
                 </div>
                 {% if classroom.allow_chat %}
+                    <div id="chatFooterError" class="text-danger text-center" style="display: none; margin: 8px 0 0 0;"></div>
                     <div class="chat-footer d-flex justify-content-between align-items-center">
                         {% csrf_token %}
                         <button id="imageButton" class="btn btn-secondary"><i class="fa-solid fa-image"></i></button>
@@ -1628,6 +1652,51 @@
                         <p style="font-weight: 500; font-size: 18px; color: #808080; margin: 0;">Chat is disabled for this classroom.</p>
                     </div>
                 {% endif %}
+
+                <script>
+                    const MAX_FILE_SIZE_MB = 10;
+
+                    function checkFileSize(file) {
+                        return file && file.size / (1024 * 1024) <= MAX_FILE_SIZE_MB;
+                    }
+
+                    function displayChatError(message) {
+                        const chatFooterError = document.getElementById('chatFooterError');
+                        chatFooterError.textContent = message;
+                        chatFooterError.style.display = 'block';
+                        setTimeout(() => {
+                            chatFooterError.style.display = 'none';
+                        }, 5000);
+                    }
+
+                    imageInput.addEventListener('change', function() {
+                        const file = imageInput.files[0];
+                        if (file && !checkFileSize(file)) {
+                            displayChatError("Image size exceeds 10MB.");
+                            imageInput.value = '';
+                            return;
+                        }
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            imagePreview.src = e.target.result;
+                            imagePreviewContainer.style.display = 'block';
+                        };
+                        reader.readAsDataURL(file);
+                        updateSendButtonColor();
+                    });
+
+                    fileInput.addEventListener('change', function() {
+                        const file = fileInput.files[0];
+                        if (file && !checkFileSize(file)) {
+                            displayChatError("File size exceeds 10MB.");
+                            fileInput.value = '';
+                            return;
+                        }
+                        document.getElementById('filePreview').textContent = file.name;
+                        document.getElementById('filePreviewContainer').style.display = 'block';
+                        updateSendButtonColor();
+                    });
+                </script>
 
                 <script>
                     function updateSendButtonColor() {
@@ -1977,7 +2046,8 @@
             </div>
             <hr style="border: 1px solid #000;">
             <h1 style="font-weight: 700;" class="text-truncate">Documents</h1>
-            <p>There are {{ section.files.count }} documents on {{ section.title }}</p>
+            <p>There are {{ section.files.count }}/5 documents on {{ section.title }}</p>
+            
             
             {% for file in section.files.all %}
                 <div class="d-flex justify-content-between align-items-center pt-3 pb-3" style="padding-right: 400px;">
@@ -2009,6 +2079,44 @@
                     </button>
                 </div>
             {% endfor %}
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    document.getElementById('editFilesForm').addEventListener('submit', function(event) {
+                        const fileInput = document.getElementById('uploadFileSection');
+                        const fileError = document.getElementById('fileErrorSection');
+                        const fileCount = {{ section.files.count }};
+                        const maxFiles = 5;
+                        const maxFileSizeMB = 10;
+                    
+                        // Kiểm tra số lượng file đã upload
+                        if (fileCount >= maxFiles && fileInput.files.length > 0) {
+                            fileError.textContent = "You cannot upload more than 5 files.";
+                            fileError.style.display = "block";
+                            document.getElementById('uploadFileError').style.display = 'none';
+                            document.getElementById('deleteFileError').style.display = 'none';
+                            event.preventDefault();
+                            return false;
+                        }
+                    
+                        // Kiểm tra kích thước file upload
+                        if (fileInput.files.length > 0) {
+                            const fileSizeMB = fileInput.files[0].size / (1024 * 1024); // chuyển đổi byte sang MB
+                            if (fileSizeMB > maxFileSizeMB) {
+                                fileError.textContent = `File size exceeds the maximum limit of ${maxFileSizeMB}MB.`;
+                                fileError.style.display = "block";
+                                document.getElementById('uploadFileError').style.display = 'none';
+                                document.getElementById('deleteFileError').style.display = 'none';
+                                event.preventDefault();
+                                return false;
+                            }
+                        }
+                    
+                        fileError.style.display = "none";
+                        return true;
+                    });
+                });
+            </script>
 
             <div class="edit-files d-flex justify-content-end">
                 {% if user.id == classroom.teacher.id %}
@@ -2063,7 +2171,7 @@
             </div>
             <hr style="border: 1px solid #000;">
             <h1 style="font-weight: 700;" class="text-truncate">Documents</h1>                     
-            <p>There are {{ subsection.files.count }} documents on {{ subsection.title }}</p>
+            <p>There are {{ subsection.files.count }}/5 documents on {{ subsection.title }}</p>
             {% for file in subsection.files.all %}
                 <div class="d-flex justify-content-between align-items-center pt-3 pb-3" style="padding-right: 400px;">
                     <div class="doc-icon mr-3">
@@ -2138,6 +2246,10 @@
                         <strong>Description:</strong> <span class="actual-description">{{ submission.description }}</span>
                     </p>
                 </div>
+
+                {% if submission.files.count > 0 %}
+                    <p><strong>Documents ({{ submission.files.count }}/3):</strong> </p>
+                {% endif %}
                 
                 <div class="d-flex align-items-center pt-2 pb-2">
                     {% for file in submission.files.all %}
@@ -2157,7 +2269,45 @@
                             </div>
                         </div>
                     {% endfor %}
-                </div>                
+                </div>
+                
+                <script>
+                    document.addEventListener('DOMContentLoaded', function () {
+                        document.getElementById('editSubmissionForm').addEventListener('submit', function(event) {
+                            const fileInput = document.getElementById('uploadFileSubmission');
+                            const fileError = document.getElementById('fileErrorSubmission');
+                            const fileCount = {{ submission.files.count }};
+                            const maxFiles = 3;
+                            const maxFileSizeMB = 10;
+                    
+                            // Kiểm tra số lượng file đã upload
+                            if (fileCount >= maxFiles && fileInput.files.length > 0) {
+                                fileError.textContent = "You cannot upload more than 3 files.";
+                                fileError.style.display = "block";
+                                document.getElementById('uploadFileErrorSubmission').style.display = 'none';
+                                document.getElementById('deleteFileErrorSubmission').style.display = 'none';
+                                event.preventDefault();
+                                return false;
+                            }
+                    
+                            // Kiểm tra kích thước file upload
+                            if (fileInput.files.length > 0) {
+                                const fileSizeMB = fileInput.files[0].size / (1024 * 1024); // chuyển đổi byte sang MB
+                                if (fileSizeMB > maxFileSizeMB) {
+                                    fileError.textContent = `File size exceeds the maximum limit of ${maxFileSizeMB}MB.`;
+                                    fileError.style.display = "block";
+                                    document.getElementById('uploadFileErrorSubmission').style.display = 'none';
+                                    document.getElementById('deleteFileErrorSubmission').style.display = 'none';
+                                    event.preventDefault();
+                                    return false;
+                                }
+                            }
+                    
+                            fileError.style.display = "none";
+                            return true;
+                        });
+                    });
+                </script>
                 
                 <div class="edit-submission d-flex justify-content-end">
                     {% if user.id == classroom.teacher.id %}
@@ -2440,6 +2590,10 @@
                         <strong>Description:</strong> <span class="actual-description">{{ submission.description }}</span>
                     </p>
                 </div>
+
+                {% if submission.files.count > 0 %}
+                    <p><strong>Documents ({{ submission.files.count }}/3):</strong> </p>
+                {% endif %}
                 
                 <div class="d-flex align-items-center pt-2 pb-2">
                     {% for file in submission.files.all %}
@@ -2939,7 +3093,7 @@
                     const form = document.getElementById('editFilesForm');
                     form.action = form.action.replace('/0/', `/${sectionId}/`);
 
-                    const deleteFileSelect = document.getElementById('deleteFile');
+                    const deleteFileSelect = document.getElementById('deleteFileSection');
                     deleteFileSelect.innerHTML = '<option value="">Select a file to delete</option>';
 
                     // Thêm tùy chọn cho mỗi file

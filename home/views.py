@@ -846,7 +846,6 @@ def classroom_detail(request, id):
     is_favorite = FavoriteClassroom.objects.filter(user=request.user, classroom=classroom).exists()
     participants = classroom.participants.all()
 
-    # Lấy tất cả kết quả kiểm tra của lớp học
     quiz_results_aggregated = QuizResult.objects.filter(
         submission__section__classroom=classroom,
         submission__submission_type='question_test'
@@ -883,13 +882,12 @@ def classroom_detail(request, id):
             'is_out': not participant_exists
         })
 
-    # Sắp xếp danh sách theo tiêu chí
     scores_data.sort(key=lambda x: (
-        x['is_out'],                        # Loại trừ người không còn trong lớp học
-        -x['total_score'],                  # Tổng điểm cao nhất xếp trước
-        x['num_tests'],                     # Làm ít bài test hơn sẽ xếp trên
-        -x['total_time_seconds'],           # Nhiều thời gian còn lại hơn xếp trước
-        x['latest_submission']              # Nộp sớm hơn sẽ xếp trước
+        x['is_out'],                       
+        -x['total_score'],                 
+        x['num_tests'],                     
+        -x['total_time_seconds'],           
+        x['latest_submission']             
     ))
 
     submissions = Submission.objects.filter(section__classroom=classroom)
@@ -924,7 +922,7 @@ def classroom_detail(request, id):
         'classroom': classroom,
         'sections': sections,
         'participants': participants,
-        'scores_data': scores_data,
+        'scores_data': scores_data[:10],
         'submissions': submissions,
         'quiz_results': quiz_results,
         'student_files': student_files,
@@ -948,7 +946,6 @@ def save_message(request):
         file = request.FILES.get('file')
         classroom = Classroom.objects.get(id=classroom_id)
 
-        # Tạo ChatMessage
         chat_message = ChatMessage.objects.create(
             user=request.user,
             classroom=classroom,
@@ -958,11 +955,9 @@ def save_message(request):
             file_size=(math.ceil(file.size / 1024)) if file else 0
         )
 
-        # Xử lý URL cho image và file
         image_url = chat_message.image if isinstance(chat_message.image, str) else (chat_message.image.url if chat_message.image else None)
         file_url = chat_message.file if isinstance(chat_message.file, str) else (chat_message.file.url if chat_message.file else None)
 
-        # Trả về JSON Response
         return JsonResponse({
             'status': 'success',
             'username': request.user.username,
@@ -998,20 +993,20 @@ def update_section(request, classroom_id, section_id):
             file = request.FILES['uploadFile']
             uploaded_file = SubsectionFile.objects.create(subsection=section, file=file)
 
-            student_emails = classroom.participants.filter(role='student', user__notify_sections=True).values_list('user__email', flat=True)
-            if student_emails:
-                subject = f"New File Uploaded in {classroom.name} - {section.title}"
-                message = f"""
-Dear Students,
+#             student_emails = classroom.participants.filter(role='student', user__notify_sections=True).values_list('user__email', flat=True)
+#             if student_emails:
+#                 subject = f"New File Uploaded in {classroom.name} - {section.title}"
+#                 message = f"""
+# Dear Students,
 
-A new file "{uploaded_file}" has been uploaded to the section "{section.title}" in your classroom "{classroom.name}".
+# A new file "{uploaded_file}" has been uploaded to the section "{section.title}" in your classroom "{classroom.name}".
 
-Please check it out at your earliest convenience.
+# Please check it out at your earliest convenience.
 
-Regards,
-{classroom.teacher.username}
-"""
-                send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, list(student_emails), fail_silently=False)
+# Regards,
+# {classroom.teacher.username}
+# """
+#                 send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, list(student_emails), fail_silently=False)
 
         if 'deleteFile' in request.POST and request.POST['deleteFile']:
             file_to_delete = request.POST['deleteFile'].strip()
@@ -1041,22 +1036,22 @@ def update_submission(request, classroom_id, submission_id):
 
         if 'uploadFile' in request.FILES:
             file = request.FILES['uploadFile']
-            SubmissionFile.objects.create(submission=submission, file=file)
+            uploaded_file = SubmissionFile.objects.create(submission=submission, file=file)
 
-            student_emails = classroom.participants.filter(role='student', user__notify_sections=True).values_list('user__email', flat=True)
-            if student_emails:
-                subject = f"New File Uploaded in {classroom.name} - {submission.title}"
-                message = f"""
-Dear Students,
+#             student_emails = classroom.participants.filter(role='student', user__notify_sections=True).values_list('user__email', flat=True)
+#             if student_emails:
+#                 subject = f"New File Uploaded in {classroom.name} - {submission.title}"
+#                 message = f"""
+# Dear Students,
 
-A new file "{file}" has been uploaded to the submission "{submission.title}" in your classroom "{classroom.name}".
+# A new file "{uploaded_file}" has been uploaded to the submission "{submission.title}" in your classroom "{classroom.name}".
 
-Please check it out at your earliest convenience.
+# Please check it out at your earliest convenience.
 
-Regards,
-{classroom.teacher.username}
-"""
-                send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, list(student_emails), fail_silently=False)
+# Regards,
+# {classroom.teacher.username}
+# """
+#                 send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, list(student_emails), fail_silently=False)
 
         if 'deleteFileSubmission' in request.POST and request.POST['deleteFileSubmission']:
             file_id = request.POST['deleteFileSubmission']
@@ -2300,8 +2295,8 @@ from django.contrib.auth.decorators import login_required
 
 @login_required
 @csrf_exempt
-def achivement(request):
-    user = request.user
+def achivement(request, user_id=None):
+    user = get_object_or_404(CustomUser, id=user_id) if user_id else request.user
     context = {}
 
     if user.role == 'teacher':
@@ -2313,6 +2308,7 @@ def achivement(request):
             'classrooms_created': classrooms_created,
             'total_likes': total_likes,
             'average_rating': average_rating,
+            'user': user,
         })
 
     elif user.role == 'student':
@@ -2324,9 +2320,11 @@ def achivement(request):
             'classrooms_joined': classrooms_joined,
             'highest_score': highest_score,
             'total_correct_answers': total_correct_answers,
+            'user': user,
         })
 
     return render(request, 'achivement.html', context)
+
 
 @login_required
 @csrf_exempt
