@@ -2358,59 +2358,6 @@
                             </div>
                             <p class="m-0" style="font-weight: 500;">{{ student_file.file.url|url_https|basename }}</p> 
                         </div>
-                        <script>
-                            let fileCheckedUpdate = false;
-
-                            function checkFileSubmissionUpdate() {
-                                fileCheckedUpdate = true;
-                                var fileErrorUpdate = document.getElementById('fileErrorUpdate');
-                                fileErrorUpdate.style.display = 'none';
-                                var deleteButton = document.querySelector('form[action="{% url 'delete_file_submission' student_file.id %}"] button');
-                                deleteButton.style.marginTop = '0px';
-
-                                var fileInput = document.getElementById('fileInputUpdate');
-                                var file = fileInput.files[0];
-                                var allowedExtensions = /(\.pdf)$/i;
-
-                                if (!allowedExtensions.test(file.name)) {
-                                    fileErrorUpdate.innerText = 'Only PDF files are allowed.';
-                                    fileErrorUpdate.style.display = 'block';
-                                    fileCheckedUpdate = false;
-                                    var deleteButton = document.querySelector('form[action="{% url 'delete_file_submission' student_file.id %}"] button');
-                                    deleteButton.style.marginTop = '40px';
-                                    return false;
-                                }
-
-                                if (file.size > 10 * 1024 * 1024) {
-                                    fileErrorUpdate.innerText = 'File size exceeds the maximum limit of 10MB.';
-                                    fileErrorUpdate.style.display = 'block';
-                                    fileCheckedUpdate = false;
-                                    var deleteButton = document.querySelector('form[action="{% url 'delete_file_submission' student_file.id %}"] button');
-                                    deleteButton.style.marginTop = '40px';
-                                    return false;
-                                }
-                                return true;
-                            }
-
-                            function validateFileSubmissionUpdate() {
-                                if (!fileCheckedUpdate) {
-                                    var fileErrorUpdate = document.getElementById('fileErrorUpdate');
-                                    fileErrorUpdate.style.display = 'block';
-                                    var deleteButton = document.querySelector('form[action="{% url 'delete_file_submission' student_file.id %}"] button');
-                                    deleteButton.style.marginTop = '40px';
-                                    return false;
-                                }
-
-                                // Save the current state before submitting
-                                const rightSidebarExpanded = document.querySelector('.right-sidebar').classList.contains('expanded');
-                                const activeSectionId = document.querySelector('.content-section.active')?.id;
-                                const activeLeftSidebarId = document.querySelector('.nav-link.active')?.dataset.content;
-                                localStorage.setItem('rightSidebarExpanded', rightSidebarExpanded);
-                                localStorage.setItem('activeSectionId', activeSectionId);
-                                localStorage.setItem('activeLeftSidebarId', activeLeftSidebarId);
-                                return true;
-                            }
-                        </script>
                         <div class="d-flex justify-content-start align-items-center">
                             {% if submission.is_open %}
                                 <form action="{% url 'update_file_submission' student_file.id %}" method="post" enctype="multipart/form-data" style="margin-right: 10px;" onsubmit="return validateFileSubmissionUpdate()">
@@ -2419,6 +2366,60 @@
                                     <input type="file" name="file" accept=".pdf" id="fileInputUpdate" class="btn-doc text-white" style="outline: none; padding: 3px 6px; font-size: 12px; background-color: var(--accent-color);" onchange="checkFileSubmissionUpdate()">
                                     <button type="submit" class="btn-doc mr-3" style="outline: none; padding: 5px 10px; background-color: var(--accent-color);">Update</button> 
                                 </form>
+                                <script>
+                                    let fileCheckedUpdate = false;
+
+                                    function checkFileSubmissionUpdate() {
+                                        fileCheckedUpdate = true;
+                                        var fileErrorUpdate = document.getElementById('fileErrorUpdate');
+                                        fileErrorUpdate.style.display = 'none';
+                                        var deleteButton = document.querySelector('form[action="{% url 'delete_file_submission' student_file.id %}"] button');
+                                        deleteButton.style.marginTop = '0px';
+
+                                        var fileInput = document.getElementById('fileInputUpdate');
+                                        var file = fileInput.files[0];
+                                        var allowedExtensions = /(\.pdf)$/i;
+
+                                        if (!allowedExtensions.test(file.name)) {
+                                            fileErrorUpdate.innerText = 'Only PDF files are allowed.';
+                                            fileErrorUpdate.style.display = 'block';
+                                            fileCheckedUpdate = false;
+                                            var deleteButton = document.querySelector('form[action="{% url 'delete_file_submission' student_file.id %}"] button');
+                                            deleteButton.style.marginTop = '40px';
+                                            return false;
+                                        }
+
+                                        if (file.size > 10 * 1024 * 1024) {
+                                            fileErrorUpdate.innerText = 'File size exceeds the maximum limit of 10MB.';
+                                            fileErrorUpdate.style.display = 'block';
+                                            fileCheckedUpdate = false;
+                                            var deleteButton = document.querySelector('form[action="{% url 'delete_file_submission' student_file.id %}"] button');
+                                            deleteButton.style.marginTop = '40px';
+                                            return false;
+                                        }
+                                        return true;
+                                    }
+
+                                    function validateFileSubmissionUpdate() {
+                                        if (!fileCheckedUpdate) {
+                                            var fileErrorUpdate = document.getElementById('fileErrorUpdate');
+                                            fileErrorUpdate.style.display = 'block';
+                                            var deleteButton = document.querySelector('form[action="{% url 'delete_file_submission' student_file.id %}"] button');
+                                            deleteButton.style.marginTop = '40px';
+                                            return false;
+                                        }
+
+                                        // Save the current state before submitting
+                                        const rightSidebarExpanded = document.querySelector('.right-sidebar').classList.contains('expanded');
+                                        const activeSectionId = document.querySelector('.content-section.active')?.id;
+                                        const activeLeftSidebarId = document.querySelector('.nav-link.active')?.dataset.content;
+                                        localStorage.setItem('rightSidebarExpanded', rightSidebarExpanded);
+                                        localStorage.setItem('activeSectionId', activeSectionId);
+                                        localStorage.setItem('activeLeftSidebarId', activeLeftSidebarId);
+                                        return true;
+                                    }
+                                </script>
+                                
                                 <form action="{% url 'delete_file_submission' student_file.id %}" method="post" onsubmit="return confirmDeleteFileSubmission(event)">
                                     {% csrf_token %}
                                     <button type="submit" class="btn-doc" style="outline: none; padding: 5px 10px;">Delete</button> 
