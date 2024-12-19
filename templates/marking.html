@@ -375,7 +375,7 @@
 
                             <div class="d-flex justify-content-center">
                                 
-                                <button class="btn-marking" data-bs-toggle="modal" data-bs-target="#markingModal" onclick="getStudentFileId({{ student_file.id }}, '{{ student_file.score }}', '{{ student_file.feedback }}')" {% if not assignment.closed %} disabled {% endif %}>
+                                <button class="btn-marking" data-bs-toggle="modal" data-bs-target="#markingModal" onclick="getStudentFileId({{ student_file.id }}, '{{ student_file.score }}', '{{ student_file.feedback }}')" {% if not assignment.closed %} disabled style="background-color: #ccc; color: #fff;" {% endif %}>
                                     Marking
 
                                 </button>
